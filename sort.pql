@@ -1,0 +1,7 @@
+load("./data/data--atoms.json").as("data")
+
+.sort("$data; 1").as("sorted_desc")
+.sort("$data; 0").as("sorted_asc")
+
+.list("$sorted_desc","$sorted_asc")
+.out("./data/sort.json", "./logs/sort.txt"
