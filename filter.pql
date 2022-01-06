@@ -1,0 +1,8 @@
+load("./data/data--atoms.json").as("data")
+
+.filter("$data", "cpu='0' AND mode='user'").as("user_cpu")
+.filter("$data", "cpu='0' AND mode='steal'").as("steal_cpu")
+.filter("$data", "{cpu='0' OR cpu='1'} AND mode='iowait'").as("wait_cpu")
+
+.list("$user_cpu","$steal_cpu","$wait_cpu")
+.out("./data/filter.json", "./logs/filter.txt")
