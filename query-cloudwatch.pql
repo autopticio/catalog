@@ -1,0 +1,11 @@
+where("$cw")
+  .what(
+    "CPUUtilization; Average; InstanceId='instance_of_interest'; namespace='AWS/EC2'"
+  )
+  .when("1h")
+
+.window("15m")
+.alias("$where[0].what[0].when[0].window[0]").as("p_cpu")
+
+.list("$p_cpu")
+.out("./data/query-cloudwatch.json", "./logs/query-cloudwatch.txt")
