@@ -1,0 +1,7 @@
+load("./data/data--atoms.json").as("data")
+
+.sort("$data; 1").as("sorted")
+.head("$sorted; 30%").as("top30")
+
+.list("$top30")
+.out("./data/top30percent.json", "./logs/top30percent.txt")
