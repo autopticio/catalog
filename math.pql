@@ -11,5 +11,5 @@ load("./data/data--atoms.json").as("data")
 
 .math("($steal_num+ $wait_num)").as("cpu_waste")
 
-.list("$cpu_waste")
+.print("$cpu_waste")
 .out("./data/math.json", "./logs/math.txt")

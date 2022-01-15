@@ -7,6 +7,6 @@ load("./data/data--atoms.json").as("data")
 .average	("$cpu_merged")		.as("avg_t")
 .math 		("1-$avg_t/$p95_t")	.as("volatility_today")
 	
-.list		("$volatility_today","$p95_t","$avg_t")
+.print		("$volatility_today","$p95_t","$avg_t")
 
 .out("./data/volatility.json", "./logs/volatility.txt")

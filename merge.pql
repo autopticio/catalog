@@ -10,5 +10,5 @@ load("./data/data--atoms.json").as("data")
 .merge("$idle_cpu; min").as("idle_min")
 .merge("$user_cpu; average").as("user_avg")
 
-.list("$wait_max","$steal_sum","$user_avg","$idle_min")
+.print("$wait_max","$steal_sum","$user_avg","$idle_min")
 .out("./data/merge.json", "./logs/merge.txt")

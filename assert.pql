@@ -9,9 +9,9 @@ load("./data/data--atoms.json").as("data")
 .average("$steal_merged").as("steal_avg")
 .average("$user_merged").as("user_avg")
 
-.assert_pql("$user_avg > $steal_avg").as("health_check")
-.assert_pql("$user_avg > 0.5 ").as("cpu_check")
+.assert("$user_avg > $steal_avg").as("health_check")
+.assert("$user_avg > 0.5 ").as("cpu_check")
 
-.list("$health_check","$cpu_check","$user_avg","$steal_avg")
+.print("$health_check","$cpu_check","$user_avg","$steal_avg")
 
 .out("./data/assert.json", "./logs/assert.txt")
