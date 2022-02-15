@@ -1,4 +1,4 @@
-load("./data/data--atoms.json").as("data")
+open("./data/data--atoms.json").as("data")
 
 .filter("$data", "cpu='0' AND mode='user'").as("user_cpu")
 .filter("$data", "cpu='0' AND mode='steal'").as("steal_cpu")

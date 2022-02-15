@@ -1,4 +1,4 @@
-load("./data/data--atoms.json").as("data")
+open("./data/data--atoms.json").as("data")
 
 .average("$data")
 .min("$data")

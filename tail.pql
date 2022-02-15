@@ -1,4 +1,4 @@
-load("./data/data--atoms.json").as("data")
+open("./data/data--atoms.json").as("data")
 
 .tail("$data; 2").as("abs")
 .tail("$data; 25%").as("perc")

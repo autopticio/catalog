@@ -1,4 +1,4 @@
-load("./data/data--atoms.json").as("data")
+open("./data/data--atoms.json").as("data")
 
 .filter("$data", "{cpu='0' OR cpu='1'} AND mode='user'").as("usr_cpu")
 

@@ -1,4 +1,4 @@
-load("./data/data--atoms.json").as("data")
+open("./data/data--atoms.json").as("data")
 
 .sort("$data; 1").as("sorted")
 .head("$sorted; 30%").as("top30")

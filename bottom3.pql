@@ -1,4 +1,4 @@
-load("./data/data--atoms.json").as("data")
+open("./data/data--atoms.json").as("data")
 
 .sort("$data; 1").as("sorted")
 .tail("$sorted; 3").as("bottom3")
