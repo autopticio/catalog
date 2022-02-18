@@ -1,11 +1,11 @@
-#Docs 
+# Docs 
 
-##Getting started <follow along simple example>
+## Getting started <follow along simple example>
 	Problem and simple example
 	Autoptic Architecture
 	Sign up here for access - send to google form
 
-##Understanding PQL
+## Understanding PQL
 		PQL Program
 			<Explanation>
 			<Logical structure diagram>
@@ -19,6 +19,6 @@
 		Function Index A-Z
 			Format: purpose | params | sample
 
-##Example program catalog
+## Example program catalog
 
-##API Reference
+## API Reference
