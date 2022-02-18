@@ -1,24 +1,29 @@
 # Docs 
 
-## Getting started <follow along simple example>
-	Problem and simple example
-	Autoptic Architecture
-	Sign up here for access - send to google form
+## Getting started 
+Problem and simple example
+Autoptic Architecture
+Sign up here for access - send to google form
 
 ## Understanding PQL
-		PQL Program
-			<Explanation>
-			<Logical structure diagram>
+PQL Program
+<Explanation>
+<program structure diagram>
 				
-				sources: cloudwatch,prometheus
-				query: where,what,when,window, open, as
-				aggregation: filter, merge
-				computation: average, min, max, count, percentile,math
-				results: assert, sort,head,tail,print,out
+### Sources
+cloudwatch,prometheus
+### Query
+where,what,when,window, open, as
+### Aggregation
+filter, merge
+### Computation
+average, min, max, count, percentile,math
+### Results
+assert, sort,head,tail,print,out
 		
-		Function Index A-Z
-			Format: purpose | params | sample
+## Functions
+purpose | params | sample
 
-## Example program catalog
+## Example programs
 
 ## API Reference
