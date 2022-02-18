@@ -1,14 +1,16 @@
 # Doc 
 
 ## Getting started with programmable assessment 
-Autoptic PQL is a functional language for expressing logic for analysis of timeseries data. Here is an example of collecting CPU statistics from AWS Cloudwatch and computing the 98th percentile for the last hour.
+Autoptic PQL is a functional language timeseries data analysis. Here is an example of collecting CPU statistics from AWS Cloudwatch and computing the 98th percentile for the last hour.
 ```
 where("$cloudwatch”)
 .what("CPUUtilization; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'")
 .when("1h")
 	.alias("$where[0].what[0].when[0].window[0]").as(“ts_cpu")
 
-.print(“$ts_cpu")
+.percentile("ts_cpu;0.15;0.99").as("perc_cpu")
+
+.print(“$perc_cpu","$ts_cpu")
 	.out("./data/cloudwatch_results.json")
 ```
 Problem and simple example
