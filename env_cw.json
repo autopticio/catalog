@@ -1,0 +1,15 @@
+{
+  "data":
+  [
+    {
+      "name": "cw_aws",
+      "type": "CloudWatch",
+      "vars": {
+        "AwsRegion": "us-east-1",
+        "window": "300s",
+        "aws_access_key_id": "",
+        "aws_secret_access_key": ""
+      }
+    }
+  ]
+}
