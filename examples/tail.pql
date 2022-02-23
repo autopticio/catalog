@@ -1,0 +1,7 @@
+open("./data/data--atoms.json").as("data")
+
+.tail("$data; 2").as("abs")
+.tail("$data; 25%").as("perc")
+
+.print("$abs","$perc")
+.out("./data/tail.json", "./logs/tail.txt")

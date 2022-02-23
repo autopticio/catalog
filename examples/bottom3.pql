@@ -1,0 +1,7 @@
+open("./data/data--atoms.json").as("data")
+
+.sort("$data; 1").as("sorted")
+.tail("$sorted; 3").as("bottom3")
+
+.print("$bottom3")
+.out("./data/bottom3.json", "./logs/bottom3.txt")
