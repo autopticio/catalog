@@ -1,9 +1,0 @@
-open("./data/data--atoms.json").as("data")
-
-.average("$data")
-.min("$data")
-.max("$data")
-.count("$data")
-.percentile("$data; 0.25; 0.5; 0.75; 0.99")
-
-.out("./data/stats.json", "./logs/stats.txt")
