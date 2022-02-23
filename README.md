@@ -16,11 +16,11 @@ where("$cw_aws")
 .print("$perc_cpu","$ts_cpu")
         .out("cloudwatch_results.json")
 ```
-PQL programs are executed through the Autoptic API. Get a free endpoint and follow the steps to run the example.
+PQL programs are executed through the Autoptic API. [Get a free endpoint]() and follow the steps to run the example.
 
 #### 1 Configure access to AWS Cloudwatch
 
-Create a local env.json file and add the contents below or download the template.
+Create a local env.json file and add the contents below or [download the template]().
 ```
 {
   "data":
