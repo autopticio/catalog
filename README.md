@@ -18,7 +18,7 @@ where("$cw_aws")
 ```
 PQL programs are executed through the Autoptic API. Get a free endpoint and follow the steps to run the example.
 
-#### 1. Configure access to AWS Cloudwatch
+#### 1 Configure access to AWS Cloudwatch
 
 Create a local env.json file and add the contents below or download the template.
 ```
@@ -40,8 +40,8 @@ Create a local env.json file and add the contents below or download the template
 ```
 Add your account credentials in the "aws_access_key_id" and "aws_secret_access_key". The account must have read access to Cloudwatch. For more information check the [AWS guide on access credentials](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html) .
 
-#### 2 .Edit and save the PQL program
-#### 3. Run the program through your endpoint and check the results
+#### 2 Edit and save the PQL program
+#### 3 Run the program through your endpoint and check the results
 
 ## Autoptic Architecture
 
