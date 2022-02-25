@@ -52,12 +52,12 @@ PQL programs are edited locally and posted through a secure API endpoint to the 
 ### Query
 Query functions describe data inputs from the data sources:
 
-[where](#where)  [what](#what)  [when](#when)  [window](#window)  [open](#open)  [as](#as)  [alias](#alias)
+[where](#where) | [what](#what) | [when](#when) | [window](#window) | [open](#open) | [as](#as) | [alias](#alias)
 
 ### Aggregate
 Aggregate functions handle timeseries data reduction or aggregation:
 
-[filter](#filter)  [merge](#merge)
+[filter](#filter) | [merge](#merge)
 
 ### Compute
 Compute functions allow computing simple or more complex statistics: 
@@ -67,12 +67,12 @@ Compute functions allow computing simple or more complex statistics:
 ### Output
 Output functions direct how the resulting output will be handled:
 
-[assert](#assert)  [sort](#sort)  [head](#head)  [tail](#tail)  [print](#print)  [out](#out)
+[assert](#assert) | [sort](#sort) | [head](#head) | [tail](#tail) | [print](#print) | [out](#out)
 
 ### Data Source Reference
 Data source references specify which data sources will be used from the environment definition:
 
-[cloudwatch](#cloudwatch)  [prometheus](#prometheus]
+[cloudwatch](#cloudwatch) | [prometheus](#prometheus]
 		
 ## Functions
 #### alias
