@@ -49,8 +49,6 @@ PQL programs are edited locally and posted through a secure API endpoint to the 
 
 ## PQL Program Structure
 ![alt text](https://www.autoptic.io/assets/img/pql_structure.png)
-PQL program functions can be classified as follows depending on their purpose:
-				
 ### Query
 Query functions describe data inputs from the data sources.
 where,what,when,window,open,as,alias
