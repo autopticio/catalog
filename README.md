@@ -44,7 +44,7 @@ Add your account credentials in the "aws_access_key_id" and "aws_secret_access_k
 #### 3 Run the program through your endpoint and check the results
 
 ## Autoptic Architecture
-
+PQL programs are edited locally and posted through a secure API endpoint to the Autoptic PQL runtime where code is executed. The runtime will get timeseries data from the remote sources configured in the program. The results from the computation are returned to the requesting client.  
 ![alt text](https://www.autoptic.io/assets/img/architecture_logical.png)
 
 ## Understanding PQL
