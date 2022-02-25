@@ -45,7 +45,7 @@ Add your account credentials in the "aws_access_key_id" and "aws_secret_access_k
 
 ## Autoptic Architecture
 
-![alt text](https://www.autoptic.io/assets/img/architecture.png)
+![alt text](https://www.autoptic.io/assets/img/architecture_logical.png)
 
 ## Understanding PQL
 PQL Program
