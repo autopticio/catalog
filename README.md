@@ -57,7 +57,7 @@ Aggregate functions handle timeseries data reduction or aggregation.
 filter,merge
 ### Compute
 Compute functions allow computing simple or more complex math. 
-average,min,max,count,percentile,math
+average,min,max,[count](#count),percentile,math
 ### Output
 Output functions direct how the resulting output will be handled.
 assert,sort,head,tail,print,out
