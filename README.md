@@ -51,7 +51,8 @@ PQL programs are edited locally and posted through a secure API endpoint to the 
 ![alt text](https://www.autoptic.io/assets/img/pql_structure.png)
 ### Query
 Query functions describe data inputs from the data sources.
-[where](#where),[what](#what),[when](#when),[window](#window),[open](#open],[as](#as),[alias](#alias)
+
+[where](#where) [what](#what) [when](#when) [window](#window) [open](#open) [as](#as) [alias](#alias)
 
 ### Aggregate
 Aggregate functions handle timeseries data reduction or aggregation.
