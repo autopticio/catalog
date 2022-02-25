@@ -72,7 +72,7 @@ Output functions direct how the resulting output will be handled:
 ### Data Source Reference
 Data source references specify which data sources will be used from the environment definition:
 
-[cloudwatch](#cloudwatch) | [prometheus](#prometheus]
+[cloudwatch](#cloudwatch) | [prometheus](#prometheus)
 		
 ## Functions
 #### alias
@@ -97,6 +97,9 @@ Data source references specify which data sources will be used from the environm
 #### when
 #### where 
 
-## Example programs
+## Data Sources
+#### cloudwatch
+#### prometheus
 
-## API Reference
+## Example programs
+Check out the [example programs](./examples/) for more ideas on how to use PQL to the max!
