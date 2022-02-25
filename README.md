@@ -68,7 +68,27 @@ Data source references specify which data sources will be used from the environm
 cloudwatch,prometheus
 		
 ## Functions
-purpose | params | sample
+#### alias
+#### as
+#### assert
+#### average
+#### count
+#### head
+#### filter
+#### math
+#### max
+#### merge
+#### min
+#### open
+#### out
+#### percentile
+#### print
+#### sort
+#### tail
+#### window
+#### what
+#### when
+#### where 
 
 ## Example programs
 
