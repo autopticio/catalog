@@ -62,7 +62,7 @@ Aggregate functions handle timeseries data reduction or aggregation:
 ### Compute
 Compute functions allow computing simple or more complex statistics: 
 
-[average](#average)  [min](#min)  [max](#max)  [count](#count)  [percentile](#percentile)  [math](#math)
+[average](#average) | [min](#min) | [max](#max) | [count](#count) | [percentile](#percentile) | [math](#math)
 
 ### Output
 Output functions direct how the resulting output will be handled:
