@@ -44,24 +44,28 @@ Add your account credentials in the "aws_access_key_id" and "aws_secret_access_k
 #### 3 Run the program through your endpoint and check the results
 
 ## Autoptic Architecture
-PQL programs are edited locally and posted through a secure API endpoint to the Autoptic PQL runtime where code is executed. The runtime will get timeseries data from the remote sources configured in the program. The results from the computation are returned to the requesting client.  
+PQL programs are edited locally and posted through a secure API endpoint to the Autoptic PQL runtime where code is executed. The runtime will get timeseries data from the remote sources configured in the program and return the computed results to the requesting client.  
 ![alt text](https://www.autoptic.io/assets/img/architecture_logical.png)
 
-## Understanding PQL
-PQL Program
-<Explanation>
-<program structure diagram>
+## PQL Program Structure
+![alt text](https://www.autoptic.io/assets/img/pql_structure.png)
+PQL program functions can be classified as follows depending on their purpose:
 				
-### Sources
-cloudwatch,prometheus
 ### Query
-where,what,when,window, open, as
-### Aggregation
-filter, merge
-### Computation
-average, min, max, count, percentile,math
-### Results
-assert, sort,head,tail,print,out
+Query functions describe data inputs from the data sources.
+where,what,when,window,open,as,alias
+### Aggregate
+Aggregate functions handle timeseries data reduction or aggregation.
+filter,merge
+### Compute
+Compute functions allow computing simple or more complex math. 
+average,min,max,count,percentile,math
+### Output
+Output functions direct how the resulting output will be handled.
+assert,sort,head,tail,print,out
+### Data Source Reference
+Data source references specify which data sources will be used from the environment definition.
+cloudwatch,prometheus
 		
 ## Functions
 purpose | params | sample
