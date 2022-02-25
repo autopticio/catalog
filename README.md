@@ -1,5 +1,3 @@
-# Doc 
-
 ## Getting started with programmable assessments 
 Autoptic PQL is a functional language for timeseries data analysis. Here is a simple example with AWS Cloudwatch.
 ```
@@ -46,6 +44,8 @@ Add your account credentials in the "aws_access_key_id" and "aws_secret_access_k
 #### 3 Run the program through your endpoint and check the results
 
 ## Autoptic Architecture
+
+![Autoptic PQL Architecture](https://www.autoptic.io/assets/img/architecture.png “Architecture”)
 
 ## Understanding PQL
 PQL Program
