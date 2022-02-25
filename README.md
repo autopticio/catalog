@@ -50,22 +50,29 @@ PQL programs are edited locally and posted through a secure API endpoint to the 
 ## PQL Program Structure
 ![alt text](https://www.autoptic.io/assets/img/pql_structure.png)
 ### Query
-Query functions describe data inputs from the data sources.
+Query functions describe data inputs from the data sources:
 
-[where](#where) [what](#what) [when](#when) [window](#window) [open](#open) [as](#as) [alias](#alias)
+[where](#where)  [what](#what)  [when](#when)  [window](#window)  [open](#open)  [as](#as)  [alias](#alias)
 
 ### Aggregate
-Aggregate functions handle timeseries data reduction or aggregation.
-filter,merge
+Aggregate functions handle timeseries data reduction or aggregation:
+
+[filter](#filter)  [merge](#merge)
+
 ### Compute
-Compute functions allow computing simple or more complex math. 
-average,min,max,[count](#count),percentile,math
+Compute functions allow computing simple or more complex statistics: 
+
+[average](#average)  [min](#min)  [max](#max)  [count](#count)  [percentile](#percentile)  [math](#math)
+
 ### Output
-Output functions direct how the resulting output will be handled.
-assert,sort,head,tail,print,out
+Output functions direct how the resulting output will be handled:
+
+[assert](#assert)  [sort](#sort)  [head](#head)  [tail](#tail)  [print](#print)  [out](#out)
+
 ### Data Source Reference
-Data source references specify which data sources will be used from the environment definition.
-cloudwatch,prometheus
+Data source references specify which data sources will be used from the environment definition:
+
+[cloudwatch](#cloudwatch)  [prometheus](#prometheus]
 		
 ## Functions
 #### alias
