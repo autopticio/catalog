@@ -109,8 +109,8 @@ Defines the query keywords and metadata submitted to the data sources.
 	```
 	what(
 	  "CPUUtilization; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'",
-    	  "NetworkOut; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'",
-    	  "NetworkIn; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'"
+	  "NetworkOut; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'",
+	  "NetworkIn; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'"
 	)	
 	```
 	- get metrics from AWS and Prometheus
