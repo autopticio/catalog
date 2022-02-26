@@ -76,31 +76,44 @@ Data source references specify which data sources will be used from the environm
 		
 ## Functions
 #### alias
+---
 #### as
+---
 #### assert
+---
 #### average
+---
 #### count
 ---
 #### head
-Selects the first set of data points from a timeseries.
+Selects the first set of data points from a timeseries variable.
 - parameters: 1 timeseries variable and 1 integer | percent value.
 - use: 
 	- get the first 15 datapoints `head("$cpu0_user; 15")`
 	- get the first 2% of datapoints `head("$cpu0_user; 2%")`
 ---
 #### filter
+---
 #### math
+---
 #### max
+---
 #### merge
+---
 #### min
+---
 #### open
+---
 #### out
+---
 #### percentile
+---
 #### print
+---
 #### sort
 ---
 #### tail
-Selects the last set of data points from a timeseries.
+Selects the last set of data points from a timeseries variable.
 - parameters: 1 timeseries variable and 1 integer | percent value.
 - use: 
 	- get the last 20 datapoints `tail("$cpu0_user; 20")`
