@@ -107,17 +107,17 @@ Defines the query keywords and metadata submitted to the data sources.
 	- get cpu utilization from Prometheus `what("node_cpu_seconds_total")`
 	- get multiple metrics from AWS
 	```
-		what(
-    			"CPUUtilization; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'",
-    			"node_cpu_seconds_total"
-		)
+	what(
+    	  "CPUUtilization; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'",
+    	  "node_cpu_seconds_total"
+	)
 	```
 	- get metrics from AWS and Prometheus
 	```
-		what(
-    			"CPUUtilization; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'",
-    			"node_cpu_seconds_total"
-		)
+	what(
+    	  "CPUUtilization; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'",
+    	  "node_cpu_seconds_total"
+	)
 	```
 #### when
 Selects the query time ranges for the program
