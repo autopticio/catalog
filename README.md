@@ -99,6 +99,7 @@ Selects the granularity of the time series data retrieved from the data source.
 	- 30 second window selection `window("30s")`
 	- 5 seconds and 1 hour window selections `window("5s","1h")`
 - default: 300s
+---
 #### what
 Defines the query keywords and metadata submitted to the data sources.
 - parameters: n+1 queries
@@ -120,6 +121,7 @@ Defines the query keywords and metadata submitted to the data sources.
 	  "node_cpu_seconds_total"
 	)
 	```
+---
 #### when
 Selects the query time ranges for the program
 - parameters:  n+1 time ranges
