@@ -95,9 +95,18 @@ Data source references specify which data sources will be used from the environm
 #### window
 #### what
 #### when
+Selects the query time ranges for the program
+- parameters: 
+	- n+1 time ranges
+- use:
+	- releative time selection 
+		- recent 5 minutes `when("5m")` 
+		- recent 1hr `when("1h")`
+	- absolute time selection 
 #### where 
 Selects the data sources that will be used in the program from the [data source configuration](#data-sources).
-- params: n+1 data source references
+- parameters: 
+	- n+1 data source references
 - use: 
 	- `where("$dsA","$dsB","$dsC")`
 
