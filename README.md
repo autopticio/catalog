@@ -16,7 +16,7 @@ where("$cw_aws")
 ```
 PQL programs are executed through the Autoptic API. [Get a free endpoint]() and follow the steps to run the example.
 
-#### 1 Configure access to AWS Cloudwatch
+#### 1. Configure access to AWS Cloudwatch
 
 Create a local env.json file and add the contents below or [download the template](./examples/env_cw.json).
 ```
@@ -38,10 +38,10 @@ Create a local env.json file and add the contents below or [download the templat
 ```
 Add your account credentials in the "aws_access_key_id" and "aws_secret_access_key". The account must have read access to Cloudwatch. For more information check the [AWS guide on access credentials](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html) .
 
-#### 2 Edit and save the PQL program
+#### 2. Edit and save the PQL program
 [Download the example](./examples/simple.pql) and change the query parameters in the "what" function to match an object in your AWS resources. The sample query is looking up "CPUUtilization" of an EC2 instance. [Check the full Cloudwatch metrics list](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/viewing_metrics_with_cloudwatch.html) for more options.
 
-#### 3 Run the program through your endpoint and check the results
+#### 3. Run the program through your endpoint and check the results
 
 ## Autoptic Architecture
 PQL programs are edited locally and posted through a secure API endpoint to the Autoptic PQL runtime where code is executed. The runtime will get timeseries data from the remote sources configured in the program and return the computed results to the requesting client.  
@@ -96,6 +96,9 @@ Data source references specify which data sources will be used from the environm
 #### what
 #### when
 #### where 
+purpose 
+parameters
+examples
 
 ## Data Sources
 #### cloudwatch
