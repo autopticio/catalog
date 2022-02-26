@@ -80,7 +80,14 @@ Data source references specify which data sources will be used from the environm
 #### assert
 #### average
 #### count
+---
 #### head
+Selects the first set of data points from a timeseries.
+- parameters: 1 timeseries variable and 1 integer | percent value.
+- use: 
+	- get the first 15 datapoints `head("$cpu0_user; 15")`
+	- get the first 2% of datapoints `head("$cpu0_user; 2%")`
+---
 #### filter
 #### math
 #### max
@@ -91,7 +98,14 @@ Data source references specify which data sources will be used from the environm
 #### percentile
 #### print
 #### sort
+---
 #### tail
+Selects the last set of data points from a timeseries.
+- parameters: 1 timeseries variable and 1 integer | percent value.
+- use: 
+	- get the last 20 datapoints `tail("$cpu0_user; 20")`
+	- get the last 3% of datapoints `tail("$cpu0_user; 3%")`
+---
 #### window
 Selects the granularity of the time series data retrieved from the data source.
 - parameters: n+1 time windows/buckets
@@ -134,7 +148,7 @@ Selects the query time ranges for the program
 		- start and end date time `"when("start = '02-22-2022 00:00:00 +00'; end = '02-22-2022 23:59:59 +00'")`
 	- multi selection
 		- recent 24 hours and 2-22-22 `when("24h","start = '02-22-2022 00:00:00 +00'; end = '02-22-2022 23:59:59 +00'")`
-
+---
 #### where 
 Selects the data sources that will be used in the program from the [data source configuration](#data-sources).
 - parameters: n+1 data source references
