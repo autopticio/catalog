@@ -100,7 +100,8 @@ Selects the query time ranges for the program
 - use:
 	- releative time selection 
 		- recent 5 minutes `when("5m")` 
-		- recent 1hr `when("1h")`
+		- recent 1 hour `when("1h")`
+		- recent 7 days `when("7d")`
 	- absolute time selection
 		- start and end date time `"when("start = '02-22-2022 00:00:00 +00'; end = '02-22-2022 23:59:59 +00'")`
 	- multi selection
