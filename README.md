@@ -93,7 +93,32 @@ Data source references specify which data sources will be used from the environm
 #### sort
 #### tail
 #### window
+Selects the granularity of the time series data retrieved from the data source.
+- parameters: n+1 time windows/buckets
+- use:
+	- 30 second window selection `window("30s")`
+	- 5 seconds and 1 hour window selections `window("5s","1h")`
+- default: 300s
 #### what
+Defines the query keywords and metadata submitted to the data sources.
+- parameters: n+1 queries
+- use:
+	- get instance CPU utilization from AWS `what("CPUUtilization; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'")`
+	- get cpu utilization from Prometheus `what("node_cpu_seconds_total")`
+	- get multiple metrics from AWS
+	```
+		what(
+    			"CPUUtilization; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'",
+    			"node_cpu_seconds_total"
+		)
+	```
+	- get metrics from AWS and Prometheus
+	```
+		what(
+    			"CPUUtilization; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'",
+    			"node_cpu_seconds_total"
+		)
+	```
 #### when
 Selects the query time ranges for the program
 - parameters:  n+1 time ranges
@@ -101,7 +126,6 @@ Selects the query time ranges for the program
 	- releative time selection 
 		- recent 5 minutes `when("5m")` 
 		- recent 1 hour `when("1h")`
-		- recent 7 days `when("7d")`
 	- absolute time selection
 		- start and end date time `"when("start = '02-22-2022 00:00:00 +00'; end = '02-22-2022 23:59:59 +00'")`
 	- multi selection
