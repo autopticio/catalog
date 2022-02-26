@@ -102,13 +102,17 @@ Selects the query time ranges for the program
 	- releative time selection 
 		- recent 5 minutes `when("5m")` 
 		- recent 1hr `when("1h")`
-	- absolute time selection 
+	- absolute time selection
+		- start and end date time `"when("start = '02-22-2022 00:00:00 +00'; end = '02-22-2022 23:59:59 +00'")`
+	- multi selection
+		- recent 24 hours and 2-22-22 `when("24h","start = '02-22-2022 00:00:00 +00'; end = '02-22-2022 23:59:59 +00'")`
+
 #### where 
 Selects the data sources that will be used in the program from the [data source configuration](#data-sources).
 - parameters: 
 	- n+1 data source references
 - use: 
-	- `where("$dsA","$dsB","$dsC")`
+	- 3 data source references `where("$dsA","$dsB","$dsC")`
 
 ## Data Sources
 #### cloudwatch
