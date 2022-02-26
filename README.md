@@ -97,12 +97,9 @@ Data source references specify which data sources will be used from the environm
 #### when
 #### where 
 Selects the data sources that will be used in the program from the [data source configuration](#data-sources).
-* params: n+1 data source references
-* use: where("$dsA","$dsB","$dsC")
-
-purpose 
-parameters
-examples
+- params: n+1 data source references
+- use: 
+	- `where("$dsA","$dsB","$dsC")`
 
 ## Data Sources
 #### cloudwatch
