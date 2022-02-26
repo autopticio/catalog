@@ -116,8 +116,8 @@ Defines the query keywords and metadata submitted to the data sources.
 	- get metrics from AWS and Prometheus
 	```
 	what(
-    	  "CPUUtilization; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'",
-    	  "node_cpu_seconds_total"
+	  "CPUUtilization; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'",
+	  "node_cpu_seconds_total"
 	)
 	```
 #### when
