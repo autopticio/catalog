@@ -148,7 +148,7 @@ Defines the query keywords and metadata submitted to the data sources.
 	  "node_cpu_seconds_total"
 	)
 	```
----
+<hr style="border:2px solid gray"> </hr>
 #### when
 Selects the query time ranges for the program
 - parameters:  n+1 time ranges
@@ -161,7 +161,7 @@ Selects the query time ranges for the program
 		- start and end date time `"when("start = '02-22-2022 00:00:00 +00'; end = '02-22-2022 23:59:59 +00'")`
 	- multi selection
 		- recent 24 hours and 2-22-22 `when("24h","start = '02-22-2022 00:00:00 +00'; end = '02-22-2022 23:59:59 +00'")`
----
+<hr style="border:2px solid gray"> </hr>
 #### where 
 Selects the data sources that will be used in the program from the [data source configuration](#data-sources).
 - parameters: n+1 data source references
