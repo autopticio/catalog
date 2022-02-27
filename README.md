@@ -80,6 +80,11 @@ Data source references specify which data sources will be used from the environm
 #### as
 ---
 #### assert
+Evaluates if a logical expression is true(1) or false(0). 
+- parameters: 1 logical expression.
+- use:
+	- check if two counters are the same `assert("$count_cpu_aws == $count_cpu_prom")`
+	- check if CPU is greater than 50% `assert("$cpu_avg_utilization > 0.5")`
 ---
 #### average
 Computes the average value for a timeseries.
@@ -91,14 +96,14 @@ Computes the average value for a timeseries.
 Computes the number of data points in a timeseries.
 - parameters: 1 timeseries variable
 - use:
-	- compute the number of points `count("$cpu_utilization")`
+	- compute the number of data points `count("$cpu_utilization")`
 ---
 #### head
 Selects the first set of data points from a timeseries variable.
 - parameters: 1 timeseries variable and 1 integer | percent value.
 - use: 
-	- get the first 15 datapoints `head("$cpu0_user; 15")`
-	- get the first 2% of datapoints `head("$cpu0_user; 2%")`
+	- get the first 15 data points `head("$cpu0_user; 15")`
+	- get the first 2% of data points `head("$cpu0_user; 2%")`
 ---
 #### filter
 ---
@@ -155,8 +160,8 @@ Sorts all data points in a timeseries.
 Selects the last set of data points from a timeseries.
 - parameters: 1 timeseries variable and 1 integer | percent value.
 - use: 
-	- get the last 20 datapoints `tail("$cpu0_user; 20")`
-	- get the last 3% of datapoints `tail("$cpu0_user; 3%")`
+	- get the last 20 data points `tail("$cpu0_user; 20")`
+	- get the last 3% of data points `tail("$cpu0_user; 3%")`
 ---
 #### window
 Selects the granularity of the timeseries data retrieved from the data source.
