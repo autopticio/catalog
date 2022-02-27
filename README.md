@@ -109,8 +109,16 @@ Selects the first set of data points from a timeseries variable.
 #### percentile
 ---
 #### print
+Outputs a set of timeseries variables.
+- parameters: N+1 timeseries variables
+- use: output stats and timeseries values `print("$cnt_aws", "$cnt_prom", "$assert_cnts")`
 ---
 #### sort
+Sorts all data points in a timeseries variable.
+- paramertes: 1 timeseries variable and 1 integer flag.
+- use:
+	- sort in ascending order `sort("$prom_cpu_5m_last30m_filtered; 1")`
+	- sort in descending order `sort("$prom_cpu_5m_last30m_filtered; 0")`
 ---
 #### tail
 Selects the last set of data points from a timeseries variable.
