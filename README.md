@@ -105,36 +105,41 @@ Selects the first set of data points from a timeseries variable.
 #### open
 ---
 #### out
+Selects the output destination for the program.
+- parameters: N+1 destinations.
+- use:
+	- send results to a single json result `.out("results.json")`
+	- send results to a multile json results `.out("resultA.json","resultB.json")`
 ---
 #### percentile
-Computes percentile summaries for select timeseries.
+Computes percentile summaries for a timeseries.
 - parameters: 1 timeseries variable and N+1 percentile float attributes.
 - use
 	- compute 1st percentile `percentile("$aws_cpu;0.01")`
 	- compute 15th and 98th percentile `percentile("$aws_cpu;0.15;0.98")`
 ---
 #### print
-Outputs a set of timeseries variables.
+Outputs a set of timeseries or computed statistics.
 - parameters: N+1 timeseries variables
 - use: 
 	- output stats and timeseries values `print("$cnt_aws", "$cnt_prom", "$assert_cnts")`
 ---
 #### sort
-Sorts all data points in a timeseries variable.
+Sorts all data points in a timeseries.
 - paramertes: 1 timeseries variable and 1 integer flag.
 - use:
 	- sort in ascending order `sort("$prom_cpu_5m_last30m_filtered; 1")`
 	- sort in descending order `sort("$prom_cpu_5m_last30m_filtered; 0")`
 ---
 #### tail
-Selects the last set of data points from a timeseries variable.
+Selects the last set of data points from a timeseries.
 - parameters: 1 timeseries variable and 1 integer | percent value.
 - use: 
 	- get the last 20 datapoints `tail("$cpu0_user; 20")`
 	- get the last 3% of datapoints `tail("$cpu0_user; 3%")`
 ---
 #### window
-Selects the granularity of the time series data retrieved from the data source.
+Selects the granularity of the timeseries data retrieved from the data source.
 - parameters: n+1 time windows/buckets
 - use:
 	- 30 second window selection `window("30s")`
