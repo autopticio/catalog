@@ -82,8 +82,16 @@ Data source references specify which data sources will be used from the environm
 #### assert
 ---
 #### average
+Computes the average value for a timeseries.
+- parameters: 1 timeseries variable
+- use:
+	- compute the average `average("$cpu_utilization")`
 ---
 #### count
+Computes the number of data points in a timeseries.
+- parameters: 1 timeseries variable
+- use:
+	- compute the number of points `count("$cpu_utilization")`
 ---
 #### head
 Selects the first set of data points from a timeseries variable.
@@ -97,12 +105,24 @@ Selects the first set of data points from a timeseries variable.
 #### math
 ---
 #### max
+Computes the maximum value for a timeseries.
+- parameters: 1 timeseries variable
+- use:
+	- compute the maximum `max("$cpu_utilization")`
 ---
 #### merge
 ---
 #### min
+Computes the minimum value for a timeseries.
+- parameters: 1 timeseries variable
+- use:
+	- compute the minimum `min("$cpu_utilization")`
 ---
 #### open
+Opens a saved PQL results resource.
+- parameters: 1 PQL results resource.
+- use:
+	- with locally running PQL runtime only, open a local file with PQL results `.open("/tmp/aws_saved_results.json")`
 ---
 #### out
 Selects the output destination for the program.
@@ -122,7 +142,7 @@ Computes percentile summaries for a timeseries.
 Outputs a set of timeseries or computed statistics.
 - parameters: N+1 timeseries variables
 - use: 
-	- output stats and timeseries values `print("$cnt_aws", "$cnt_prom", "$assert_cnts")`
+	- output summary and timeseries values `print("$cnt_aws", "$cnt_prom", "$assert_cnts")`
 ---
 #### sort
 Sorts all data points in a timeseries.
@@ -140,7 +160,7 @@ Selects the last set of data points from a timeseries.
 ---
 #### window
 Selects the granularity of the timeseries data retrieved from the data source.
-- parameters: n+1 time windows/buckets
+- parameters: N+1 time windows/buckets
 - use:
 	- 30 second window selection `window("30s")`
 	- 5 seconds and 1 hour window selections `window("5s","1h")`
@@ -148,7 +168,7 @@ Selects the granularity of the timeseries data retrieved from the data source.
 ---
 #### what
 Defines the query keywords and metadata submitted to the data sources.
-- parameters: n+1 queries
+- parameters: N+1 queries
 - use:
 	- get instance CPU utilization from AWS `what("CPUUtilization; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'")`
 	- get cpu utilization from Prometheus `what("node_cpu_seconds_total")`
@@ -170,7 +190,7 @@ Defines the query keywords and metadata submitted to the data sources.
 ---
 #### when
 Selects the query time ranges for the program
-- parameters:  n+1 time ranges
+- parameters:  N+1 time ranges
 - use:
 	- releative time selection 
 		- recent 5 minutes `when("5m")` 
@@ -183,7 +203,7 @@ Selects the query time ranges for the program
 ---
 #### where 
 Selects the data sources that will be used in the program from the [data source configuration](#data-sources).
-- parameters: n+1 data source references
+- parameters: N+1 data source references
 - use: 
 	- 3 data source references `where("$dsA","$dsB","$dsC")`
 
