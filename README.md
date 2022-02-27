@@ -107,11 +107,17 @@ Selects the first set of data points from a timeseries variable.
 #### out
 ---
 #### percentile
+Computes percentile summaries for select timeseries.
+- parameters: 1 timeseries variable and N+1 percentile float attributes.
+- use
+	- compute 1st percentile `percentile("$aws_cpu;0.01")`
+	- compute 15th and 98th percentile `percentile("$aws_cpu;0.15;0.98")`
 ---
 #### print
 Outputs a set of timeseries variables.
 - parameters: N+1 timeseries variables
-- use: output stats and timeseries values `print("$cnt_aws", "$cnt_prom", "$assert_cnts")`
+- use: 
+	- output stats and timeseries values `print("$cnt_aws", "$cnt_prom", "$assert_cnts")`
 ---
 #### sort
 Sorts all data points in a timeseries variable.
