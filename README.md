@@ -78,6 +78,22 @@ Data source references specify which data sources will be used from the environm
 #### alias
 ---
 #### as
+Creates a named timesieres variable from the results of a function. Variables are used as inputs to other functions.
+- parameters: 1 variable name
+- use:
+	- Compute the average CPU and print the result
+	```
+	average("$cpu_timeseries").as("avg_cpu")
+	.print("$avg_cpu")
+	.out("results.json")
+	```
+	- Filter query data and merge into a single timeseries and print it
+	```
+	filter("$prom_cpu_5m_last30m", "{cpu='0' OR cpu='1'} AND mode='user'").as("cpu_filtered")
+	.merge("$cpu_filtered;average").as("single_cpu_ts")
+	.print("$single_cpu_ts")
+	.out("results.json")
+	```
 ---
 #### assert
 Evaluates if a logical expression is true(1) or false(0). 
