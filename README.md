@@ -127,6 +127,21 @@ Computes the maximum value for a timeseries.
 	- compute the maximum `max("$cpu_utilization")`
 ---
 #### merge
+Combines multiple timeseries into a single timeseries using an aggregation function.
+- parameters: N+1 timeseries and 1 aggregation function (min | max | average | sum).
+- use:
+	- Merges system and user CPU 0 into a timeseries by adding data points in the same time window.
+	```
+	merge("$avg_cpu0_system; $avg_cpu0_user; sum")
+	```
+	- Merges the user CPU 0 and 1 into a single timeseries by computing the average for data points in the same time window. 
+	```
+	merge("$cpu0_user_case3; $cpu1_user_case3; avg")
+	```
+	- Merges the user CPU 0,1,2,3 into a single timeseries based on the max valye for data points in the same time widnow.
+	```
+	merge("$cpu0_user; $cpu1_user; $cpu2_user; cpu3_user; max")
+	```
 ---
 #### min
 Computes the minimum value for a timeseries.
