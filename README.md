@@ -76,9 +76,21 @@ Data source references specify which data sources will be used from the environm
 		
 ## Functions
 #### alias
+Creates a variable name for a selection in the query matrix.
+- parameters: 1 query matrix selection
+- use:
+	- Selecting the first and second time periods of the query.
+	```
+	```
+	- Selecting the second data source and first time window of the query.
+	```
+	```
+	- Selecting all data sources and all time periods of the query.
+	```
+	```
 ---
 #### as
-Creates a named timesieres variable from the results of a function. Variables are used as inputs to other functions.
+Creates a named timesieres variable from the results of the preceding function. Variables are used as inputs to other functions.
 - parameters: 1 variable name
 - use:
 	- Compute the average CPU and print the result
