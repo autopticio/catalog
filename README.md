@@ -109,8 +109,14 @@ Selects the first set of data points from a timeseries variable.
 Selects the timeseries matching a logical expression.
 - parameters: 1 timeseries variable and 1 expression.
 - use:
-	- Select the timeseries that match the 'user' mode for CPU 0 `filter("$cpu_usage", "{cpu='0' AND mode='user'}")` 
-	- Select the timeseries that match the 'user' and/or 'system' mode for CPU 0 and/or 1 `filter("$cpu_usage", "{cpu='0' OR cpu='1'} AND {mode='user' OR mode='system'}")` 
+	- Select the timeseries that match the 'user' mode for CPU 0 
+	```
+	filter("$cpu_usage", "{cpu='0' AND mode='user'}")
+	``` 
+	- Select the timeseries that match the 'user' and/or 'system' mode for CPU 0 and/or 1 
+	```
+	filter("$cpu_usage", "{cpu='0' OR cpu='1'} AND {mode='user' OR mode='system'}")
+	``` 
 ---
 #### math
 ---
