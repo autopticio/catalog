@@ -119,6 +119,17 @@ Selects the timeseries matching a logical expression.
 	``` 
 ---
 #### math
+Computes a value from a mathematical expression.
+- parameters: 1 math expression. Only single value variables can be provided in the expression.
+- use:
+	- Sum of the CPU0 user and system utilization. 
+	```
+	math("($avg_cpu0_user + $avg_cpu0_system)")
+	```
+	- Network Bytes in to out throughput ratio in percent
+	```
+	math("(1 - $net_in/$net_out)")
+	```
 ---
 #### max
 Computes the maximum value for a timeseries.
