@@ -304,7 +304,7 @@ Selects the data sources that will be used in the program from the [data source 
 	- 3 data source references `where("$dsA","$dsB","$dsC")`
 
 ## Data Sources
-The environment definition is a global configuration that stores preferences and data source access. Multiple data sources of different types can be configured and used by a PQL program.
+The environment definition is a global configuration that stores preferences and data source access. Multiple data sources of different types can be configured and used by a PQL program. [download the template](./examples/env_cw.json)
 #### cloudwatch
 Multiple cloudwatch data sources can be configured in the environment definition. 
 - attributes:
