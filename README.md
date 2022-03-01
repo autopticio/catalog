@@ -304,6 +304,7 @@ Selects the data sources that will be used in the program from the [data source 
 	- 3 data source references `where("$dsA","$dsB","$dsC")`
 
 ## Data Sources
+The environment definition is a global configuration that stores preferences and data source access. Multiple data sources of different types can be configured and used by a PQL program.
 #### cloudwatch
 Multiple cloudwatch data sources can be configured in the environment definition. 
 - attributes:
@@ -316,17 +317,34 @@ Multiple cloudwatch data sources can be configured in the environment definition
 		- aws_secret_access_key: The token token that is paired with the key id above.
 ```
 {
-      "name": "cw1",
-      "type": "CloudWatch",
-      "vars": {
-        "AwsRegion": "eu-west-1",
-        "window": "300s",
-        "aws_access_key_id": "<aws_key_id>",
-        "aws_secret_access_key": "<key_value>"
-      }
-    }
+"name": "cw1",
+"type": "CloudWatch",
+"vars": {
+	"AwsRegion": "eu-west-1",
+	"window": "300s",
+	"aws_access_key_id": "<aws_key_id>",
+	"aws_secret_access_key": "<key_value>"
+	}
+}
 ```
 #### prometheus
+Multiple Promethues data sources can be configured in the environment definition. 
+- attributes:
+	- name: The name that will be referenced by the "where" function in a PQL program.
+	- type: Prometheus
+	- vars:
+		- prom_address: The http url for the Prometheus server.
+		- window: default window size if not specified by the "window" function in a PQL program.
+```
+{
+"name": "promOnAws",
+"type": "Prometheus",
+"vars": {
+	"prom_address": "http://192.168.0.15:9090",
+	"window": "300s"
+	}
+}
+```
 
 ## Example programs
 Check out the [example programs](./examples/) for more ideas on how to use PQL to the max!
