@@ -75,18 +75,44 @@ Data source references specify which data sources will be used from the environm
 [cloudwatch](#cloudwatch) | [prometheus](#prometheus)
 		
 ## Functions
+#### 3w's
+A query consists of 3 required (what,where,when) and 1 optional (window) dimensions. Each combination of dimensions produces a distinct collection that can be used by other functions in the PQL program. Every such collection is automatically labeled with the tuple of dimensions and position index of the parameters referenced.
+```
+//The following query can produce 8 distinct timeseries collections:
+where("$cwA", "$cwB")
+.what(
+    "CPUUtilization; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'",
+    "NetworkOut; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'",
+)
+.when("1d", "1h")
+
+//The following collections are labeled as a response matrix.
+//Collection1 is labeled where[0].what[0].when[0] for tuple [$cwA][CPUUtilization...][1d]
+//Collection2 is labeled where[0].what[0].when[1] for tuple [$cwA][CPUUtilization...][1h]
+//Collection3 is labeled where[0].what[1].when[0] for tuple [$cwA][NetworkOut...][1d]
+//Collection4 is labeled where[0].what[1].when[1] for tuple [$cwA][NetworkOut...][1h]
+//Collection5 is labeled where[1].what[0].when[0] for tuple [$cwB][CPUUtilization...][1d]
+//Collection6 is labeled where[1].what[0].when[1] for tuple [$cwB][CPUUtilization...][1h]
+//Collection7 is labeled where[1].what[1].when[0] for tuple [$cwB][NetworkOut...][1d]
+//Collection8 is labeled where[1].what[1].when[1] for tuple [$cwB][NetworkOut...][1h]
+```
+
 #### alias
-Creates a variable name for a selection in the query matrix.
+Creates a variable name for a selection in the response matrix.
 - parameters: 1 query matrix selection
 - use:
 	- Selecting the first and second time periods of the query.
 	```
+	.alias("$what[0].when[0].where[0]").as("snapshot_A")
+	.alias("$what[0].when[1].where[0]").as("snapshot_B")
 	```
-	- Selecting the second data source and first time window of the query.
+	- Selecting the second data source and third time window of the query.
 	```
+	alias("$what[0].when[0].where[1].window[2]").as("snapshot_C")
 	```
 	- Selecting all data sources and all time periods of the query.
 	```
+	alias("$what[0].when[*].where[*]").as("snapshot_D")
 	```
 ---
 #### as
