@@ -317,7 +317,7 @@ Multiple cloudwatch data sources can be configured in the environment definition
 		- aws_secret_access_key: The token token that is paired with the key id above.
 ```
 {
-"name": "cw1",
+"name": "aws_prod",
 "type": "CloudWatch",
 "vars": {
 	"AwsRegion": "eu-west-1",
@@ -337,7 +337,7 @@ Multiple Promethues data sources can be configured in the environment definition
 		- window: default window size if not specified by the "window" function in a PQL program.
 ```
 {
-"name": "promOnAws",
+"name": "localprom",
 "type": "Prometheus",
 "vars": {
 	"prom_address": "http://192.168.0.15:9090",
