@@ -52,7 +52,7 @@ PQL programs are edited locally and posted through a secure API endpoint to the 
 ### Query
 Query functions describe data inputs from the data sources:
 
-[where](#where) | [what](#what) | [when](#when) | [window](#window) | [open](#open) | [as](#as) | [alias](#alias)
+[3w's](#3ws) | [where](#where) | [what](#what) | [when](#when) | [window](#window) | [open](#open) | [as](#as) | [alias](#alias)
 
 ### Aggregate
 Aggregate functions handle timeseries data reduction or aggregation:
@@ -305,6 +305,27 @@ Selects the data sources that will be used in the program from the [data source 
 
 ## Data Sources
 #### cloudwatch
+Multiple cloudwatch data sources can be configured in the environment definition. 
+- attributes:
+	- name: The name that will be referenced by the "where" function in a PQL program.
+	- type: CloudWatch
+	- vars:
+		- AwsRegion: AWS region that the PQL program will be querying.
+		- window: default window size if not specified by the "window" function in a PQL program.
+		- aws_access_key_id: AWS key that you have to generate through IAM in AWS.
+		- aws_secret_access_key: The token token that is paired with the key id above.
+```
+{
+      "name": "cw1",
+      "type": "CloudWatch",
+      "vars": {
+        "AwsRegion": "eu-west-1",
+        "window": "300s",
+        "aws_access_key_id": "<aws_key_id>",
+        "aws_secret_access_key": "<key_value>"
+      }
+    }
+```
 #### prometheus
 
 ## Example programs
