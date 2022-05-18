@@ -1,4 +1,7 @@
-open("./data/data--atoms.json").as("data")
+where("$cw_aws")
+.what("CPUUtilization; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'")
+.when("24h")
+.alias("$where[0].what[0].when[0]").as("data")
 
 .average("$data")
 .min("$data")
@@ -6,4 +9,4 @@ open("./data/data--atoms.json").as("data")
 .count("$data")
 .percentile("$data; 0.25; 0.5; 0.75; 0.99")
 
-.out("./data/stats.json", "./logs/stats.txt")
+.out("stats.json")

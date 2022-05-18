@@ -1,4 +1,4 @@
-open("./data/data--atoms.json").as("data")
+open("https://autoptic-ts.s3.eu-west-1.amazonaws.com/prometheus.json; $p_cpu").as("data")
 
 .filter("$data", "{cpu='0' OR cpu='1'} AND mode='user'").as("usr_cpu")
 
@@ -9,4 +9,4 @@ open("./data/data--atoms.json").as("data")
 	
 .print		("$volatility_today","$p95_t","$avg_t")
 
-.out("./data/volatility.json", "./logs/volatility.txt")
+.out("volatility.json")

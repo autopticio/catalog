@@ -1,8 +1,8 @@
-open("./data/data--atoms.json").as("data")
+open("https://autoptic-ts.s3.eu-west-1.amazonaws.com/prometheus.json; $p_cpu")
 
-.filter("$data", "cpu='0' AND mode='user'").as("user_cpu")
-.filter("$data", "cpu='0' AND mode='steal'").as("steal_cpu")
-.filter("$data", "{cpu='0' OR cpu='1'} AND mode='iowait'").as("wait_cpu")
+.filter("$p_cpu", "cpu='0' AND mode='user'").as("user_cpu")
+.filter("$p_cpu", "cpu='0' AND mode='steal'").as("steal_cpu")
+.filter("$p_cpu", "{cpu='0' OR cpu='1'} AND mode='iowait'").as("wait_cpu")
 
 .print("$user_cpu","$steal_cpu","$wait_cpu")
-.out("./data/filter.json", "./logs/filter.txt")
+.out("filter.json")

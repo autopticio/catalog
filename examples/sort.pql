@@ -1,7 +1,10 @@
-open("./data/data--atoms.json").as("data")
+where("$cw_aws")
+.what("CPUUtilization; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'")
+.when("24h")
+.alias("$where[0].what[0].when[0]").as("data")
 
 .sort("$data; 1").as("sorted_desc")
 .sort("$data; 0").as("sorted_asc")
 
 .print("$sorted_desc","$sorted_asc")
-.out("./data/sort.json", "./logs/sort.txt")
+.out("sort.json")

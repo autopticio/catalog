@@ -1,14 +1,18 @@
-open("./data/data--atoms.json").as("data")
+where("$cw_aws")
+.what(
+    "NetworkPacketsIn; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'",
+    "NetworkPacketsIn; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'"
+)
+.when("24h")
+.window("15m")
 
-.filter("$data", "{cpu='0' OR cpu='1'} AND mode='user'").as("user_cpu")
-.filter("$data", "{cpu='0' OR cpu='1'} AND mode='steal'").as("steal_cpu")
-.filter("$data", "{cpu='0' OR cpu='1'} AND mode='iowait'").as("wait_cpu")
-.filter("$data", "{cpu='0' OR cpu='1'} AND mode='idle'").as("idle_cpu")
+.alias("$where[0].what[0].when[0].window[0]").as("netin_a")
+.alias("$where[0].what[1].when[0].window[0]").as("netin_b")
 
-.merge("$wait_cpu; max").as("wait_max")
-.merge("$steal_cpu; sum").as("steal_sum")
-.merge("$idle_cpu; min").as("idle_min")
-.merge("$user_cpu; average").as("user_avg")
+.merge("$netin_a;$netin_b; sum").as("netin_sum")
+.merge("$netin_a;$netin_b; max").as("netin_max")
+.merge("$netin_a;$netin_b; min").as("netin_min")
+.merge("$netin_a;$netin_b; average").as("netin_average")
 
-.print("$wait_max","$steal_sum","$user_avg","$idle_min")
-.out("./data/merge.json", "./logs/merge.txt")
+.print("$netin_max","$netin_sum","$netin_average","$netin_min")
+.out("merge.json")

@@ -1,10 +1,18 @@
-where("$cw1")
+where("$cw_aws")
 .what(
-    "CPUUtilization; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'"
+    "CPUUtilization; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'",
+    "NetworkIn; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'",
+    "NetworkOut; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'",
+    "NetworkPacketsIn; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'",
+    "NetworkPacketsOut; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'"
 )
-.when("1h")
+.when("24h")
 .window("15m")
-.alias("$where[0].what[0].when[0].window[0]").as("p_cpu")
+.alias("$where[0].what[0].when[0].window[0]").as("i_cpu")
+.alias("$where[0].what[1].when[0].window[0]").as("i_netin_b")
+.alias("$where[0].what[2].when[0].window[0]").as("i_netout_b")
+.alias("$where[0].what[3].when[0].window[0]").as("i_netin_p")
+.alias("$where[0].what[4].when[0].window[0]").as("i_netout_p")
 
-.print("$p_cpu")
-.out("./data/query--cloudwatch.json", "./logs/query--cloudwatch.txt")
+.print("$i_cpu","$i_netin_p","$i_netout_p","$i_netin_b","$i_netout_b")
+.out("cloudwatch-ec2-full.json")

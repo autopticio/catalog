@@ -1,17 +1,14 @@
-open("./data/data--atoms.json").as("data")
+where("$cw_aws")
+.what("CPUUtilization; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'")
+.when("24h")
+.alias("$where[0].what[0].when[0]").as("data")
 
-.filter("$data", "{cpu='0' OR cpu='1'} AND mode='user'").as("user_cpu")
-.filter("$data", "{cpu='0' OR cpu='1'} AND mode='steal'").as("steal_cpu")
+.average("$data").as("avg_cpu")
+.percentile("$data;0.8").as("perc_cpu")
 
-.merge("$user_cpu; max").as("user_merged")
-.merge("$steal_cpu; max").as("steal_merged")
+.assert("$perc_cpu > $avg_cpu").as("health_check")
+.assert("$avg_cpu > 0 ").as("cpu_check")
 
-.average("$steal_merged").as("steal_avg")
-.average("$user_merged").as("user_avg")
+.print("$health_check","$cpu_check")
 
-.assert("$user_avg > $steal_avg").as("health_check")
-.assert("$user_avg > 0.5 ").as("cpu_check")
-
-.print("$health_check","$cpu_check","$user_avg","$steal_avg")
-
-.out("./data/assert.json", "./logs/assert.txt")
+.out("assert.json")

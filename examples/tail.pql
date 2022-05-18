@@ -1,7 +1,10 @@
-open("./data/data--atoms.json").as("data")
+where("$cw_aws")
+.what("CPUUtilization; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'")
+.when("24h")
+.alias("$where[0].what[0].when[0]").as("data")
 
 .tail("$data; 2").as("abs")
 .tail("$data; 25%").as("perc")
 
 .print("$abs","$perc")
-.out("./data/tail.json", "./logs/tail.txt")
+.out("tail.json")

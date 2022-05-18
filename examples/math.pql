@@ -1,15 +1,18 @@
-open("./data/data--atoms.json").as("data")
+where("$cw_aws")
+.what(
+    "NetworkPacketsIn; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'",
+    "NetworkPacketsOut; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'"
+)
+.when("24h")
+.window("15m")
 
-.filter("$data", "{cpu='0' OR cpu='1'} AND mode='iowait'").as("wait_cpu")
-.filter("$data", "{cpu='0' OR cpu='1'} AND mode='steal'").as("steal_cpu")
+.alias("$where[0].what[0].when[0].window[0]").as("pin")
+.alias("$where[0].what[1].when[0].window[0]").as("pout")
 
-.merge("$wait_cpu; average").as("wait_merged_series")
-.merge("$steal_cpu; average").as("steal_merged_series")
+.percentile("$pin;0.85").as("perc_pin")
+.percentile("$pout;0.85").as("perc_pout")
 
-.average("$steal_merged_series").as("steal_num")
-.average("$wait_merged_series").as("wait_num")
+.math("($perc_pin - $perc_pout)").as("packet_io_diff")
 
-.math("($steal_num+ $wait_num)").as("cpu_waste")
-
-.print("$cpu_waste")
-.out("./data/math.json", "./logs/math.txt")
+.print("$packet_io_diff")
+.out("math.json")

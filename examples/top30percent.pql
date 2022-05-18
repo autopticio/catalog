@@ -1,7 +1,10 @@
-open("./data/data--atoms.json").as("data")
+where("$cw_aws")
+.what("CPUUtilization; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'")
+.when("24h")
+.alias("$where[0].what[0].when[0]").as("data")
 
 .sort("$data; 1").as("sorted")
 .head("$sorted; 30%").as("top30")
 
 .print("$top30")
-.out("./data/top30percent.json", "./logs/top30percent.txt")
+.out("top30percent.json")
