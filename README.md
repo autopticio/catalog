@@ -18,7 +18,7 @@ PQL programs are executed through the Autoptic API. [Get a free endpoint](https:
 
 #### 1. Configure access to AWS Cloudwatch
 
-Create a local env.json file and add the contents below or [download the template](./examples/env_cw.json).
+Create a local env_cw.json file and add the contents below or [download the template](./examples/env_cw.json).
 ```
 {
   "data":
@@ -36,12 +36,38 @@ Create a local env.json file and add the contents below or [download the templat
   ]
 }
 ```
-Add your account credentials in the "aws_access_key_id" and "aws_secret_access_key". The account must have read access to Cloudwatch. For more information check the [AWS guide on access credentials](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html) .
+Add your account credentials in the "aws_access_key_id" and "aws_secret_access_key". The account must have read access to Cloudwatch. For more information check the [AWS guide on access credentials](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html). Autoptic does not cache or store the credentials you submit over the API.
 
 #### 2. Edit and save the PQL program
-[Download the example](./examples/simple.pql) and change the query parameters in the "what" function to match an object in your AWS resources. The sample query is looking up "CPUUtilization" of an EC2 instance. [Check the full Cloudwatch metrics list](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/viewing_metrics_with_cloudwatch.html) for more options.
+[Download the example](./examples/simple.pql) and change the query parameters in the "what" function to match an object in your AWS resources. The sample query is looking up "CPUUtilization" of an EC2 instance. [Check the full Cloudwatch metrics list](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/viewing_metrics_with_cloudwatch.html) for more options. Check out the [example programs](./examples/) for more ideas on how to use PQL for more programmable assessments. 
 
 #### 3. Run the program through your endpoint and check the results
+You will need to have active endpoint to run PQL programs. [You can signup for an endpoint.](https://www.autoptic.io/#signup).
+
+The run.sh script below illustrates how to submit a program to the Autoptic API.
+```
+#!/bin/bash
+
+# Input params
+#1 PQL environment definition json 
+#2 PQL program file
+#3 PQL endpoint URL
+
+curl  -H "content-type: application/json" -X POST  \
+--data '{"vars": "'$(cat $1 | base64 )'", "pql": "'$(cat $2 | base64 )'"}' $3
+```
+
+Substitute the endpoint URL in the example with your own active endpoint URL and run the script as follows: `sh run.sh simple.pql env_cw.json https://autoptic.io/pql/ep/007/run ` 
+
+Here the response you would expect:
+```
+{
+ "Errors": "0",
+ "Info": "Rm91bmQgMSBQUUwgdmFyaWFibGVzLgpUSU1FIFRPT0sgZ2V0dGluZyByb3cgbWV0cmljcyBmcm9tIFswIDAgMCAyNTVdICg2MC4wOTIwN21zKQpQcWwgc291cmNlIGlkOiAkd2hlcmVbMF0ud2hhdFswXS53aGVuWzBdOyBQcm9jZXNzZWQgYWxpYXMoIiR3aGVyZVswXS53aGF0WzBdLndoZW5bMF0iKSAtLT4gRE9ORQpQcWwgc291cmNlIGlkOiAkd2hlcmVbMF0ud2hhdFswXS53aGVuWzBdOyBQcm9jZXNzZWQgYWxpYXMoIiR3aGVyZVswXS53aGF0WzBdLndoZW5bMF0iKTsgQ2FsbGluZyBzdGF0aXN0aWMgZnVuY3Rpb24gcGVyY2VudGlsZSB3aXRoIHBhcmFtZXRlciAkdHNfY3B1OzAuMTU7MC45OSBvbiBQUUwgU2VyaWVzIHJlc3VsdGluZyBvZiB0aGUgZWFybHkgaW5mbyAtLT4gRE9ORQoyIGVudHJpZXMgaGFzIGJlZW4gd3JpdHRlbiBpbiBhIG91dHB1dCBjbG91ZHdhdGNoX3Jlc3VsdHMuanNvbiAoY2xvdWR3YXRjaF9yZXN1bHRzLmpzb24gdmFsdWUgfCBiYXNlNjQgLWQpCgoKCSoqKioqKiogICBUSU1FIFRPT0soZnJvbSBzdGFydCB0byBlbmQpIDE2MC4yNTQ4NzRtcyAgICoqKioqKioKMCBFcnJvcnMK",
+ "cloudwatch_results.json": "WwogewogICJwcWxfdmFyIjogIiR0c19jcHUiLAogICJzZXJpZXMiOiB7CiAgICJpbmZvX3NvdXJjZSI6IHsKICAgICJvbiI6ICIxOS4wNS4yMDIyIDAwOjM5OjI5ICswMDAwIiwKICAgICJtZXRyaWNfc291cmNlIjogIkNsb3VkV2F0Y2ggKHByb2ZpbGU6ICwgcmVnaW9uOiBldS13ZXN0LTEpIiwKICAgICJ3aGVuIjogIlN0YXJ0OiAxOS4wNS4yMDIyIDAwOjA5OjI5ICswMDAwOyBFbmQ6IDE5LjA1LjIwMjIgMDA6Mzk6MjkgKzAwMDAiLAogICAgInN0ZXAiOiAiNW0wcyIsCiAgICAicXVlcnkiOiBbCiAgICAgewogICAgICAibWV0cmljX25hbWUiOiAiQ1BVVXRpbGl6YXRpb24iLAogICAgICAibmFtZXNwYWNlIjogIkFXUy9FQzIiLAogICAgICAiaWQiOiAiYXV0b3B0aWNfMTY1MjkyMDc2OTg0ODg4NjQxNyIsCiAgICAgICJsYWJlbCI6ICJhdXRvcHRpYy0xNjUyOTIwNzY5ODQ4ODg2NDE3IiwKICAgICAgInN0YXQiOiAiQXZlcmFnZSIsCiAgICAgICJleHByZXNzaW9uIjogIiIsCiAgICAgICJwZXJpb2QiOiAzMDAsCiAgICAgICJEaW1lbnNpb25zIjogWwogICAgICAgewogICAgICAgICJuYW1lIjogIkluc3RhbmNlSWQiLAogICAgICAgICJ2YWx1ZSI6ICJpLTAwZjg4ODBkN2E0ZDUwMmRiIgogICAgICAgfQogICAgICBdCiAgICAgfQogICAgXQogICB9LAogICAicHFsX2V4cHJlc3Npb24iOiAiJHdoZXJlWzBdLndoYXRbMF0ud2hlblswXSIsCiAgICJtc2dzIjogWwogICAgIlBxbCBzb3VyY2UgaWQ6ICR3aGVyZVswXS53aGF0WzBdLndoZW5bMF0iLAogICAgIlByb2Nlc3NlZCBhbGlhcyhcIiR3aGVyZVswXS53aGF0WzBdLndoZW5bMF1cIikiCiAgIF0sCiAgICJwcWxfc2VyaWVzIjogWwogICAgewogICAgICJkaW1fcGFpcnMiOiBbCiAgICAgIHsKICAgICAgICJrIjogIk1ldHJpY19pZCIsCiAgICAgICAidiI6ICJhdXRvcHRpY18xNjUyOTIwNzY5ODQ4ODg2NDE3IgogICAgICB9LAogICAgICB7CiAgICAgICAiayI6ICJNZXRyaWNfbGFiZWwiLAogICAgICAgInYiOiAiYXV0b3B0aWMtMTY1MjkyMDc2OTg0ODg4NjQxNyIKICAgICAgfQogICAgIF0sCiAgICAgImxlbmd0aCI6IDUsCiAgICAgInN0YXR1cyI6ICJPSyIsCiAgICAgInRzIjogWwogICAgICB7CiAgICAgICAidGltZXN0YW1wIjogMTY1MjkyMDE0MCwKICAgICAgICJ2YWx1ZSI6IDAuMTUwODQ3NDU3NjI2MTE1MzcKICAgICAgfSwKICAgICAgewogICAgICAgInRpbWVzdGFtcCI6IDE2NTI5MTk4NDAsCiAgICAgICAidmFsdWUiOiAwLjE0OTc1NDU2MTQ1MzczNDY3CiAgICAgIH0sCiAgICAgIHsKICAgICAgICJ0aW1lc3RhbXAiOiAxNjUyOTE5NTQwLAogICAgICAgInZhbHVlIjogMC4xNjU4NjU1MTgxOTk0OTE2CiAgICAgIH0sCiAgICAgIHsKICAgICAgICJ0aW1lc3RhbXAiOiAxNjUyOTE5MjQwLAogICAgICAgInZhbHVlIjogMC4xMzMzNTE4NTY5OTc4NDAxNgogICAgICB9LAogICAgICB7CiAgICAgICAidGltZXN0YW1wIjogMTY1MjkxODk0MCwKICAgICAgICJ2YWx1ZSI6IDAuMTY3MjUwMTYyMDgyMDExNAogICAgICB9CiAgICAgXQogICAgfQogICBdCiAgfQogfSwKIHsKICAicHFsX3ZhciI6ICIkcGVyY19jcHUiLAogICJ3aG9faXNfdGhlcmUiOiAxLAogICJyZXN1bHQiOiB7CiAgICJpbmZvIjogWwogICAgIlBxbCBzb3VyY2UgaWQ6ICR3aGVyZVswXS53aGF0WzBdLndoZW5bMF0iLAogICAgIlByb2Nlc3NlZCBhbGlhcyhcIiR3aGVyZVswXS53aGF0WzBdLndoZW5bMF1cIikiLAogICAgIkNhbGxpbmcgc3RhdGlzdGljIGZ1bmN0aW9uIHBlcmNlbnRpbGUgd2l0aCBwYXJhbWV0ZXIgJHRzX2NwdTswLjE1OzAuOTkgb24gUFFMIFNlcmllcyByZXN1bHRpbmcgb2YgdGhlIGVhcmx5IGluZm8iCiAgIF0sCiAgICJvbiI6ICIxOS4wNS4yMDIyIDAwOjM5OjI5ICswMDAwIiwKICAgInBxbF9mdW5jdGlvbiI6ICJwZXJjZW50aWxlIiwKICAgInRoZV9yZXNfdmFsIjogWwogICAgewogICAgICJtZXRyaWMiOiBbCiAgICAgIHsKICAgICAgICJrIjogIk1ldHJpY19pZCIsCiAgICAgICAidiI6ICJhdXRvcHRpY18xNjUyOTIwNzY5ODQ4ODg2NDE3IgogICAgICB9LAogICAgICB7CiAgICAgICAiayI6ICJNZXRyaWNfbGFiZWwiLAogICAgICAgInYiOiAiYXV0b3B0aWMtMTY1MjkyMDc2OTg0ODg4NjQxNyIKICAgICAgfQogICAgIF0sCiAgICAgInN0YXR1cyI6IDAsCiAgICAgInBhcmFtZXRlcnMiOiBbCiAgICAgIDAuMTUsCiAgICAgIDAuOTkKICAgICBdLAogICAgICJ2YWx1ZXMiOiBbCiAgICAgIDAuMTQ1NjUzODg1MzM5NzYxMDQsCiAgICAgIDAuMTY3MTgwOTI5ODg3ODg1NAogICAgIF0KICAgIH0KICAgXQogIH0KIH0KXQ=="
+}
+```
+Notice the results are base64 encoded so you would need to decode them with `base64 -D`.
 
 ## Autoptic Architecture
 PQL programs are edited locally and posted through a secure API endpoint to the Autoptic PQL runtime where code is executed. The runtime will get timeseries data from the remote sources configured in the program and return the computed results to the requesting client.  
@@ -215,10 +241,10 @@ Computes the minimum value for a timeseries.
 	- compute the minimum `min("$cpu_utilization")`
 ---
 #### open
-Opens a saved PQL results resource.
-- parameters: 1 PQL results resource.
+Opens a saved PQL results resource from a URI.
+- parameters: 1 PQL results resource and N+1 variables to select.
 - use:
-	- with locally running PQL runtime only, open a local file with PQL results `.open("/tmp/aws_saved_results.json")`
+	- open a remote file with PQL results and select which variables will be loaded `.open("https://s3bucketurl/data/aws_saved_results.json;$varA;varB")`
 ---
 #### out
 Selects the output destination for the program.
@@ -347,4 +373,4 @@ Multiple Promethues data sources can be configured in the environment definition
 ```
 
 ## Example programs
-Check out the [example programs](./examples/) for more ideas on how to use PQL to the max!
+Check out the [example programs](./examples/) for more ideas on how to use PQL for more programmable assessments. 
