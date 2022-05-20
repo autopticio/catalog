@@ -14,7 +14,8 @@ where("$cw_aws")
 .print("$perc_cpu","$ts_cpu")
         .out("cloudwatch_results.json")
 ```
-PQL programs are executed through the Autoptic API. [Get a free endpoint](https://www.autoptic.io/#signup) and follow the steps to run the example.
+
+Follow the steps below to run the example program.
 
 #### 1. Configure access to AWS Cloudwatch
 
@@ -42,7 +43,7 @@ Add your account credentials in the "aws_access_key_id" and "aws_secret_access_k
 [Download the example](./examples/simple.pql) and change the query parameters in the "what" function to match an object in your AWS resources. The sample query is looking up "CPUUtilization" of an EC2 instance. [Check the full Cloudwatch metrics list](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/viewing_metrics_with_cloudwatch.html) for more options. Check out the [example programs](./examples/) for more ideas on how to use PQL for more programmable assessments. 
 
 #### 3. Run the program through your endpoint and check the results
-You will need an active endpoint to run PQL programs. [Signup for an endpoint.](https://www.autoptic.io/#signup).
+[Signup and activate an Autoptic endpoint](https://www.autoptic.io/#signup).
 
 The run.sh script below illustrates how to submit a program to the Autoptic API.
 ```
