@@ -58,7 +58,7 @@ curl  -H "content-type: application/json" -X POST  \
 --data '{"vars": "'$(cat $1 | base64 )'", "pql": "'$(cat $2 | base64 )'"}' $3
 ```
 
-Substitute the URL in the example with the endpoint URL you received and run the script as follows: `sh run.sh simple.pql env_cw.json https://autoptic.io/pql/ep/007/run ` 
+Substitute the URL in the example with the endpoint URL you received and run the script as follows: `sh run.sh env_cw.json simpple.pql https://autoptic.io/pql/ep/007/run ` 
 
 Here the response you would expect:
 ```
