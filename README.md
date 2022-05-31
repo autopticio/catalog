@@ -320,9 +320,9 @@ Selects the query time ranges for the program
 		- recent 1 hour `when("1h")`
 		- recent 7 days `when("7d")`
 	- absolute time selection
-		- start and end date time `"when("start = '02-22-2022 00:00:00 +00'; end = '02-22-2022 23:59:59 +00'")`
+		- start and end date time `"when("start = '22-02-2022 00:00:00 +00'; end = '22-02-2022 23:59:59 +00'")`
 	- multi selection
-		- recent 24 hours and 2-22-22 `when("24h","start = '02-22-2022 00:00:00 +00'; end = '02-22-2022 23:59:59 +00'")`
+		- recent 24 hours and 2-22-22 `when("24h","start = '22-02-2022 00:00:00 +00'; end = '22-02-2022 23:59:59 +00'")`
 ---
 #### where 
 Selects the data sources that will be used in the program from the [data source configuration](#data-sources).
