@@ -15,8 +15,8 @@
       "name": "prometheus",
       "type": "Prometheus",
       "vars": {
-        "prom_address": "{{PromUrlAndPort}}",
-        "window": "{{PromWindow}}"
+        "prom_address": "{{.PromUrlAndPort}}",
+        "window": "{{.PromWindow}}"
       }
     }
   ]
