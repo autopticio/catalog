@@ -1,15 +1,23 @@
 {
-    "data":
-    [
-      {
-        "name": "cw_aws",
-        "type": "CloudWatch",
-        "vars": {
-          "AwsRegion": "{{.AwsRegion}}",
-          "window": "{{.AwsWindow}}",
-          "aws_access_key_id": "{{.AwsAccessKeyId}}",
-          "aws_secret_access_key": "{{.AwsSecretAccessKey}}"
-        }
+  "data":
+  [
+    {
+      "name": "cw_aws",
+      "type": "CloudWatch",
+      "vars": {
+        "AwsRegion": "{{.AwsRegion}}",
+        "window": "{{.AwsWindow}}",
+        "aws_access_key_id": "{{.AwsAccessKeyId}}",
+        "aws_secret_access_key": "{{.AwsSecretAccessKey}}"
       }
-    ]
-  }
+    },
+    {
+      "name": "prometheus",
+      "type": "Prometheus",
+      "vars": {
+        "prom_address": "{{PromUrlAndPort}}",
+        "window": "{{PromWindow}}"
+      }
+    }
+  ]
+}
