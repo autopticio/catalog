@@ -108,8 +108,8 @@ A query consists of 3 required (what,where,when) and 1 optional (window) dimensi
 //The following query can produce 8 distinct timeseries collections:
 where("$cwA", "$cwB")
 .what(
-    "CPUUtilization; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'",
-    "NetworkOut; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'",
+    "MetricName='CPUUtilization';InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'",
+    "MetricName='NetworkOut'; InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'",
 )
 .when("1d", "1h")
 
@@ -293,20 +293,20 @@ Selects the granularity of the timeseries data retrieved from the data source.
 Defines the query keywords and metadata submitted to the data sources.
 - parameters: N+1 queries
 - use:
-	- get instance CPU utilization from AWS `what("CPUUtilization; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'")`
+	- get instance CPU utilization from AWS `what("MetricName='CPUUtilization';InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'")`
 	- get cpu utilization from Prometheus `what("node_cpu_seconds_total")`
 	- get multiple metrics from AWS EC2 instance
 	```
 	what(
-	  "CPUUtilization; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'",
-	  "NetworkOut; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'",
-	  "NetworkIn; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'"
+	  "MetricName='CPUUtilization'; InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'",
+	  "MetricName='NetworkOut'; InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'",
+	  "MetricName='NetworkIn'; InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'"
 	)	
 	```
 	- get metrics from AWS and Prometheus
 	```
 	what(
-	  "CPUUtilization; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'",
+	  "MetricName='CPUUtilization';InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'",
 	  "node_cpu_seconds_total"
 	)
 	```
