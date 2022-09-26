@@ -1,9 +1,9 @@
 ## Getting started with programmable assessments 
-Autoptic PQL is a functional language for timeseries data analysis. Here is a simple example with AWS Cloudwatch.
+Autoptic PQL is a functional language for timeseries data analysis. Here is a simple example with Amazon CloudWatch.
 ```
 //query cloudwatch and get instance CPU utilization for the last hour
 where("$cw_aws")
-.what("CPUUtilization; Average; InstanceId='i-00f8880d7a4d502db'; namespace='AWS/EC2'")
+.what("MetricName='CPUUtilization';InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'")
 .when("1h")
         .alias("$where[0].what[0].when[0]").as("ts_cpu")
 
@@ -17,7 +17,7 @@ where("$cw_aws")
 
 Follow the steps below to run the example program.
 
-#### 1. Configure access to AWS Cloudwatch
+#### 1. Configure access to Amazon CloudWatch
 
 Create a local env_cw.json file and add the contents below or [download the template](./examples/env_cw.json).
 ```
@@ -37,10 +37,10 @@ Create a local env_cw.json file and add the contents below or [download the temp
   ]
 }
 ```
-Add your account credentials in the "aws_access_key_id" and "aws_secret_access_key". The account must have read access to Cloudwatch. For more information check the [AWS guide on access credentials](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html). Autoptic does not cache or store the credentials you submit over the API.
+Add your account credentials in the "aws_access_key_id" and "aws_secret_access_key". The account must have read access to CloudWatch. For more information check the [AWS guide on access credentials](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html). Autoptic does not cache or store the credentials you submit over the API.
 
 #### 2. Edit and save the PQL program
-[Download the example](./examples/simple.pql) and change the query parameters in the "what" function to match an object in your AWS resources. The sample query is looking up "CPUUtilization" of an EC2 instance. [Check the full Cloudwatch metrics list](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/viewing_metrics_with_cloudwatch.html) for more options. Check out the [example programs](./examples/) for more ideas on how to use PQL for more programmable assessments. 
+[Download the example](./examples/simple.pql) and change the query parameters in the "what" function to match an object in your AWS resources. The sample query is looking up "CPUUtilization" of an EC2 instance. [Check the full CloudWatch metrics list](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/viewing_metrics_with_cloudwatch.html) for more options. Check out the [example programs](./examples/) for more ideas on how to use PQL for more programmable assessments. 
 
 #### 3. Run the program through your endpoint and check the results
 [Signup and activate an Autoptic endpoint](https://www.autoptic.io/#signup).
