@@ -1,0 +1,20 @@
+where("$cw_aws")
+.what(
+    "MetricName='Utilization*';Namespace='AWS/*'",
+    "MetricName='Utilization*';Namespace='AWS/*';Region='eu-*|us-*'",
+    "MetricName='CPU*'; InstanceId='*';Namespace='AWS/EC2';Region='us-east-1';Stat='Maximum'",
+    "MetricName='Latency';ApiName='Autoptic*';Namespace='AWS/ApiGateway';Region='eu-west-1'",
+    "MetricName='Latency*';TableName='Endpoint*';Namespace='AWS/DynamoDB';Region='eu-west-1'",
+    "MetricName='Latency*';TableName='Endpoint*';Operation='*';Namespace='AWS/DynamoDB';Region='eu-west-1'",
+)
+.when("30m")
+.window("30m")
+.alias("$where[0].what[0].when[0].window[0]").as("a")
+.alias("$where[0].what[1].when[0].window[0]").as("b")
+.alias("$where[0].what[2].when[0].window[0]").as("c")
+.alias("$where[0].what[3].when[0].window[0]").as("d")
+.alias("$where[0].what[4].when[0].window[0]").as("e")
+.alias("$where[0].what[4].when[0].window[0]").as("f")
+
+.print("$a","$b","$c","$d","$e","$f")
+.out("cloudwatch-ec2-full.json")
