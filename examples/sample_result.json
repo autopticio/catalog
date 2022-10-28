@@ -1,0 +1,168 @@
+{
+ "result": {
+  "cloudwatch_results.json": [
+   {
+    "pql_var": "$ts_cpu",
+    "series": {
+     "info_source": {
+      "on": "28.10.2022 01:23:00 +0000",
+      "metric_source": "cloudwatch",
+      "when": "Start: 28.10.2022 00:23:00 +0000; End: 28.10.2022 01:23:00 +0000",
+      "step": "5m0s",
+      "details": {
+       "metric_name": "CPUUtilization",
+       "namespace": "AWS/EC2",
+       "region": "eu-west-1",
+       "period": 300000000000,
+       "Dimensions": [
+        {
+         "k": "InstanceId",
+         "v": "i-00f8880d7a4d502db"
+        }
+       ]
+      }
+     },
+     "pql_expression": "$where[0].what[0].when[0]",
+     "msgs": [
+      "Got 1 time series from CloudWatch(eu-west-1)",
+      "Become 1 as PQL time series(eu-west-1)",
+      "Pql source id: $where[0].what[0].when[0]",
+      "Processed alias(\"$where[0].what[0].when[0]\")"
+     ],
+     "pql_series": [
+      {
+       "dim_pairs": [
+        {
+         "k": "MetricName",
+         "v": "CPUUtilization"
+        },
+        {
+         "k": "Namespace",
+         "v": "AWS/EC2"
+        },
+        {
+         "k": "Region",
+         "v": "eu-west-1"
+        },
+        {
+         "k": "Stat",
+         "v": "Average"
+        },
+        {
+         "k": "InstanceId",
+         "v": "i-00f8880d7a4d502db"
+        }
+       ],
+       "length": 11,
+       "status": 200,
+       "ts": [
+        {
+         "timestamp": 1666919580,
+         "value": 0.16673108224471342
+        },
+        {
+         "timestamp": 1666919280,
+         "value": 0.19999999999708978
+        },
+        {
+         "timestamp": 1666918980,
+         "value": 0.18253218486700779
+        },
+        {
+         "timestamp": 1666918680,
+         "value": 0.21594708207771257
+        },
+        {
+         "timestamp": 1666918380,
+         "value": 0.2187200786916438
+        },
+        {
+         "timestamp": 1666918080,
+         "value": 0.18197647494771524
+        },
+        {
+         "timestamp": 1666917780,
+         "value": 0.16788002847177882
+        },
+        {
+         "timestamp": 1666917480,
+         "value": 0.198944151150203
+        },
+        {
+         "timestamp": 1666917180,
+         "value": 0.20008479367076398
+        },
+        {
+         "timestamp": 1666916880,
+         "value": 0.2006029772019796
+        },
+        {
+         "timestamp": 1666916580,
+         "value": 0.20151485040177536
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "pql_var": "$perc_cpu",
+    "who_is_there": 1,
+    "result": {
+     "info": [
+      "Got 1 time series from CloudWatch(eu-west-1)",
+      "Become 1 as PQL time series(eu-west-1)",
+      "Pql source id: $where[0].what[0].when[0]",
+      "Processed alias(\"$where[0].what[0].when[0]\")",
+      "Calling statistic function percentile with parameter $ts_cpu;0.15;0.99 on PQL Series resulting of the early info"
+     ],
+     "on": "28.10.2022 01:23:01 +0000",
+     "pql_function": "percentile",
+     "the_res_val": [
+      {
+       "metric": [
+        {
+         "k": "MetricName",
+         "v": "CPUUtilization"
+        },
+        {
+         "k": "Namespace",
+         "v": "AWS/EC2"
+        },
+        {
+         "k": "Region",
+         "v": "eu-west-1"
+        },
+        {
+         "k": "Stat",
+         "v": "Average"
+        },
+        {
+         "k": "InstanceId",
+         "v": "i-00f8880d7a4d502db"
+        }
+       ],
+       "status": 200,
+       "parameters": [
+        0.15,
+        0.99
+       ],
+       "values": [
+        0.17492825170974702,
+        0.2184427790302507
+       ]
+      }
+     ]
+    }
+   }
+  ]
+ },
+ "errors": 0,
+ "info": [
+  "Found 2 PQL variables.",
+  "TIME TOOK getting row metrics from [0 0 0 255] (93.327475ms)",
+  "Got 1 time series from CloudWatch(eu-west-1); Become 1 as PQL time series(eu-west-1); Pql source id: $where[0].what[0].when[0]; Processed alias(\"$where[0].what[0].when[0]\") - DONE",
+  "Got 1 time series from CloudWatch(eu-west-1); Become 1 as PQL time series(eu-west-1); Pql source id: $where[0].what[0].when[0]; Processed alias(\"$where[0].what[0].when[0]\"); Calling statistic function percentile with parameter $ts_cpu;0.15;0.99 on PQL Series resulting of the early info - DONE",
+  "2 entries has been written in the output cloudwatch_results.json"
+ ]
+}

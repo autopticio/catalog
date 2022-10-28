@@ -60,15 +60,7 @@ curl  -H "content-type: application/json" -X POST  \
 
 Substitute the URL in the example with the endpoint URL you received and run the script as follows: `sh run.sh env_cw.json simpple.pql https://autoptic.io/pql/ep/007/run ` 
 
-Here the response you would expect:
-```
-{
- "Errors": "0",
- "Info": "Rm91bmQgMSBQUUwgdmFyaWFibGVzLgpUSU1FIFRPT0sgZ2V0dGluZyByb3cgbWV0cmljcyBmcm9tIFswIDAgMCAyNTVdICg2MC4wOTIwN21zKQpQcWwgc291cmNlIGlkOiAkd2hlcmVbMF0ud2hhdFswXS53aGVuWzBdOyBQcm9jZXNzZWQgYWxpYXMoIiR3aGVyZVswXS53aGF0WzBdLndoZW5bMF0iKSAtLT4gRE9ORQpQcWwgc291cmNlIGlkOiAkd2hlcmVbMF0ud2hhdFswXS53aGVuWzBdOyBQcm9jZXNzZWQgYWxpYXMoIiR3aGVyZVswXS53aGF0WzBdLndoZW5bMF0iKTsgQ2FsbGluZyBzdGF0aXN0aWMgZnVuY3Rpb24gcGVyY2VudGlsZSB3aXRoIHBhcmFtZXRlciAkdHNfY3B1OzAuMTU7MC45OSBvbiBQUUwgU2VyaWVzIHJlc3VsdGluZyBvZiB0aGUgZWFybHkgaW5mbyAtLT4gRE9ORQoyIGVudHJpZXMgaGFzIGJlZW4gd3JpdHRlbiBpbiBhIG91dHB1dCBjbG91ZHdhdGNoX3Jlc3VsdHMuanNvbiAoY2xvdWR3YXRjaF9yZXN1bHRzLmpzb24gdmFsdWUgfCBiYXNlNjQgLWQpCgoKCSoqKioqKiogICBUSU1FIFRPT0soZnJvbSBzdGFydCB0byBlbmQpIDE2MC4yNTQ4NzRtcyAgICoqKioqKioKMCBFcnJvcnMK",
- "cloudwatch_results.json": "WwogewogICJwcWxfdmFyIjogIiR0c19jcHUiLAogICJzZXJpZXMiOiB7CiAgICJpbmZvX3NvdXJjZSI6IHsKICAgICJvbiI6ICIxOS4wNS4yMDIyIDAwOjM5OjI5ICswMDAwIiwKICAgICJtZXRyaWNfc291cmNlIjogIkNsb3VkV2F0Y2ggKHByb2ZpbGU6ICwgcmVnaW9uOiBldS13ZXN0LTEpIiwKICAgICJ3aGVuIjogIlN0YXJ0OiAxOS4wNS4yMDIyIDAwOjA5OjI5ICswMDAwOyBFbmQ6IDE5LjA1LjIwMjIgMDA6Mzk6MjkgKzAwMDAiLAogICAgInN0ZXAiOiAiNW0wcyIsCiAgICAicXVlcnkiOiBbCiAgICAgewogICAgICAibWV0cmljX25hbWUiOiAiQ1BVVXRpbGl6YXRpb24iLAogICAgICAibmFtZXNwYWNlIjogIkFXUy9FQzIiLAogICAgICAiaWQiOiAiYXV0b3B0aWNfMTY1MjkyMDc2OTg0ODg4NjQxNyIsCiAgICAgICJsYWJlbCI6ICJhdXRvcHRpYy0xNjUyOTIwNzY5ODQ4ODg2NDE3IiwKICAgICAgInN0YXQiOiAiQXZlcmFnZSIsCiAgICAgICJleHByZXNzaW9uIjogIiIsCiAgICAgICJwZXJpb2QiOiAzMDAsCiAgICAgICJEaW1lbnNpb25zIjogWwogICAgICAgewogICAgICAgICJuYW1lIjogIkluc3RhbmNlSWQiLAogICAgICAgICJ2YWx1ZSI6ICJpLTAwZjg4ODBkN2E0ZDUwMmRiIgogICAgICAgfQogICAgICBdCiAgICAgfQogICAgXQogICB9LAogICAicHFsX2V4cHJlc3Npb24iOiAiJHdoZXJlWzBdLndoYXRbMF0ud2hlblswXSIsCiAgICJtc2dzIjogWwogICAgIlBxbCBzb3VyY2UgaWQ6ICR3aGVyZVswXS53aGF0WzBdLndoZW5bMF0iLAogICAgIlByb2Nlc3NlZCBhbGlhcyhcIiR3aGVyZVswXS53aGF0WzBdLndoZW5bMF1cIikiCiAgIF0sCiAgICJwcWxfc2VyaWVzIjogWwogICAgewogICAgICJkaW1fcGFpcnMiOiBbCiAgICAgIHsKICAgICAgICJrIjogIk1ldHJpY19pZCIsCiAgICAgICAidiI6ICJhdXRvcHRpY18xNjUyOTIwNzY5ODQ4ODg2NDE3IgogICAgICB9LAogICAgICB7CiAgICAgICAiayI6ICJNZXRyaWNfbGFiZWwiLAogICAgICAgInYiOiAiYXV0b3B0aWMtMTY1MjkyMDc2OTg0ODg4NjQxNyIKICAgICAgfQogICAgIF0sCiAgICAgImxlbmd0aCI6IDUsCiAgICAgInN0YXR1cyI6ICJPSyIsCiAgICAgInRzIjogWwogICAgICB7CiAgICAgICAidGltZXN0YW1wIjogMTY1MjkyMDE0MCwKICAgICAgICJ2YWx1ZSI6IDAuMTUwODQ3NDU3NjI2MTE1MzcKICAgICAgfSwKICAgICAgewogICAgICAgInRpbWVzdGFtcCI6IDE2NTI5MTk4NDAsCiAgICAgICAidmFsdWUiOiAwLjE0OTc1NDU2MTQ1MzczNDY3CiAgICAgIH0sCiAgICAgIHsKICAgICAgICJ0aW1lc3RhbXAiOiAxNjUyOTE5NTQwLAogICAgICAgInZhbHVlIjogMC4xNjU4NjU1MTgxOTk0OTE2CiAgICAgIH0sCiAgICAgIHsKICAgICAgICJ0aW1lc3RhbXAiOiAxNjUyOTE5MjQwLAogICAgICAgInZhbHVlIjogMC4xMzMzNTE4NTY5OTc4NDAxNgogICAgICB9LAogICAgICB7CiAgICAgICAidGltZXN0YW1wIjogMTY1MjkxODk0MCwKICAgICAgICJ2YWx1ZSI6IDAuMTY3MjUwMTYyMDgyMDExNAogICAgICB9CiAgICAgXQogICAgfQogICBdCiAgfQogfSwKIHsKICAicHFsX3ZhciI6ICIkcGVyY19jcHUiLAogICJ3aG9faXNfdGhlcmUiOiAxLAogICJyZXN1bHQiOiB7CiAgICJpbmZvIjogWwogICAgIlBxbCBzb3VyY2UgaWQ6ICR3aGVyZVswXS53aGF0WzBdLndoZW5bMF0iLAogICAgIlByb2Nlc3NlZCBhbGlhcyhcIiR3aGVyZVswXS53aGF0WzBdLndoZW5bMF1cIikiLAogICAgIkNhbGxpbmcgc3RhdGlzdGljIGZ1bmN0aW9uIHBlcmNlbnRpbGUgd2l0aCBwYXJhbWV0ZXIgJHRzX2NwdTswLjE1OzAuOTkgb24gUFFMIFNlcmllcyByZXN1bHRpbmcgb2YgdGhlIGVhcmx5IGluZm8iCiAgIF0sCiAgICJvbiI6ICIxOS4wNS4yMDIyIDAwOjM5OjI5ICswMDAwIiwKICAgInBxbF9mdW5jdGlvbiI6ICJwZXJjZW50aWxlIiwKICAgInRoZV9yZXNfdmFsIjogWwogICAgewogICAgICJtZXRyaWMiOiBbCiAgICAgIHsKICAgICAgICJrIjogIk1ldHJpY19pZCIsCiAgICAgICAidiI6ICJhdXRvcHRpY18xNjUyOTIwNzY5ODQ4ODg2NDE3IgogICAgICB9LAogICAgICB7CiAgICAgICAiayI6ICJNZXRyaWNfbGFiZWwiLAogICAgICAgInYiOiAiYXV0b3B0aWMtMTY1MjkyMDc2OTg0ODg4NjQxNyIKICAgICAgfQogICAgIF0sCiAgICAgInN0YXR1cyI6IDAsCiAgICAgInBhcmFtZXRlcnMiOiBbCiAgICAgIDAuMTUsCiAgICAgIDAuOTkKICAgICBdLAogICAgICJ2YWx1ZXMiOiBbCiAgICAgIDAuMTQ1NjUzODg1MzM5NzYxMDQsCiAgICAgIDAuMTY3MTgwOTI5ODg3ODg1NAogICAgIF0KICAgIH0KICAgXQogIH0KIH0KXQ=="
-}
-```
-The results are base64 encoded and can be decoded with `base64 -D`.
+Here the response you would expect in a json format: [Sample results](./examples/sample_result.json)
 
 ## Autoptic Architecture
 PQL programs are edited locally and posted through a secure API endpoint to the Autoptic PQL runtime where code is executed. The runtime will get timeseries data from the remote sources configured in the program and return the computed results to the requesting client.  
@@ -293,14 +285,31 @@ Selects the granularity of the timeseries data retrieved from the data source.
 Defines the query keywords and metadata submitted to the data sources.
 - parameters: N+1 queries
 - use:
-	- get instance CPU utilization from AWS `what("MetricName='CPUUtilization';InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'")`
+	- get instance Cloudwatch CPU utilization from AWS `what("MetricName='CPUUtilization';InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'")`
 	- get cpu utilization from Prometheus `what("node_cpu_seconds_total")`
-	- get multiple metrics from AWS EC2 instance
+	- get multiple Cloudwatch metrics for an AWS EC2 instance
 	```
 	what(
 	  "MetricName='CPUUtilization'; InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'",
 	  "MetricName='NetworkOut'; InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'",
 	  "MetricName='NetworkIn'; InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'"
+	)	
+	```
+	- get multiple Cloudwatch metrics using wildcards. Wildcards will match dimension values that contain the literal string preceding the wildcard. Multiple dimensions in a what function can be wildcarded. The results will match the union of dimensionsions and values specified.  
+	```
+	what(
+	  //match any metric that contains 'Utilization' across all Namespaces
+    	  "MetricName='Utilization*';Namespace='AWS/*'",
+	  //match any metric that contains 'Utilization' across all Namespaces across all Regions
+    	  "MetricName='Utilization*';Namespace='AWS/*';Region='eu-*'",
+	  //match any metric that contains 'CPU' across all InstanceIds for the EC2 Namespace in us-east-1
+    	  "MetricName='CPU*'; InstanceId='*';Namespace='AWS/EC2';Region='us-east-1';Stat='Maximum'",
+	  //match the 'Latency' metric for APIs that contain 'Autoptic; in the ApiGateway Namespace in eu-west-1
+    	  "MetricName='Latency';ApiName='Autoptic*';Namespace='AWS/ApiGateway';Region='eu-west-1'",
+	  //match any metric that contains 'Latency' for tables that contain 'Endpoint' in DynamoDB Namespace in eu-west-1
+    	  "MetricName='Latency*';TableName='Endpoint*';Namespace='AWS/DynamoDB';Region='eu-west-1'",
+	  //match any metric that contains 'Latency' for tables that contain 'Endpoint' for all operations in DynamoDB Namespace in eu-west-1
+    	  "MetricName='Latency*';TableName='Endpoint*';Operation='*';Namespace='AWS/DynamoDB';Region='eu-west-1'",
 	)	
 	```
 	- get metrics from AWS and Prometheus
@@ -338,7 +347,7 @@ Multiple cloudwatch data sources can be configured in the environment definition
 	- name: The name that will be referenced by the "where" function in a PQL program.
 	- type: CloudWatch
 	- vars:
-		- AwsRegion: AWS region that the PQL program will be querying.
+		- AwsRegion: default AWS region that the PQL program will be querying, if "Region" is not specified in 'what'
 		- window: default window size if not specified by the "window" function in a PQL program.
 		- aws_access_key_id: AWS key that you have to generate through IAM in AWS.
 		- aws_secret_access_key: The token token that is paired with the key id above.
