@@ -1,0 +1,13 @@
+where("$cw_aws_pk")
+.what("MetricName='DiskWriteBytes';InstanceId='*'; Region='us-*';Namespace='AWS/EC2'")
+.when("720h")
+.window("1h")
+.alias("$where[0].what[0].when[0]").as("data")
+
+.merge("$data;avg").as("merged")
+
+.sort("$merged; 1").as("sorted")
+.tail("$sorted; 10").as("lowtimes")
+
+.print("$lowtimes")
+.out("lowutilization.json")

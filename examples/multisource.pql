@@ -4,8 +4,8 @@ where("$cw_aws","$prometheus","$cw_aws_pk")
 	"node_cpu_seconds_total",
 	"process_cpu_seconds_total",
 )
-.when("1h")
-.window("30m")
+.when("3h")
+.window("10m")
 .alias("$where[0].what[0].when[0].window[0]").as("instance_cpu")
 .alias("$where[2].what[0].when[0].window[0]").as("instance_cpu_pk")
 .alias("$where[1].what[1].when[0].window[0]").as("node_cpu_seconds")
@@ -35,6 +35,6 @@ where("$cw_aws","$prometheus","$cw_aws_pk")
 .math("(1-$prometheus_utilization/$ec2_avg_cpu)*100").as("workload_waste")
 
 
-//.print("$instance_cpu","$instance_cpu_pk","$node_cpu_seconds","$process_cpu_seconds","$cpu_total_seconds","$prometheus_utilization")
+.print("$cpu_total_seconds","$ec2_cpu_utilization")
 .print("$workload_waste","$prometheus_utilization","$ec2_avg_cpu")
 .out("multisource.json")
