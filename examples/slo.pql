@@ -1,0 +1,24 @@
+where("$cw_aws")
+.what(	"MetricName='Latency'; Stage='*';ApiName='Autoptic*';Region='eu-west-1';Namespace='AWS/ApiGateway'",
+	"MetricName='Count'; Stage='*';ApiName='Autoptic*';Stat='Sum';Region='eu-west-1';Namespace='AWS/ApiGateway'",
+	"MetricName='4XXError'; Stage='*';ApiName='Autoptic*';Stat='Sum';Region='eu-west-1';Namespace='AWS/ApiGateway'",
+	"MetricName='5XXError'; Stage='*';ApiName='Autoptic*';Stat='Sum';Region='eu-west-1';Namespace='AWS/ApiGateway'",
+	)
+.when("24h")
+.window("8h")
+        .alias("$where[0].what[0].when[0].window[0]").as("l")
+        .alias("$where[0].what[1].when[0].window[0]").as("c")
+        .alias("$where[0].what[2].when[0].window[0]").as("e4")
+        .alias("$where[0].what[3].when[0].window[0]").as("e5")
+
+.percentile("$l;0.9").as("latency")
+.average("$c").as("count")
+.average("$e4").as("err4xx")
+.average("$e5").as("err5xx")
+
+.math("(1-($err4xx+$err5xx)/$count)*100").as("err_budget")
+.math("((1500-$latency)/1500)*100").as("perf_budget")
+.math("($err_budget+$perf_budget)/2").as("slo")
+
+.print("$perf_budget","$err_budget","$slo")
+        .out("slo.json")
