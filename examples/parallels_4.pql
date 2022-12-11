@@ -1,0 +1,16 @@
+//query cloudwatch and get CPU utilization
+where("$cw_aws")
+.what("MetricName='CPUUtilization';InstanceId='*'; Namespace='AWS/EC2'")
+	.when("start = '29-09-2022 00:00:00 +00'; end = '29-12-2022 23:59:59 +00'")
+
+.window("1h")
+        .alias("$where[0].what[0].when[0]").as("ts_cpu")
+
+
+//compute the 75th percentile summary statistics for the periods 
+.percentile("$ts_cpu;0.75").as("perc_cpu")
+
+.assert("$perc_cpu > 0.5").as("busy_period")
+
+.print("$busy_period")
+        .out("times.json")
