@@ -1,0 +1,18 @@
+where("$cw_aws")
+.what(
+    "MetricName='NetworkPacketsIn'; InstanceId='*'; Namespace='AWS/EC2'",
+    "MetricName='NetworkIn'; InstanceId='*'; Namespace='AWS/EC2'"
+)
+.when("24h")
+.window("15m")
+
+.alias("$where[0].what[0].when[0].window[0]").as("np")
+.alias("$where[0].what[1].when[0].window[0]").as("nb")
+
+.merge("$nb; average").as("net_bytes")
+.merge("$np; average").as("net_packets")
+.correlate("$net_bytes;$net_packets").as("net_balance_bytes_packets")
+.assert("$net_balance_bytes_packets > 0.75").as("network_throughput_is_in_balance")
+
+.print("$network_throughput_is_in_balance")
+.out("merge.json")
