@@ -1,4 +1,4 @@
-where("$cw_aws","$prometheus","$cw_aws_pk")
+where("@cw_aws","@prometheus","@cw_aws_x")
 .what(
 	"MetricName='CPUUtilization';InstanceId='*'; Namespace='AWS/EC2'",
 	"node_cpu_seconds_total",

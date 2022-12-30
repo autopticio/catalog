@@ -1,4 +1,4 @@
-where("$cw_aws")
+where("@cw_aws")
 .what(
     "MetricName='NetworkPacketsIn'; InstanceId='*'; Namespace='AWS/EC2'",
     "MetricName='NetworkIn'; InstanceId='*'; Namespace='AWS/EC2'"

@@ -1,4 +1,4 @@
-where("$cw_aws_pk")
+where("@cw_aws_x")
 .what("MetricName='DiskWriteBytes';InstanceId='*'; Region='us-*';Namespace='AWS/EC2'")
 .when("720h")
 .window("1h")

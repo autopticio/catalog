@@ -1,4 +1,4 @@
-where("$cw_aws")
+where("@cw_aws")
 .what(	
 	"MetricName='Count'; Stage='*';ApiName='Autoptic*';Stat='Sum';Region='eu-west-1';Namespace='AWS/ApiGateway'",
 	"MetricName='4XXError'; Stage='*';ApiName='Autoptic*';Stat='Sum';Region='eu-west-1';Namespace='AWS/ApiGateway'",

@@ -1,4 +1,4 @@
-where("$cw_aws")
+where("@cw_aws")
 .what(
     "MetricName='Utilization*';Namespace='AWS/*'",
     "MetricName='Utilization*';Namespace='AWS/*';Region='eu-*|us-*'",

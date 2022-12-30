@@ -1,5 +1,5 @@
 //query cloudwatch and get a list of active services 
-where("$cw_aws_pk")
+where("@cw_aws_x")
 .what("MetricName='CallCount';Region='us-*';Service='*'; Namespace='AWS/Usage'")
 .what("MetricName='ResourceCount';Type='*';Service='*';Region='eu-west-1'; Namespace='AWS/Usage'")
 

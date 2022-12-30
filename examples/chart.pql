@@ -1,0 +1,9 @@
+//query cloudwatch and get CPU utilization
+where("@cw_aws")
+.what("MetricName='CPUUtilization';InstanceId='*'; Namespace='AWS/EC2'")
+.when("1h")
+        .alias("$where[0].what[0].when[0]").as("ts_cpu")
+
+.chart("$ts_cpu; @line")
+.chart("@bar; $ts_cpu")
+.out("./chart.html")

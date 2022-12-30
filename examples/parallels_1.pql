@@ -1,5 +1,5 @@
 //query cloudwatch and get CPU utilization
-where("$cw_aws")
+where("@cw_aws")
 .what("MetricName='CPUUtilization';InstanceId='*'; Namespace='AWS/EC2'")
 	.when("start = '29-01-2022 00:00:00 +00'; end = '29-03-2022 23:59:59 +00'")
 

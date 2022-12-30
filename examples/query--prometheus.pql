@@ -1,4 +1,4 @@
-where("$prometheus")
+where("@prometheus")
 .what("node_cpu_seconds_total")
 .when("24h")
 .window("15m")

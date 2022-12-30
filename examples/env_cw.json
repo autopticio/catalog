@@ -1,5 +1,5 @@
 {
-  "data":
+  "where":
   [
     {
       "name": "cw_aws",
@@ -9,6 +9,50 @@
         "window": "300s",
         "aws_access_key_id": "",
         "aws_secret_access_key": ""
+      }
+    }
+  ],
+ "chart":
+  [
+    {
+      "name": "line",
+      "type": "line",
+      "vars": {
+          "backgroundColor": "rgb(99, 99, 132)",
+          "borderColor": "rgb(99, 99, 132)",
+          "stacked": false
+      }
+    },
+    {
+      "name": "lineNotStacked",
+      "type": "line",
+      "vars": {
+          "backgroundColor": "#99d376",
+          "borderColor": "#3158f9",
+          "stacked": false
+      }
+    },
+    {
+      "name": "lineDefault",
+      "type": "line"
+
+    },
+    {
+      "name": "lineStack",
+      "type": "line",
+      "vars": {
+          "backgroundColor": "rgb(99, 99, 132)",
+          "borderColor": "rgb(99, 99, 132)",
+          "stacked": "1"
+      }
+    },
+    {
+      "name": "bar",
+      "type": "bar",
+      "vars": {
+          "backgroundColor": "rgb(255, 99, 132)",
+          "borderColor": "rgb(255, 99, 132)",
+          "stacked": "1"
       }
     }
   ]

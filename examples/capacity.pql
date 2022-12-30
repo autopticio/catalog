@@ -1,5 +1,5 @@
 //query cloudwatch usage and check against limits 
-where("$cw_aws_pk")
+where("@cw_aws_x")
 .what("MetricName='CallCount';Region='us-*';Service='CloudWatch';Resource='GetMetricData'; Namespace='AWS/Usage'")
 .when("720h")
 .window("360h")

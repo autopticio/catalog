@@ -1,4 +1,4 @@
-where("$cw_aws_pk")
+where("@cw_aws_x")
 .what("MetricName='NetworkIn';InstanceId='*'; Region='us-*';Namespace='AWS/EC2'")
 .when("24h")
 .alias("$where[0].what[0].when[0]").as("data")
