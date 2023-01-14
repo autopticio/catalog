@@ -51,14 +51,14 @@ The run.sh script below illustrates how to submit a program to the Autoptic API.
 
 # Input params
 #1 PQL environment definition json 
-#2 PQL program file
-#3 PQL endpoint URL
+#2 PQL endpoint URL
+#3 PQL program file
 
 curl  -H "content-type: application/json" -X POST  \
---data '{"vars": "'$(cat $1 | base64 )'", "pql": "'$(cat $2 | base64 )'"}' $3
+--data '{"vars": "'$(cat $1 | base64 )'", "pql": "'$(cat $3 | base64 )'"}' $2
 ```
 
-Substitute the URL in the example with the endpoint URL you received and run the script as follows: `sh run.sh env_cw.json simple.pql https://autoptic.io/pql/ep/007/run ` 
+Substitute the URL in the example with the endpoint URL you received and run the script as follows: `sh run.sh env_cw.json https://autoptic.io/pql/ep/007/run simple.pql` 
 
 Here the response you would expect in a json format: [Sample results](./examples/sample_result.json)
 
