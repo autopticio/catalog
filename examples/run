@@ -1,13 +1,22 @@
 #!/bin/bash
 
 PQL_PROGRAM=$1
+clientos="$(uname -s)"
+if [[ $clientos == *"Darwin"* ]]; then
+	base_params=""
+elif [[ $clientos == *"Linux"* ]]; then
+	base_params="-w 0"
+else
+	echo "The run script supports Mac and Linux. ClientOS detected:$cleintos"
+	exit 1
+fi
 
 if [ -z "$AUTOPTIC_EP" ] || [ -z "$PQL_PROGRAM" ] || [ -z "$AUTOPTIC_ENV" ]
 then
 	echo "Missing inputs: AUTOPTIC_ENV or AUTOPTIC_EP environment variables were not set, or a PQL program  was not provided as an input parameter."
-	echo "example ..."
+	exit 1
 else
-curl -H "content-type: application/json" -X POST  \
---data '{"vars": "'$(cat $AUTOPTIC_ENV | base64 )'", "pql": "'$(cat $PQL_PROGRAM | base64 )'"}' $AUTOPTIC_EP 
+	curl -H "content-type: application/json" -X POST  \
+	--data '{"vars": "'$(cat $AUTOPTIC_ENV | base64 $base_params)'", "pql": "'$(cat $PQL_PROGRAM | base64 $base_params)'"}' $AUTOPTIC_EP 
 fi
 
