@@ -9,4 +9,5 @@ where("@cw_aws")
 
 //print the percentile values, and all cpu timeseries data points.
 .print("$perc_cpu","$ts_cpu")
+//.chart("$ts_cpu ; @line")
         .out("cloudwatch_results.json")
