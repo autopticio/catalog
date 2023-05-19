@@ -1,40 +1,40 @@
-where("@cw_aws","@prometheus","@cw_aws_x")
+where(@cw_aws; @prometheus ; @cw_aws_x)
 .what(
-	"MetricName='CPUUtilization';InstanceId='*'; Namespace='AWS/EC2'",
-	"node_cpu_seconds_total",
-	"process_cpu_seconds_total",
+	"MetricName='CPUUtilization';InstanceId='*'; Namespace='AWS/EC2'";
+	"node_cpu_seconds_total";
+	"process_cpu_seconds_total"
 )
-.when("3h")
-.window("10m")
-.alias("$where[0].what[0].when[0].window[0]").as("instance_cpu")
-.alias("$where[2].what[0].when[0].window[0]").as("instance_cpu_pk")
-.alias("$where[1].what[1].when[0].window[0]").as("node_cpu_seconds")
-.alias("$where[1].what[2].when[0].window[0]").as("process_cpu_seconds")
+.when(3h)
+.window(10m)
+.request($where[0];$what[0];$when[0];$window[0]).as($instance_cpu)
+.request($where[2];$what[0];$when[0];$window[0]).as($instance_cpu_pk)
+.request($where[1];$what[1];$when[0];$window[0]).as($node_cpu_seconds)
+.request($where[1];$what[2];$when[0];$window[0]).as($process_cpu_seconds)
 
 //Compute total CPU seconds across 2 CPUs from Prometheus
-.filter("$node_cpu_seconds", "cpu='0'").as("cpu0")
-.filter("$node_cpu_seconds", "cpu='1'").as("cpu1")
+.filter($node_cpu_seconds; "cpu='0'").as($cpu0)
+.filter($node_cpu_seconds; "cpu='1'").as($cpu1)
 
-.merge("$cpu0; sum").as("cpu0_total_seconds")
-.merge("$cpu1; sum").as("cpu1_total_seconds")
-.merge("$cpu0_total_seconds;$cpu1_total_seconds; average").as("cpu_total_seconds")
+.merge($cpu0; sum).as($cpu0_total_seconds)
+.merge($cpu1; sum).as($cpu1_total_seconds)
+.merge($cpu0_total_seconds;$cpu1_total_seconds; average).as($cpu_total_seconds)
 
 //Filter the Prometheus process CPU seconds
-.filter("$process_cpu_seconds", "job='prometheus'").as("prometheus_seconds")
+.filter($process_cpu_seconds; "job='prometheus'").as($prometheus_seconds)
 
 //Compute Prometheus process utilization percent
-.average("$cpu_total_seconds").as("cpu_avg")
-.average("$prometheus_seconds").as("prom_avg")
-.math("($prom_avg/$cpu_avg)*100").as("prometheus_utilization")
+.average($cpu_total_seconds).as($cpu_avg)
+.average($prometheus_seconds).as($prom_avg)
+.math(($prom_avg/$cpu_avg)*100).as($prometheus_utilization)
 
 //Compute the average EC2 CPU utilization percent
-.merge("$instance_cpu;$instance_cpu_pk;average").as("ec2_cpu_utilization")
-.average("$ec2_cpu_utilization").as("ec2_avg_cpu")
+.merge($instance_cpu;$instance_cpu_pk;average).as($ec2_cpu_utilization)
+.average($ec2_cpu_utilization).as($ec2_avg_cpu)
 
 //Compute CPU utilization that is NOT taken up by the prometheus process across regions and accounts
-.math("(1-$prometheus_utilization/$ec2_avg_cpu)*100").as("workload_waste")
+.math((1-$prometheus_utilization/$ec2_avg_cpu)*100).as($workload_waste)
 
 
-.print("$cpu_total_seconds","$ec2_cpu_utilization")
-.print("$workload_waste","$prometheus_utilization","$ec2_avg_cpu")
-.out("multisource.json")
+.print($cpu_total_seconds;$ec2_cpu_utilization)
+.print($workload_waste;$prometheus_utilization;$ec2_avg_cpu)
+.out("processing_waste")

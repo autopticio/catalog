@@ -1,10 +1,10 @@
-where("@cw_aws")
+where(@cw_aws)
 .what("MetricName='CPUUtilization';InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'")
-.when("24h")
-.alias("$where[0].what[0].when[0]").as("data")
+.when(24h)
+.request($where[0] ;$what[0];$when[0]).as($data)
 
-.sort("$data; 1").as("sorted")
-.tail("$sorted; 3").as("bottom3")
+.sort($data; 1).as($sorted)
+.tail($sorted; 3).as($bottom3 ; unit='percent')
 
-.print("$bottom3")
-.out("bottom3.json")
+.print($bottom3)
+.out("bottom3")

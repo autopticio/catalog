@@ -1,0 +1,12 @@
+where(@cw_aws)
+.what(
+    "MetricName='Calls';VERSION='1.0';Region='us-west-2';Namespace='Resources'";
+    "MetricName='ActiveEndpoints';Region='us-west-2';Namespace='Resources'"
+)
+.when(30m)
+.window(5m)
+.request($where[0];$what[0];$when[0];$window[0]).as($calls)
+.request($where[0];$what[1];$when[0];$window[0]).as($activeep)
+
+.print($calls;$activeep)
+.out("custom metrics")

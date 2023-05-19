@@ -1,17 +1,17 @@
 //query cloudwatch usage and check against limits 
-where("@cw_aws_x")
+where(@cw_aws_x)
 .what("MetricName='CallCount';Region='us-*';Service='CloudWatch';Resource='GetMetricData'; Namespace='AWS/Usage'")
-.when("720h")
-.window("360h")
-        .alias("$where[0].what[0].when[0].window[0]").as("calls")
+.when(720h)
+.window(360h)
+        .request($where[0];$what[0];$when[0];$window[0]).as($calls)
 
-.open("https://autoptic-demo.s3.us-west-2.amazonaws.com/snaps/awsquota.json; $cw_getmetrics_quota").as("limits")
+.open("https://autoptic-demo.s3.us-west-2.amazonaws.com/snaps/awsquota.json"; $cw_getmetrics_quota).as($limits)
 
-.merge("$calls;max").as("mcalls")
-.max("$mcalls").as("maxcalls")
+.merge($calls;max).as($mcalls)
+.max($mcalls).as($maxcalls)
 
-.assert("$maxcalls < $limits").as("capacity_cloudwatch_ok")
+.assert($maxcalls < $limits).as($capacity_cloudwatch_ok)
 
 //print the percentile values, and all cpu timeseries data points.
-.print("$calls","$limits","$capacity_cloudwatch_ok")
-        .out("capacity.json")
+.print($calls;$limits;$capacity_cloudwatch_ok)
+        .out(capacity.json)

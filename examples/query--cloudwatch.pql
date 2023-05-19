@@ -1,18 +1,18 @@
-where("@cw_aws")
+where(@cw_aws)
 .what(
-    "MetricName='CPUUtilization';InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'",
-    "MetricName='NetworkIn';InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'",
-    "MetricName='NetworkOut';InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'",
-    "MetricName='NetworkPacketsIn';InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'",
+    "MetricName='CPUUtilization';InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'";
+    "MetricName='NetworkIn';InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'";
+    "MetricName='NetworkOut';InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'";
+    "MetricName='NetworkPacketsIn';InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'";
     "MetricName='NetworkPacketsOut';InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'"
 )
-.when("24h")
-.window("15m")
-.alias("$where[0].what[0].when[0].window[0]").as("i_cpu")
-.alias("$where[0].what[1].when[0].window[0]").as("i_netin_b")
-.alias("$where[0].what[2].when[0].window[0]").as("i_netout_b")
-.alias("$where[0].what[3].when[0].window[0]").as("i_netin_p")
-.alias("$where[0].what[4].when[0].window[0]").as("i_netout_p")
+.when(24h)
+.window(15m)
+.request($where[0];$what[0];$when[0];$window[0]).as($i_cpu)
+.request($where[0];$what[1];$when[0];$window[0]).as($i_netin_b)
+.request($where[0];$what[2];$when[0];$window[0]).as($i_netout_b)
+.request($where[0];$what[3];$when[0];$window[0]).as($i_netin_p)
+.request($where[0];$what[4];$when[0];$window[0]).as($i_netout_p)
 
-.print("$i_cpu","$i_netin_p","$i_netout_p","$i_netin_b","$i_netout_b")
-.out("cloudwatch-ec2-full.json")
+.print($i_cpu; $i_netin_p ; $i_netout_p ; $i_netin_b ; $i_netout_b)
+.out("cloudwatch queries")

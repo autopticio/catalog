@@ -1,0 +1,22 @@
+ //query cloudwatch and get CPU related metrics
+where(@cw_aws ; @prometheus)
+.what("MetricName='CPU*'; Namespace='AWS/EC2'")
+.what("node_cpu_seconds_total; cpu='1'; mode=~'user|system'")
+.when(1h)
+
+.request($where[0]; $what[0] ; $when[0]).as($ts_cpu ; tag='cpu related metrics';  description='wildcard')
+.request($where[1]; $what[1] ; $when[0]).as($ts_p_cpu ; tag='process cpu related metrics')
+
+.filter($ts_p_cpu; "cpu='1' AND {mode='user' OR mode='system'}").as($user_p)
+
+.average($ts_cpu).as($avg)
+.average($ts_p_cpu).as($avg_p)
+.assert ($avg > 0).as($bool)
+
+.chart($bool;@pie)
+.chart($avg;@line)
+.chart($avg_p;@line)
+.chart($user_p;@line)
+//.print($ts_cpu ; $avg; $bool)
+        
+.out("cloudwatch_results")

@@ -1,12 +1,12 @@
-where("@cw_aws_x")
+where(@cw_aws_x)
 .what("MetricName='NetworkIn';InstanceId='*'; Region='us-*';Namespace='AWS/EC2'")
-.when("24h")
-.alias("$where[0].what[0].when[0]").as("data")
+.when(24h)
+.request($where[0];$what[0];$when[0]).as($data)
 
-.merge("$data;avg").as("merged")
+.merge($data;average).as($merged)
 
-.sort("$merged; 1").as("sorted")
-.head("$sorted; 3%").as("top3")
+.sort($merged; 1).as($sorted)
+.head($sorted; 3%).as($top3)
 
-.print("$top3")
-.out("peak3percent.json")
+.chart($top3;@bar)
+.out("peak 3 percent usage")

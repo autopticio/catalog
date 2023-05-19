@@ -1,0 +1,13 @@
+where(@cw_aws)
+.what(
+    "MetricName='BucketSizeBytes';BucketName='*';Namespace='AWS/S3';Region='eu-*|us-*'" ;
+    "MetricName='NumberOfObjects';BucketName='*';Namespace='AWS/S3';Region='eu-*|us-*'"
+)
+.when(3600h)
+.window(168h)
+.request($where[0] ; $what[0] ; $when[0] ; $window[0]).as($size)
+.request($where[0] ; $what[1] ; $when[0] ; $window[0]).as($count)
+
+.chart($size;@line)
+.chart($count;@line)
+.out("cloudwatch-s3")

@@ -1,0 +1,27 @@
+where(@cw_aws)
+.what(
+    "MetricName='BucketSizeBytes';BucketName='*';Namespace='AWS/S3';Region='eu-west-1'";
+    "MetricName='NumberOfObjects';BucketName='*';Namespace='AWS/S3';Region='eu-west-1'"
+)
+.when(3600h)
+.window(168h)
+.request($where[0];$what[0];$when[0];$window[0]).as($size)
+.request($where[0];$what[1];$when[0];$window[0]).as($count)
+
+.merge		($size; average)	.as($size_merged)
+.merge		($count; average)	.as($count_merged)
+
+.percentile	($size_merged; 0.95)	.as($p95_s)
+.average	($size_merged)	.as($avg_s)
+
+.percentile	($count_merged; 0.95)	.as($p95_c)
+.average	($count_merged)	.as($avg_c)
+
+.math 		(1-$avg_s/$p95_s)	.as($size_change)
+.math 		(1-$avg_c/$p95_c)	.as($count_change)
+
+.assert	($count_change > $size_change).as($count_has_changed_the_most)
+
+.chart ($size_change ; $count_change; $count_has_changed_the_most ; @bar)
+.chart ($size_change ; $count_change; $count_has_changed_the_most ; @pie)
+.out("cloudwatch-s3")

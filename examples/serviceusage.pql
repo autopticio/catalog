@@ -1,14 +1,14 @@
 //query cloudwatch and get a list of active services 
-where("@cw_aws_x")
+where(@cw_aws_x)
 .what("MetricName='CallCount';Region='us-*';Service='*'; Namespace='AWS/Usage'")
 .what("MetricName='ResourceCount';Type='*';Service='*';Region='eu-west-1'; Namespace='AWS/Usage'")
 
-.when("720h")
-.window("720h")
-        .alias("$where[0].what[0].when[0].window[0]").as("calls_us")
-        .alias("$where[0].what[1].when[0].window[0]").as("resources_eu")
+.when(720h)
+.window(720h)
+        .request($where[0];$what[0];$when[0];$window[0]).as($calls_us)
+        .request($where[0];$what[1];$when[0];$window[0]).as($resources_eu)
 
-.merge("$calls_us;average").as("active_services_us")
+.merge($calls_us;average).as($active_services_us)
 
-.print("$active_services_us","$resources_eu")
-        .out("serviceusage.json")
+.print($active_services_us; $resources_eu)
+        .out("service_usage")

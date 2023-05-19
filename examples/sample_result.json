@@ -1,13 +1,13 @@
 {
  "result": {
-  "cloudwatch_results.json": [
+  "simple cw program": [
    {
     "pql_var": "$ts_cpu",
     "series": {
      "info_source": {
-      "on": "28.10.2022 01:23:00 +0000",
+      "on": "19.05.2023 23:17:45 +0000",
       "metric_source": "cloudwatch",
-      "when": "Start: 28.10.2022 00:23:00 +0000; End: 28.10.2022 01:23:00 +0000",
+      "when": "Start: 19.05.2023 22:17:45 +0000; End: 19.05.2023 23:17:45 +0000",
       "step": "5m0s",
       "details": {
        "metric_name": "CPUUtilization",
@@ -22,12 +22,12 @@
        ]
       }
      },
-     "pql_expression": "$where[0].what[0].when[0]",
+     "pql_expression": "request($where[0];$what[0];$when[0])",
      "msgs": [
       "Got 1 time series from CloudWatch(eu-west-1)",
       "Become 1 as PQL time series(eu-west-1)",
-      "Pql source id: $where[0].what[0].when[0]",
-      "Processed alias(\"$where[0].what[0].when[0]\")"
+      "Pql source id: request($where[0];$what[0];$when[0])",
+      "Processed request"
      ],
      "pql_series": [
       {
@@ -57,48 +57,48 @@
        "status": 200,
        "ts": [
         {
-         "timestamp": 1666919580,
-         "value": 0.16673108224471342
+         "ts": 1684537620,
+         "v": 0.16670371399462822
         },
         {
-         "timestamp": 1666919280,
-         "value": 0.19999999999708978
+         "ts": 1684537320,
+         "v": 0.18364360470474358
         },
         {
-         "timestamp": 1666918980,
-         "value": 0.18253218486700779
+         "ts": 1684537020,
+         "v": 0.2153190701125734
         },
         {
-         "timestamp": 1666918680,
-         "value": 0.21594708207771257
+         "ts": 1684536720,
+         "v": 0.16671297582657804
         },
         {
-         "timestamp": 1666918380,
-         "value": 0.2187200786916438
+         "ts": 1684536420,
+         "v": 0.2664212281187036
         },
         {
-         "timestamp": 1666918080,
-         "value": 0.18197647494771524
+         "ts": 1684536120,
+         "v": 0.18391682874849602
         },
         {
-         "timestamp": 1666917780,
-         "value": 0.16788002847177882
+         "ts": 1684535820,
+         "v": 0.18337038066230543
         },
         {
-         "timestamp": 1666917480,
-         "value": 0.198944151150203
+         "ts": 1684535520,
+         "v": 0.1658655181994916
         },
         {
-         "timestamp": 1666917180,
-         "value": 0.20008479367076398
+         "ts": 1684535220,
+         "v": 0.1833518569970512
         },
         {
-         "timestamp": 1666916880,
-         "value": 0.2006029772019796
+         "ts": 1684534920,
+         "v": 0.1838983050845154
         },
         {
-         "timestamp": 1666916580,
-         "value": 0.20151485040177536
+         "ts": 1684534620,
+         "v": 0.20058349541490017
         }
        ]
       }
@@ -112,11 +112,11 @@
      "info": [
       "Got 1 time series from CloudWatch(eu-west-1)",
       "Become 1 as PQL time series(eu-west-1)",
-      "Pql source id: $where[0].what[0].when[0]",
-      "Processed alias(\"$where[0].what[0].when[0]\")",
-      "Calling statistic function percentile with parameter $ts_cpu;0.15;0.99 on PQL Series resulting of the early info"
+      "Pql source id: request($where[0];$what[0];$when[0])",
+      "Processed request",
+      "Calling statistic function percentile($ts_cpu;0.15;0.99)"
      ],
-     "on": "28.10.2022 01:23:01 +0000",
+     "on": "19.05.2023 23:17:45 +0000",
      "pql_function": "percentile",
      "the_res_val": [
       {
@@ -148,8 +148,8 @@
         0.99
        ],
        "values": [
-        0.17492825170974702,
-        0.2184427790302507
+        0.16670834491060313,
+        0.2613110123180906
        ]
       }
      ]
@@ -159,10 +159,11 @@
  },
  "errors": 0,
  "info": [
-  "Found 2 PQL variables.",
-  "TIME TOOK getting row metrics from [0 0 0 255] (93.327475ms)",
-  "Got 1 time series from CloudWatch(eu-west-1); Become 1 as PQL time series(eu-west-1); Pql source id: $where[0].what[0].when[0]; Processed alias(\"$where[0].what[0].when[0]\") - DONE",
-  "Got 1 time series from CloudWatch(eu-west-1); Become 1 as PQL time series(eu-west-1); Pql source id: $where[0].what[0].when[0]; Processed alias(\"$where[0].what[0].when[0]\"); Calling statistic function percentile with parameter $ts_cpu;0.15;0.99 on PQL Series resulting of the early info - DONE",
-  "2 entries has been written in the output cloudwatch_results.json"
+  "Found 3 PQL where and 7 chart variables.",
+  "TIME TOOK getting row metrics from [48 48 48 255] (130.608276ms)",
+  "$ts_cpu: Got 1 time series from CloudWatch(eu-west-1); Become 1 as PQL time series(eu-west-1); Pql source id: request($where[0];$what[0];$when[0]); Processed request - DONE",
+  "$perc_cpu: Got 1 time series from CloudWatch(eu-west-1); Become 1 as PQL time series(eu-west-1); Pql source id: request($where[0];$what[0];$when[0]); Processed request; Calling statistic function percentile($ts_cpu;0.15;0.99) - DONE",
+  "2 entries has been written in the output simple cw program",
+  "*******   TIME TOOK(from start to end) 827.292192ms   *******"
  ]
 }

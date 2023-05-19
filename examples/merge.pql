@@ -1,18 +1,18 @@
-where("@cw_aws")
+where(@cw_aws)
 .what(
-    "MetricName='NetworkPacketsIn'; InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'",
+    "MetricName='NetworkPacketsIn'; InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'";
     "MetricName='NetworkPacketsIn'; InstanceId='i-00f9990d7a4d502xy'; Namespace='AWS/EC2'"
 )
-.when("24h")
-.window("15m")
+.when(24h)
+.window(15m)
 
-.alias("$where[0].what[0].when[0].window[0]").as("netin_a")
-.alias("$where[0].what[1].when[0].window[0]").as("netin_b")
+.request($where[0];$what[0];$when[0];$window[0]).as($netin_a)
+.request($where[0];$what[1];$when[0];$window[0]).as($netin_b)
 
-.merge("$netin_a;$netin_b; sum").as("netin_sum")
-.merge("$netin_a;$netin_b; max").as("netin_max")
-.merge("$netin_a;$netin_b; min").as("netin_min")
-.merge("$netin_a;$netin_b; average").as("netin_average")
+.merge($netin_a;$netin_b; sum).as($netin_sum)
+.merge($netin_a;$netin_b; max).as($netin_max)
+.merge($netin_a;$netin_b; min).as($netin_min)
+.merge($netin_a;$netin_b; average).as($netin_average)
 
-.print("$netin_max","$netin_sum","$netin_average","$netin_min")
-.out("merge.json")
+.print($netin_max;$netin_sum;$netin_average;$netin_min)
+.out("merge")

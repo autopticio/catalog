@@ -5,14 +5,32 @@
       "name": "cw_aws",
       "type": "CloudWatch",
       "vars": {
+        "AwsRegion": "eu-west-1",
+        "window": "300s",
+        "aws_access_key_id": "",
+        "aws_secret_access_key": ""
+      }
+    },
+    {
+      "name": "cw_aws_x",
+      "type": "CloudWatch",
+      "vars": {
         "AwsRegion": "us-east-1",
         "window": "300s",
         "aws_access_key_id": "",
         "aws_secret_access_key": ""
       }
+    },
+    {
+      "name": "prometheus",
+      "type": "Prometheus",
+      "vars": {
+        "prom_address": "",
+        "window": "300s"
+      }
     }
   ],
- "chart":
+  "chart":
   [
     {
       "name": "line",
@@ -33,12 +51,12 @@
       }
     },
     {
-      "name": "lineDefault",
+      "name": "line123",
       "type": "line"
 
     },
     {
-      "name": "lineStack",
+      "name": "linestack",
       "type": "line",
       "vars": {
           "backgroundColor": "rgb(99, 99, 132)",
@@ -53,6 +71,24 @@
           "backgroundColor": "rgb(255, 99, 132)",
           "borderColor": "rgb(255, 99, 132)",
           "stacked": "1"
+      }
+    },
+    {
+      "name": "pie",
+      "type": "pie",
+      "vars": {
+          "backgroundColor": "rgb(99, 99, 132)",
+          "borderColor": "rgb(99, 99, 132)",
+          "stacked": true
+      }
+    },
+    {
+      "name": "pie-not-stacked",
+      "type": "pie",
+      "vars": {
+          "backgroundColor": "rgb(99, 99, 132)",
+          "borderColor": "rgb(99, 99, 132)",
+          "stacked": false
       }
     }
   ]

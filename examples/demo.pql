@@ -1,13 +1,12 @@
-//query cloudwatch and get CPU utilization
-where("@cw_aws")
+ //query cloudwatch and get CPU utilization
+where(@cw_aws)
 .what("MetricName='CPUUtilization'; Namespace='AWS/EC2'")
-.when("1h")
-        .alias("$where[0].what[0].when[0]").as("ts_cpu")
-
+.when(1h)
+        .request($where[0];$what[0];$when[0]).as($ts_cpu)
 //compute the 15th and 99th percentile summary statistics for the last hour
-.percentile("$ts_cpu;0.15;0.99").as("perc_cpu")
+.percentile($ts_cpu;0.15;0.99).as($perc_cpu)
 
 //print the percentile values, and all cpu timeseries data points.
-.print("$perc_cpu","$ts_cpu")
-//.chart("$ts_cpu ; @line")
-        .out("cloudwatch_results.json")
+.print($perc_cpu;$ts_cpu)
+//.chart($ts_cpu ; @line)
+        .out("cloudwatch_cpu_results")
