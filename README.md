@@ -1,25 +1,25 @@
 ## Getting started with programmable assessments 
-Autoptic PQL is a functional language for timeseries data analysis. Here is a simple example with Amazon CloudWatch.
+Autoptic PQL is a functional language for time-series data analysis. Here is a simple example with Amazon CloudWatch.
 ```
 //query cloudwatch and get instance CPU utilization for the last hour
-where("@cw_aws")
-.what("MetricName='CPUUtilization';InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'")
-.when("1h")
-        .alias("$where[0].what[0].when[0]").as("ts_cpu")
+where(@cw_aws)
+.what("MetricName='CPUUtilization';InstanceId='i-a0f8880d7a4d502db'; Namespace='AWS/EC2'")
+.when(1h)
+        .request($where[0];$what[0];$when[0]).as($ts_cpu)
 
 //compute the 15th and 99th percentile summary statistics
-.percentile("$ts_cpu;0.15;0.99").as("perc_cpu")
+.percentile($ts_cpu;0.15;0.99).as($perc_cpu)
 
 //print the percentile values, and all cpu timeseries data points.
-.print("$perc_cpu","$ts_cpu")
-        .out("cloudwatch_results.json")
+.print($perc_cpu ; $ts_cpu)
+        .out("cloudwatch cpu results")
 ```
 
 Follow the steps below to run the example program.
 
 #### 1. Configure access to Amazon CloudWatch
 
-Create a local env_cw.json file and add the contents below or [download the template](./examples/env_cw.json).
+Create a local env.json file and add the contents below or [download the template](./examples/env_template.json).
 ```
 {
   "where":
@@ -45,7 +45,7 @@ Add your account credentials in the "aws_access_key_id" and "aws_secret_access_k
 #### 3. Run the program through your endpoint and check the results
 [Signup and activate an Autoptic endpoint](https://www.autoptic.io/#signup).
 
-The run.sh script below illustrates how to submit a program to the Autoptic API.
+The simple script below illustrates how to submit a program to the Autoptic API. You can also [download the script from the examples](./examples/run).
 ```
 #!/bin/bash
 
@@ -58,12 +58,14 @@ curl  -H "content-type: application/json" -X POST  \
 --data '{"vars": "'$(cat $1 | base64 )'", "pql": "'$(cat $3 | base64 )'"}' $2
 ```
 
-Substitute the URL in the example with the endpoint URL you received and run the script as follows: `sh run.sh env_cw.json https://autoptic.io/pql/ep/007/run simple.pql` 
+Substitute the URL in the example with the endpoint URL you received and run the script as follows: `sh run env.json https://autoptic.io/pql/ep/007/run simple.pql` 
 
 Here the response you would expect in a json format: [Sample results](./examples/sample_result.json)
 
+#### 4. Install the vscode Autoptic extension 
+
 ## Autoptic Architecture
-PQL programs are edited locally and posted through a secure API endpoint to the Autoptic PQL runtime where code is executed. The runtime will get timeseries data from the remote sources configured in the program and return the computed results to the requesting client.  
+PQL programs are edited locally and posted through a secure API endpoint to the Autoptic PQL runtime where code is executed. The runtime will get timeseries data from the remote sources configured in the program and return the computed results in html or json to the requesting client.  
 ![alt text](https://www.autoptic.io/assets/img/architecture_logical.png)
 
 ## PQL Program Structure
@@ -71,7 +73,7 @@ PQL programs are edited locally and posted through a secure API endpoint to the 
 ### Query
 Query functions describe data inputs from the data sources:
 
-[3w's](#3ws) | [where](#where) | [what](#what) | [when](#when) | [window](#window) | [open](#open) | [as](#as) | [alias](#alias)
+[3w's](#3ws) | [where](#where) | [what](#what) | [when](#when) | [window](#window) | [open](#open) | [as](#as) | [request](#request)
 
 ### Aggregate
 Aggregate functions handle timeseries data reduction or aggregation:
@@ -81,12 +83,12 @@ Aggregate functions handle timeseries data reduction or aggregation:
 ### Compute
 Compute functions allow computing simple or more complex statistics: 
 
-[average](#average) | [min](#min) | [max](#max) | [count](#count) | [percentile](#percentile) | [math](#math)
+[average](#average) | [min](#min) | [max](#max) | [count](#count) | [percentile](#percentile) | [assert](#assert) | [math](#math) | [correlate](#correlate)
 
 ### Output
 Output functions direct how the resulting output will be handled:
 
-[assert](#assert) | [sort](#sort) | [head](#head) | [tail](#tail) | [print](#print) | [out](#out)
+[sort](#sort) | [head](#head) | [tail](#tail) | [print](#print) | [chart](#chart) | [out](#out) 
 
 ### Data Source Reference
 Data source references specify which data sources will be used from the environment definition:
@@ -97,188 +99,205 @@ Data source references specify which data sources will be used from the environm
 #### 3w's
 A query consists of 3 required (what,where,when) and 1 optional (window) dimensions. Each combination of dimensions produces a distinct collection that can be used by other functions in the PQL program. Every such collection is automatically labeled with the tuple of dimensions and position index of the parameters referenced.
 ```
-//The following query can produce 8 distinct timeseries collections:
-where("@cwA", "@cwB")
+//The following query can produce 8 distinct time-series collections:
+where(@cwA, @cwB)
 .what(
-    "MetricName='CPUUtilization';InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'",
-    "MetricName='NetworkOut'; InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'",
+    "MetricName='CPUUtilization';InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'";
+    "MetricName='NetworkOut'; InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'"
 )
-.when("1d", "1h")
+.when(1d, 1h)
 
 //The following collections are labeled as a response matrix.
-//Collection1 is labeled where[0].what[0].when[0] for tuple [@cwA][CPUUtilization...][1d]
-//Collection2 is labeled where[0].what[0].when[1] for tuple [@cwA][CPUUtilization...][1h]
-//Collection3 is labeled where[0].what[1].when[0] for tuple [@cwA][NetworkOut...][1d]
-//Collection4 is labeled where[0].what[1].when[1] for tuple [@cwA][NetworkOut...][1h]
-//Collection5 is labeled where[1].what[0].when[0] for tuple [@cwB][CPUUtilization...][1d]
-//Collection6 is labeled where[1].what[0].when[1] for tuple [@cwB][CPUUtilization...][1h]
-//Collection7 is labeled where[1].what[1].when[0] for tuple [@cwB][NetworkOut...][1d]
-//Collection8 is labeled where[1].what[1].when[1] for tuple [@cwB][NetworkOut...][1h]
+//Collection1 is composed as where[0].what[0].when[0] for tuple [@cwA][CPUUtilization...][1d]
+//Collection2 is composed as where[0].what[0].when[1] for tuple [@cwA][CPUUtilization...][1h]
+//Collection3 is composed as where[0].what[1].when[0] for tuple [@cwA][NetworkOut...][1d]
+//Collection4 is composed as where[0].what[1].when[1] for tuple [@cwA][NetworkOut...][1h]
+//Collection5 is composed as where[1].what[0].when[0] for tuple [@cwB][CPUUtilization...][1d]
+//Collection6 is composed as where[1].what[0].when[1] for tuple [@cwB][CPUUtilization...][1h]
+//Collection7 is composed as where[1].what[1].when[0] for tuple [@cwB][NetworkOut...][1d]
+//Collection8 is composed as where[1].what[1].when[1] for tuple [@cwB][NetworkOut...][1h]
 ```
 
-#### alias
-Creates a variable name for a selection in the response matrix.
-- parameters: 1 query matrix selection
-- use:
-	- Selecting the first and second time periods of the query.
-	```
-	.alias("$what[0].when[0].where[0]").as("snapshot_A")
-	.alias("$what[0].when[1].where[0]").as("snapshot_B")
-	```
-	- Selecting the second data source and third time window of the query.
-	```
-	alias("$what[0].when[0].where[1].window[2]").as("snapshot_C")
-	```
-	- Selecting all data sources and all time periods of the query.
-	```
-	alias("$what[0].when[*].where[*]").as("snapshot_D")
-	```
----
 #### as
-Creates a named timesieres variable from the results of the preceding function. Variables are used as inputs to other functions.
-- parameters: 1 variable name
+Creates a named time-sieres or a results variable from the results of the preceding function. Variables are used as inputs to other functions.
+- parameters: 1 variable name, N dimensions (optional)
 - use:
 	- Compute the average CPU and print the result
 	```
-	average("$cpu_timeseries").as("avg_cpu")
-	.print("$avg_cpu")
-	.out("results.json")
+	.average($cpu_timeseries).as($avg_cpu)
+	.print($avg_cpu)
+	.out("cpu results")
 	```
-	- Filter query data and merge into a single timeseries and print it
+	- Add dimensions to a variable
 	```
-	filter("$prom_cpu_5m_last30m", "{cpu='0' OR cpu='1'} AND mode='user'").as("cpu_filtered")
-	.merge("$cpu_filtered;average").as("single_cpu_ts")
-	.print("$single_cpu_ts")
-	.out("results.json")
+	.average($cpu_timeseries).as($avg_cpu ; unit='ticks' ; description='cpu metrics')
+	.print($avg_cpu")
+	.out("cpu results")
 	```
 ---
 #### assert
-Evaluates if a logical expression is true(1) or false(0). 
+Evaluates if a logical expression is true or false. 
 - parameters: 1 logical expression.
+- returns: 0 or 1
 - use:
-	- check if two counters are the same `assert("$count_cpu_aws == $count_cpu_prom")`
-	- check if CPU is greater than 50% `assert("$cpu_avg_utilization > 0.5")`
+	- check if two counters are the same `assert($count_cpu_aws == $count_cpu_prom)`
+	- check if CPU is greater than 50% `assert($cpu_avg_utilization > 0.5)`
 ---
 #### average
 Computes the average value for a timeseries.
-- parameters: 1 timeseries variable
+- parameters: 1 time-series variable
+- returns: float[] collection
 - use:
-	- compute the average `average("$cpu_utilization")`
+	- compute the average `average($cpu_utilization)`
+---
+#### correlate
+Computes the number of data points in a time-series.
+- parameters: 2 time-series variables
+- returns: float number of degree of correlation. 1 is highest correlation to -1 for inverse correlation. Numbers closer to 0 indicate low or no correlation.
+- use:
+	- compute the number of data points `correlate($cpu_utilization; $memory_utilization).as($resource_correlation)`
 ---
 #### count
-Computes the number of data points in a timeseries.
-- parameters: 1 timeseries variable
+Computes the number of data points in a time-series.
+- parameters: 1 time-series variable
+- returns: float[] collection
 - use:
 	- compute the number of data points `count("$cpu_utilization")`
 ---
 #### head
-Selects the first set of data points from a timeseries variable.
-- parameters: 1 timeseries variable and 1 integer | percent value.
+Selects the first set of data points from a time-series variable.
+- parameters: 1 time-series variable and 1 integer | percent value.
+- returns: time-series[] collection
 - use: 
-	- get the first 15 data points `head("$cpu0_user; 15")`
-	- get the first 2% of data points `head("$cpu0_user; 2%")`
+	- get the first 15 data points `head($cpu0_user; 15)`
+	- get the first 2% of data points `head($cpu0_user; 2%)`
 ---
 #### filter
-Selects the timeseries matching a logical expression.
-- parameters: 1 timeseries variable and 1 expression.
+Selects the time-series matching a logical expression.
+- parameters: 1 time-series variable and 1 expression.
+- returns: time-series[] collection
 - use:
-	- Select the timeseries that match the 'user' mode for CPU 0 
+	- Select the time-series that match the 'user' mode for CPU 0 
 	```
-	filter("$cpu_usage", "{cpu='0' AND mode='user'}")
+	filter($cpu_usage ; "{cpu='0' AND mode='user'}")
 	``` 
-	- Select the timeseries that match the 'user' and/or 'system' mode for CPU 0 and/or 1 
+	- Select the time-series that match the 'user' and/or 'system' mode for CPU 0 and/or 1 
 	```
-	filter("$cpu_usage", "{cpu='0' OR cpu='1'} AND {mode='user' OR mode='system'}")
+	filter($cpu_usage ; "{cpu='0' OR cpu='1'} AND {mode='user' OR mode='system'}")
 	``` 
 ---
 #### math
 Computes a value from a mathematical expression.
-- parameters: 1 math expression. Only single value variables can be provided in the expression.
+- parameters: 1 math expression. Only variables that contain single values can be provided in the expression.
+- returns: float
 - use:
 	- Sum of the CPU0 user and system utilization. 
 	```
-	math("($avg_cpu0_user + $avg_cpu0_system)")
+	math(($avg_cpu0_user + $avg_cpu0_system))
 	```
 	- Network Bytes in to out throughput ratio in percent
 	```
-	math("(1 - $net_in/$net_out)")
+	math((1 - $net_in/$net_out))
 	```
 ---
 #### max
 Computes the maximum value for a timeseries.
-- parameters: 1 timeseries variable
+- parameters: 1 time-series variable
+- returns: float[] collection
 - use:
-	- compute the maximum `max("$cpu_utilization")`
+	- compute the maximum `max($cpu_utilization)`
 ---
 #### merge
-Combines multiple timeseries into a single timeseries using an aggregation function.
-- parameters: N+1 timeseries and 1 aggregation function (min | max | average | sum).
+Combines multiple time-series into a single timeseries using an aggregation function.
+- parameters: N+1 time-series and 1 aggregation function (min | max | average | sum).
+- returns: timeseries[] collection
 - use:
 	- Merges system and user CPU 0 into a timeseries by adding data points in the same time window.
 	```
-	merge("$avg_cpu0_system; $avg_cpu0_user; sum")
+	merge($avg_cpu0_system; $avg_cpu0_user; sum)
 	```
-	- Merges the user CPU 0 and 1 into a single timeseries by computing the average for data points in the same time window. 
+	- Merges the user CPU 0 and 1 into a single time-series by computing the average for data points in the same time window. 
 	```
-	merge("$cpu0_user_case3; $cpu1_user_case3; avg")
+	merge($cpu0_user_case3; $cpu1_user_case3; average)
 	```
-	- Merges the user CPU 0,1,2,3 into a single timeseries based on the max valye for data points in the same time widnow.
+	- Merges the user CPU 0,1,2,3 into a single time-series based on the max valye for data points in the same time widnow.
 	```
-	merge("$cpu0_user; $cpu1_user; $cpu2_user; cpu3_user; max")
+	merge($cpu0_user; $cpu1_user; $cpu2_user; cpu3_user; max)
 	```
 ---
 #### min
-Computes the minimum value for a timeseries.
-- parameters: 1 timeseries variable
+Computes the minimum value for a time-series.
+- parameters: 1 time-series variable
+- returns: float[] collection
 - use:
-	- compute the minimum `min("$cpu_utilization")`
+	- compute the minimum `min($cpu_utilization)`
 ---
 #### open
 Opens a saved PQL results resource from a URI.
 - parameters: 1 PQL results resource and N+1 variables to select.
+- returns: time-series[] collection
 - use:
-	- open a remote file with PQL results and select which variables will be loaded `.open("https://s3bucketurl/data/aws_saved_results.json;$varA;varB")`
+	- open a remote file with PQL results and select which variables will be loaded `.open("https://s3bucketurl/data/aws_saved_results.json;$varA;varB)`
 ---
 #### out
-Selects the output destination for the program.
+Selects the output destination for the program for all preceding output functions calls. A single program can have multiple out calls.
 - parameters: N+1 destinations.
+- returns: html or json results.
 - use:
-	- send results to a single json result `.out("results.json")`
-	- send results to a multile json results `.out("resultA.json","resultB.json")`
+	- send results to a single result group `.out("results")`
 ---
 #### percentile
-Computes percentile summaries for a timeseries.
-- parameters: 1 timeseries variable and N+1 percentile float attributes.
+Computes percentile summaries for a time-series.
+- parameters: 1 time-series variable and N+1 percentile float attributes.
+- returns: float[] collection
 - use
-	- compute 1st percentile `percentile("$aws_cpu;0.01")`
-	- compute 15th and 98th percentile `percentile("$aws_cpu;0.15;0.98")`
+	- compute 1st percentile `percentile($aws_cpu;0.01)`
+	- compute 15th and 98th percentile `percentile($aws_cpu;0.15;0.98)`
 ---
 #### print
-Outputs a set of timeseries or computed statistics.
-- parameters: N+1 timeseries variables
+Outputs the contents of the selected variables in json.
+- parameters: N+1 time-series variables
+- returns: N/A
 - use: 
-	- output summary and timeseries values `print("$cnt_aws", "$cnt_prom", "$assert_cnts")`
+	- output summary and time-series values `print($cnt_aws ; $cnt_prom ; $assert_cnts)`
+---
+#### request
+Creates a variable name for a selection in the response matrix.
+- parameters: 1 query matrix selection
+- returns: time-series[] collection
+- use:
+	- Selecting the first and second time periods of the query.
+	```
+	.request($what[0]; $when[0] ; $where[0]).as($snapshot_A)
+	.request($what[0]; $when[1] ; $where[0]).as($snapshot_B)
+	```
+	- Selecting the second data source and third time window of the query.
+	```
+	.request($what[0]; $when[0] ; $where[1]; $window[2]).as($snapshot_C)
+	```
 ---
 #### sort
 Sorts all data points in a timeseries.
-- paramertes: 1 timeseries variable and 1 integer flag.
+- paramertes: 1 time-series[] or 1 aggregate[] variable and 1 integer flag.
+- returns: timeseries[] or float[] collection
 - use:
-	- sort in ascending order `sort("$prom_cpu_5m_last30m_filtered; 1")`
-	- sort in descending order `sort("$prom_cpu_5m_last30m_filtered; 0")`
+	- sort in ascending order `sort($prom_cpu_5m_last30m_filtered; 1)`
+	- sort in descending order `sort($prom_cpu_5m_last30m_filtered; 0)`
 ---
 #### tail
-Selects the last set of data points from a timeseries.
-- parameters: 1 timeseries variable and 1 integer | percent value.
+Selects the last set of data points from a time-series.
+- parameters: 1 time-series variable and 1 integer | percent value.
+- returns: time-series[] or float[] collection
 - use: 
-	- get the last 20 data points `tail("$cpu0_user; 20")`
-	- get the last 3% of data points `tail("$cpu0_user; 3%")`
+	- get the last 20 data points `tail($cpu0_user; 20)`
+	- get the last 3% of data points `tail($cpu0_user; 3%)`
 ---
 #### window
-Selects the granularity of the timeseries data retrieved from the data source.
+Selects the granularity of the time-series data retrieved from the data source.
 - parameters: N+1 time windows/buckets
 - use:
-	- 30 second window selection `window("30s")`
-	- 5 seconds and 1 hour window selections `window("5s","1h")`
+	- 30 second window selection `window(30s)`
+	- 5 seconds and 1 hour window selections `window(5s;1h)`
 - default: 300s
 ---
 #### what
@@ -290,32 +309,32 @@ Defines the query keywords and metadata submitted to the data sources.
 	- get multiple Cloudwatch metrics for an AWS EC2 instance
 	```
 	what(
-	  "MetricName='CPUUtilization'; InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'",
-	  "MetricName='NetworkOut'; InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'",
+	  "MetricName='CPUUtilization'; InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'" ;
+	  "MetricName='NetworkOut'; InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'" ;
 	  "MetricName='NetworkIn'; InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'"
 	)	
 	```
-	- get multiple Cloudwatch metrics using wildcards. Wildcards will match dimension values that contain the literal string preceding the wildcard. Multiple dimensions in a what function can be wildcarded. The results will match the union of dimensionsions and values specified.  
+	- get multiple Cloudwatch metrics using wildcards. Wildcards will match dimension values that contain the literal string preceding the wildcard. Multiple dimensions in a "what" function can be wildcarded. The results will match the union of dimensionsions and values specified.  
 	```
 	what(
 	  //match any metric that contains 'Utilization' across all Namespaces
-    	  "MetricName='Utilization*';Namespace='AWS/*'",
+    	  "MetricName='Utilization*';Namespace='AWS/*'" ;
 	  //match any metric that contains 'Utilization' across all Namespaces across all Regions
-    	  "MetricName='Utilization*';Namespace='AWS/*';Region='eu-*'",
+    	  "MetricName='Utilization*';Namespace='AWS/*';Region='eu-*'" ;
 	  //match any metric that contains 'CPU' across all InstanceIds for the EC2 Namespace in us-east-1
-    	  "MetricName='CPU*'; InstanceId='*';Namespace='AWS/EC2';Region='us-east-1';Stat='Maximum'",
+    	  "MetricName='CPU*'; InstanceId='*';Namespace='AWS/EC2';Region='us-east-1';Stat='Maximum'" ;
 	  //match the 'Latency' metric for APIs that contain 'Autoptic; in the ApiGateway Namespace in eu-west-1
-    	  "MetricName='Latency';ApiName='Autoptic*';Namespace='AWS/ApiGateway';Region='eu-west-1'",
+    	  "MetricName='Latency';ApiName='Autoptic*';Namespace='AWS/ApiGateway';Region='eu-west-1'" ;
 	  //match any metric that contains 'Latency' for tables that contain 'Endpoint' in DynamoDB Namespace in eu-west-1
-    	  "MetricName='Latency*';TableName='Endpoint*';Namespace='AWS/DynamoDB';Region='eu-west-1'",
+    	  "MetricName='Latency*';TableName='Endpoint*';Namespace='AWS/DynamoDB';Region='eu-west-1'" ;
 	  //match any metric that contains 'Latency' for tables that contain 'Endpoint' for all operations in DynamoDB Namespace in eu-west-1
-    	  "MetricName='Latency*';TableName='Endpoint*';Operation='*';Namespace='AWS/DynamoDB';Region='eu-west-1'",
+    	  "MetricName='Latency*';TableName='Endpoint*';Operation='*';Namespace='AWS/DynamoDB';Region='eu-west-1'"
 	)	
 	```
 	- get metrics from AWS and Prometheus
 	```
 	what(
-	  "MetricName='CPUUtilization';InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'",
+	  "MetricName='CPUUtilization';InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'" ;
 	  "node_cpu_seconds_total"
 	)
 	```
@@ -325,19 +344,19 @@ Selects the query time ranges for the program
 - parameters:  N+1 time ranges
 - use:
 	- releative time selection 
-		- recent 5 minutes `when("5m")` 
-		- recent 1 hour `when("1h")`
-		- recent 7 days `when("7d")`
+		- recent 5 minutes `when(5m)` 
+		- recent 1 hour `when(1h)`
+		- recent 7 days `when(7d)`
 	- absolute time selection
-		- start and end date time `"when("start = '22-02-2022 00:00:00 +00'; end = '22-02-2022 23:59:59 +00'")`
+		- start and end date time `when("start = '22-02-2022 00:00:00 +00'; end = '22-02-2022 23:59:59 +00'")`
 	- multi selection
-		- recent 24 hours and 2-22-22 `when("24h","start = '22-02-2022 00:00:00 +00'; end = '22-02-2022 23:59:59 +00'")`
+		- recent 24 hours and 2-22-22 `when(24h,"start = '22-02-2022 00:00:00 +00'; end = '22-02-2022 23:59:59 +00'")`
 ---
 #### where 
 Selects the data sources that will be used in the program from the [data source configuration](#data-sources).
 - parameters: N+1 data source references
 - use: 
-	- 3 data source references `where("$dsA","$dsB","$dsC")`
+	- 3 data source references `where(@dsA ; @dsB ; @dsC)`
 
 ## Data Sources
 The environment definition is a global configuration that stores preferences and data source access. Multiple data sources of different types can be configured and used by a PQL program. [download the template](./examples/env_cw.json)
