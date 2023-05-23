@@ -25,7 +25,7 @@ The sample query is looking up "CPUUtilization" of an EC2 instance. [Check the f
 Here the response you would expect in a json format: [Sample results](./examples/sample_result.json)
 
 #### 2. Install the vscode Autoptic extension 
-You can download and install a [VSCode exensions](https://github.com/autopticio/vscode-pql) and edit/run programs from the IDE.
+You can download and install a [VSCode exension](https://github.com/autopticio/vscode-pql) and edit/run PQL programs from the IDE.
 
 ## Autoptic Architecture
 PQL programs are edited locally and posted through a secure API endpoint to the Autoptic PQL runtime where code is executed. The runtime will get time series data from the remote sources configured in the program and return the computed results in html or json to the requesting client.  
