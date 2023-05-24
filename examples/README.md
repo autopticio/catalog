@@ -1,6 +1,5 @@
 ## About the catalog
 You can accomplish wonderful things with PQL and we want to share our learnings and experience through the example PQL programs. We are steadily researching and adding new recipes in this repository. The examples are curated through research, review and thorough testing, however feedback is always welcome so please submit PRs or issues for matters that can be improved! 
-Check out the [example programs](./examples/) for more ideas on how to use PQL for more programmable assessments. 
 
 ### 1.  What's up with your AWS S3 buckets? 
 [aha-s3-changes.pql](./aha-s3-changes.pql)  retrieves metrics related to S3 bucket size and object count, calculates statistics and percentage changes, and generates charts to visualize the results. The program then outputs the analysis description "what changes in S3."
