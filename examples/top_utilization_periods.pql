@@ -1,0 +1,14 @@
+where(@cw_aws;@cw_aws_x)
+.what("MetricName='CPUUtilization';InstanceId='*';Region='eu-*|us-*';Namespace='AWS/EC2'")
+.when(7d)
+.window(1h)
+.request($where[0];$what[0];$when[0];$window[0]).as($ts_cpu_acct_1)
+.request($where[1];$what[0];$when[0];$window[0]).as($ts_cpu_acct_2)
+
+.merge($ts_cpu_acct_1;$ts_cpu_acct_2; max).as($data)
+
+.sort($data; 1).as($sorted)
+.head($sorted; 5%).as($top5)
+
+.chart($top5;@bar)
+.out("top percent peak cpu times across accounts and regions")
