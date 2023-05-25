@@ -33,3 +33,33 @@ This program performs a series of operations on AWS CloudWatch metrics related t
 11. The `chart` statements create visualizations of the size change, count change, and the boolean result in bar and pie chart formats.
 12. The `out` statement specifies the output format and provides a description of the analysis, which is "what changes in S3".
 
+### 2.  What are the busiest CPU times across your AWS accounts and zones?
+[top_utilization_periods.pql](./top_utilization_periods.pql)facilitates the analysis, comparison, and visualization of CPU utilization data across multiple accounts and regions, offering insights that can drive performance optimization, cost savings, capacity planning, and centralized monitoring.
+
+#### When should I use it?
+It can be useful for analyzing and comparing CPU utilization across multiple AWS accounts and regions. Here are a few scenarios where you can get more insights:
+
+1. **Performance Monitoring**: By retrieving CPU utilization metrics, you can monitor the performance of your EC2 instances over time. This information helps identify patterns, spikes, or anomalies in CPU usage, which can be crucial for optimizing resource allocation, identifying performance bottlenecks, or detecting instances that may require scaling.
+
+2. **Cross-Account and Cross-Region Comparison**: The program allows you to gather CPU utilization data from different AWS accounts and regions. This capability is particularly useful for organizations with a multi-account or multi-region infrastructure, as it provides a consolidated view of CPU usage across various environments. You can compare CPU utilization patterns, identify regional differences, or identify instances with higher or lower utilization across different accounts.
+
+3. **Resource Allocation and Cost Optimization**: CPU utilization is directly related to the cost and efficiency of your infrastructure. By analyzing the CPU utilization data, you can identify overutilized instances that may require resizing or load balancing, leading to cost optimization. Additionally, underutilized instances can be identified and potentially downsized or terminated to reduce unnecessary expenses.
+
+4. **Capacity Planning**: The program's ability to aggregate and visualize CPU utilization data helps with capacity planning. By analyzing historical trends and identifying peak CPU times across accounts and regions, you can estimate future resource needs and plan for scaling activities accordingly. This proactive approach ensures that you have sufficient resources to handle workload spikes and avoid performance degradation.
+
+5. **Centralized Monitoring and Reporting**: The program streamlines the process of gathering CPU utilization data from multiple accounts and regions, providing a centralized view of important metrics. This centralized monitoring enables easier reporting, allows for the identification of overall trends, and provides a comprehensive understanding of the CPU utilization landscape across your AWS infrastructure.
+
+#### How does it work?
+This program performs a series of operations on AWS CloudWatch metrics related to CPU utilization in EC2 instances. It retrieves CPU utilization metrics for EC2 instances, combines the data from multiple accounts and regions, sorts it, selects the top 5%, and presents the result as a bar chart.Here is a breakdown of the steps:
+
+1. The program defines two variables: @cw_aws and @cw_aws_x representing AWS CloudWatch accounts.
+2. The .what() function specifies the metric to retrieve, in this case, "CPUUtilization," and applies filters to limit the results to specific instances, regions, and namespaces.
+3. The .when() function sets the time range for the metric data. In this case, it retrieves data from the past 7 days.
+4. The .window() function sets the aggregation window size to 1 hour. This means that the metric data will be aggregated in one-hour intervals.
+5. The .request() function is used twice to retrieve the metric data for both @cw_aws and @cw_aws_x. The retrieved data is stored in variables $ts_cpu_acct_1 and $ts_cpu_acct_2, respectively.
+6. The .merge() function combines the two sets of metric data ($ts_cpu_acct_1 and $ts_cpu_acct_2) using the "max" aggregation method. The merged data is stored in the variable $data.
+7. The .sort() function sorts the merged data $data based on the second column in ascending order (1 indicates the second column).
+8. The .head() function selects the top 5% of rows from the sorted data $sorted and stores them in the variable $top5.
+9. The .chart() function generates a chart using the data $top5 and specifies the chart type as a bar chart (@bar).
+10. Finally, the .out() function displays the resulting chart with a description: "top percent peak CPU times across accounts and regions."
+
