@@ -53,13 +53,13 @@ It can be useful for analyzing and comparing CPU utilization across multiple AWS
 This program performs a series of operations on AWS CloudWatch metrics related to CPU utilization in EC2 instances. It retrieves CPU utilization metrics for EC2 instances, combines the data from multiple accounts and regions, sorts it, selects the top 5%, and presents the result as a bar chart.Here is a breakdown of the steps:
 
 1. The program defines two variables: @cw_aws and @cw_aws_x representing AWS CloudWatch accounts.
-2. The .what() function specifies the metric to retrieve, in this case, "CPUUtilization," and applies filters to limit the results to specific instances, regions, and namespaces.
-3. The .when() function sets the time range for the metric data. In this case, it retrieves data from the past 7 days.
-4. The .window() function sets the aggregation window size to 1 hour. This means that the metric data will be aggregated in one-hour intervals.
-5. The .request() function is used twice to retrieve the metric data for both @cw_aws and @cw_aws_x. The retrieved data is stored in variables $ts_cpu_acct_1 and $ts_cpu_acct_2, respectively.
-6. The .merge() function combines the two sets of metric data ($ts_cpu_acct_1 and $ts_cpu_acct_2) using the "max" aggregation method. The merged data is stored in the variable $data.
-7. The .sort() function sorts the merged data $data based on the second column in ascending order (1 indicates the second column).
-8. The .head() function selects the top 5% of rows from the sorted data $sorted and stores them in the variable $top5.
-9. The .chart() function generates a chart using the data $top5 and specifies the chart type as a bar chart (@bar).
-10. Finally, the .out() function displays the resulting chart with a description: "top percent peak CPU times across accounts and regions."
+2. The `.what()` function specifies the metric to retrieve, in this case, "CPUUtilization," and applies filters to limit the results to specific instances, regions, and namespaces.
+3. The `.when()` function sets the time range for the metric data. In this case, it retrieves data from the past 7 days.
+4. The `.window()` function sets the aggregation window size to 1 hour. This means that the metric data will be aggregated in one-hour intervals.
+5. The `.request()` function is used twice to retrieve the metric data for both `@cw_aws and @cw_aws_x`. The retrieved data is stored in variables `$ts_cpu_acct_1` and `$ts_cpu_acct_2`, respectively.
+6. The `.merge()` function combines the two sets of metric data `$ts_cpu_acct_1 and $ts_cpu_acct_2` using the "max" aggregation method. The merged data is stored in the variable $data.
+7. The `.sort()` function sorts the merged data `$data` in descending order.
+8. The `.head()` function selects the top 5% of rows from the sorted data $sorted and stores them in the variable `$top5`.
+9. The `.chart()` function generates a chart using the data `$top5` and specifies the chart type as a bar chart `@bar`.
+10. Finally, the `.out()` function displays the resulting chart with a description: "top percent peak CPU times across accounts and regions."
 
