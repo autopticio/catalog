@@ -22,7 +22,7 @@ This program performs a series of operations on AWS CloudWatch metrics related t
 
 1. The `where` clause specifies the target AWS account and region for the metrics.
 2. The `what` clause defines two metrics to be collected: "BucketSizeBytes" and "NumberOfObjects" for all buckets in the specified region.
-3. The `when` clause sets the time interval to 3600 hours (1 hour).
+3. The `when` clause sets the time interval to 3600 hours (150 days).
 4. The `window` clause sets the aggregation window to 168 hours (1 week).
 5. The first `request` statement retrieves the data for the "BucketSizeBytes" metric and assigns it to the variable `$size`.
 6. The second `request` statement retrieves the data for the "NumberOfObjects" metric and assigns it to the variable `$count`.
