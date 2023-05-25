@@ -34,7 +34,7 @@ This program performs a series of operations on AWS CloudWatch metrics related t
 12. The `out` statement specifies the output format and provides a description of the analysis, which is "what changes in S3".
 
 ### 2.  What are the busiest CPU times across your AWS accounts and zones?
-[top_utilization_periods.pql](./top_utilization_periods.pql)facilitates the analysis, comparison, and visualization of CPU utilization data across multiple accounts and regions, offering insights that can drive performance optimization, cost savings, capacity planning, and centralized monitoring.
+[top_utilization_periods.pql](./top_utilization_periods.pql) facilitates the analysis, comparison, and visualization of CPU utilization data across multiple accounts and regions, offering insights that can drive performance optimization, cost savings, capacity planning, and centralized monitoring.
 
 #### When should I use it?
 It can be useful for analyzing and comparing CPU utilization across multiple AWS accounts and regions. Here are a few scenarios where you can get more insights:
