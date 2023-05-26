@@ -2,6 +2,7 @@
 You can accomplish wonderful things with PQL and we want to share our learnings and experience through the example PQL programs. We are steadily researching and adding new recipes in this repository. The examples are curated through research, review and thorough testing, however feedback is always welcome so please submit PRs or issues for matters that can be improved! 
 
 Here are a few brain teasers:
+
 [1. What's up with your AWS S3 buckets?](#1--whats-up-with-your-aws-s3-buckets)
 
 [2. What are the busiest EC2 CPU times across your AWS accounts and zones?](#2--what-are-the-busiest-ec2-cpu-times-across-your-aws-accounts-and-zones)
