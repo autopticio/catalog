@@ -63,7 +63,7 @@ This program performs a series of operations on AWS CloudWatch metrics related t
 9. The `.chart()` function generates a chart using the data `$top5` and specifies the chart type as a bar chart `@bar`.
 10. Finally, the `.out()` function displays the resulting chart with a description: "top percent peak CPU times across accounts and regions."
 
-### 3. How much does a process running in EC2 cost me?
+### 3. How much does a process running in EC2 cost you?
 [process_utilization_cloud.pql](./process_utilization_cloud.pql) provides a comprehensive and customizable approach to CPU utilization analysis and monitoring, facilitating performance optimization, troubleshooting, and resource management in systems utilizing both AWS CloudWatch and Prometheus metrics. It computes the utilization of the Prometheus agent process running on EC2 instances as percent of overall CPU utilization reported by Cloudwatch. It collects and processes data from multiple accounts using AWS CloudWatch and Prometheus data.
 
 #### When should I use it?
@@ -120,7 +120,7 @@ Overall, this program provides a comprehensive and customizable approach to CPU 
 7. Outputs the result:
    - `.out("cpu utilization excluding the prometheus process")`: Displays the final result, which is the CPU utilization excluding the Prometheus process.
 
-### 4. Are we on track with our Service Level Objectives?
+### 4. Are you on track with Service Level Objectives?
 [slo.pql](./slo.pql) enables you to monitor, analyze, and manage the performance of your API Gateway in a systematic and quantitative manner. It helps you identify performance issues, track progress towards performance goals, and ensure that your API Gateway meets the defined service level objectives and standards.
 
 #### When should I use it?
