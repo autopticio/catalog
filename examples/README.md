@@ -33,7 +33,7 @@ This program performs a series of operations on AWS CloudWatch metrics related t
 11. The `chart` statements create visualizations of the size change, count change, and the boolean result in bar and pie chart formats.
 12. The `out` statement specifies the output format and provides a description of the analysis, which is "what changes in S3".
 
-### 2.  What are the busiest CPU times across your AWS accounts and zones?
+### 2.  What are the busiest EC2 CPU times across your AWS accounts and zones?
 [top_utilization_periods.pql](./top_utilization_periods.pql) facilitates the analysis, comparison, and visualization of CPU utilization data across multiple accounts and regions, offering insights that can drive performance optimization, cost savings, capacity planning, and centralized monitoring.
 
 #### When should I use it?
@@ -62,4 +62,61 @@ This program performs a series of operations on AWS CloudWatch metrics related t
 8. The `.head()` function selects the top 5% of rows from the sorted data $sorted and stores them in the variable `$top5`.
 9. The `.chart()` function generates a chart using the data `$top5` and specifies the chart type as a bar chart `@bar`.
 10. Finally, the `.out()` function displays the resulting chart with a description: "top percent peak CPU times across accounts and regions."
+
+### 3. How much does a process running in EC2 cost me?
+[process_utilization_cloud.pql](./process_utilization_cloud.pql) provides a comprehensive and customizable approach to CPU utilization analysis and monitoring, facilitating performance optimization, troubleshooting, and resource management in systems utilizing both AWS CloudWatch and Prometheus metrics. It computes the utilization of the Prometheus agent process running on EC2 instances as percent of overall CPU utilization reported by Cloudwatch. It collects and processes data from multiple accounts using AWS CloudWatch and Prometheus data.
+
+#### When should I use it?
+Here are a few reasons why this program can be beneficial:
+
+1. **Performance Monitoring**: The program collects CPU utilization metrics from both AWS CloudWatch and Prometheus, providing a comprehensive view of CPU usage. It allows you to monitor and analyze CPU utilization patterns over time, identify trends, and detect anomalies or performance bottlenecks.
+
+2. **Multi-Account Support**: The program supports fetching CPU utilization metrics from multiple AWS accounts (`@cw_aws` and `@cw_aws_x`). This is helpful when managing resources across multiple accounts and allows for centralized monitoring and analysis of CPU utilization across those accounts.
+
+3. **Different Metric Sources**: By using both AWS CloudWatch and Prometheus metrics, the program enables you to leverage the strengths of each metric source. AWS CloudWatch provides native integration with AWS services, while Prometheus offers more flexibility and customizability for monitoring containerized environments or systems that use Prometheus as the monitoring solution.
+
+4. **Calculating Utilization**: The program calculates various utilization metrics, such as the average EC2 CPU utilization across instances and accounts, the percentage of CPU utilization taken up by the Prometheus process, and the non-Prometheus workload percentage. These calculations provide valuable insights into how CPU resources are utilized and the impact of the Prometheus process on overall CPU usage.
+
+5. **Identifying Performance Impact**: By comparing the Prometheus process utilization with the average EC2 CPU utilization, the program helps identify how much of the CPU resources are dedicated to the Prometheus process. This information can be useful in determining the performance impact of running Prometheus and optimizing resource allocation accordingly.
+
+6. **Alerting and Troubleshooting**: With the ability to analyze CPU utilization patterns and detect anomalies, this program can be integrated into an alerting system to notify you of abnormal CPU usage. It can help in troubleshooting performance issues and identifying the cause of high CPU utilization, whether it's related to specific instances, processes, or the Prometheus monitoring system itself.
+
+Overall, this program provides a comprehensive and customizable approach to CPU utilization analysis and monitoring, facilitating performance optimization, troubleshooting, and resource management in systems utilizing both AWS CloudWatch and Prometheus metrics.
+
+#### How does it work?
+1. Defines the data sources:
+   - `@cw_aws`: AWS CloudWatch metrics.
+   - `@prometheus`: Prometheus metrics.
+   - `@cw_aws_x`: AWS CloudWatch metrics (presumably from another account).
+
+2. Defines the metrics to collect:
+   - `MetricName='CPUUtilization';InstanceId='*'; Namespace='AWS/EC2'`: CPU utilization metric for EC2 instances in AWS CloudWatch.
+   - `node_cpu_seconds_total`: CPU seconds metric from Prometheus for node level.
+   - `process_cpu_seconds_total`: CPU seconds metric from Prometheus for process level.
+
+3. Sets the time range:
+   - `.when(3h)`: The program considers data from the past 3 hours.
+
+4. Sets the data window size:
+   - `.window(10m)`: The program processes data in 10-minute windows.
+
+5. Makes multiple requests to fetch and store the required metrics:
+   - `.request($where[0];$what[0];$when[0];$window[0]).as($instance_cpu_a1)`: Fetches AWS EC2 CPU utilization metrics and assigns them to `$instance_cpu_a1`.
+   - `.request($where[2];$what[0];$when[0];$window[0]).as($instance_cpu_a2)`: Fetches AWS EC2 CPU utilization metrics from another account and assigns them to `$instance_cpu_a2`.
+   - `.request($where[1];$what[1];$when[0];$window[0]).as($node_cpu_seconds)`: Fetches node CPU seconds metrics from Prometheus and assigns them to `$node_cpu_seconds`.
+   - `.request($where[1];$what[2];$when[0];$window[0]).as($process_cpu_seconds)`: Fetches process CPU seconds metrics from Prometheus and assigns them to `$process_cpu_seconds`.
+
+6. Performs calculations and operations on the collected metrics:
+   - Filters the Prometheus CPU seconds metric to separate data for each CPU core.
+   - Computes the total CPU seconds for each CPU core using `sum`.
+   - Merges the total CPU seconds for both cores and calculates the average.
+   - Filters the Prometheus process CPU seconds metric to extract data for the Prometheus job.
+   - Computes the average CPU utilization and process utilization percentage for Prometheus.
+   - Merges the EC2 CPU utilization metrics from different accounts and calculates the average across instances.
+   - Computes the CPU utilization percentage that is not taken up by the Prometheus process.
+   - Prints the CPU total seconds and EC2 CPU utilization.
+   - Prints the non-Prometheus workload percentage, Prometheus utilization percentage, and average EC2 CPU utilization.
+
+7. Outputs the result:
+   - `.out("cpu utilization excluding the prometheus process")`: Displays the final result, which is the CPU utilization excluding the Prometheus process.
 
