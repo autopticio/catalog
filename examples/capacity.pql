@@ -5,6 +5,7 @@ where(@cw_aws_x)
 .window(360h)
         .request($where[0];$what[0];$when[0];$window[0]).as($calls)
 
+//load the aws quotas for the service
 .open("https://autoptic-demo.s3.us-west-2.amazonaws.com/snaps/awsquota.json"; $cw_getmetrics_quota).as($limits)
 
 .merge($calls;max).as($mcalls)
@@ -14,4 +15,4 @@ where(@cw_aws_x)
 
 //print the percentile values, and all cpu timeseries data points.
 .print($calls;$limits;$capacity_cloudwatch_ok)
-        .out(capacity.json)
+        .out("verify capacity against service limits")
