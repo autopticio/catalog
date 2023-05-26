@@ -155,3 +155,32 @@ The program collects metrics related to latency, request count, and error rates 
 10. The `print` function is used to display the values of `$perf_budget`, `$err_budget`, and `$slo`.
 11. The `out` function is used to output the values of `$perf_budget`, `$err_budget`, and `$slo` along with the label "service level objective" and the abbreviation "slo".
 
+### 5. How close are you to hitting AWS quota limits?
+[capacity.pql](./capacity.pql) queries CloudWatch usage data, retrieves AWS quota limits, compares the usage against the limits, and prints the results for verification of capacity against service limits. It helps you maintain control over your CloudWatch usage, ensures compliance with quotas, and enables proactive capacity planning to optimize the performance and stability of your AWS infrastructure.
+
+#### When should I use it?
+
+1. **Usage Monitoring**: The program allows you to query and analyze the usage of CloudWatch metrics, specifically the "CallCount" metric in this case. By retrieving and examining this metric over a specified time range and window size, you can gain insights into the volume and frequency of API calls made to CloudWatch.
+
+2. **Limit Checking**: The program retrieves AWS quota limits for the CloudWatch service from a JSON file. By comparing the usage data against these limits, the program helps you determine if the current usage is within acceptable boundaries or if it has exceeded the defined limits. This is crucial for ensuring that your application or system doesn't encounter unexpected issues due to reaching or surpassing service limits.
+
+3. **Capacity Planning**: By monitoring usage and checking it against limits, the program assists in capacity planning for CloudWatch. It provides visibility into the usage patterns and helps you understand if you need to adjust your resources or make optimizations to stay within the limits. This proactive approach enables you to allocate resources effectively and avoid potential performance or scalability problems.
+
+4. **Automated Verification**: The program performs the necessary queries and comparisons automatically, eliminating the need for manual checks. It allows you to set up scheduled or automated monitoring to ensure continuous adherence to the defined limits. This saves time and effort by automating the verification process.
+
+
+#### How does it work?
+This program queries CloudWatch usage and checks it against limits. Here's a breakdown of what each section does:
+
+1. `where(@cw_aws_x)`: This specifies the location or context where the program is being executed. It is referring to the AWS CloudWatch service.
+2. `.what("MetricName='CallCount';Region='us-*';Service='CloudWatch';Resource='GetMetricData'; Namespace='AWS/Usage'")`: This defines the specific metric being queried. It requests the metric named "CallCount" for the CloudWatch service in the "AWS/Usage" namespace. It is limited to the "us-*" AWS region.
+3. `.when(720h)`: This sets the time range for the query. It specifies a duration of 720 hours (30 days).
+4. `.window(360h)`: This defines the sliding window size for analyzing the metric data. It sets a window size of 360 hours (15 days).
+5. `.request($where[0];$what[0];$when[0];$window[0]).as($calls)`: This is the main query request that combines the previously defined parameters. The results of the query are assigned to the variable `$calls`.
+6. `.open("https://autoptic-demo.s3.us-west-2.amazonaws.com/snaps/awsquota.json"; $cw_getmetrics_quota).as($limits)`: This opens a URL to retrieve AWS quota information for the CloudWatch service from the specified JSON file. The quota data is assigned to the variable `$limits`.
+7. `.merge($calls;max).as($mcalls)`: This merges the `$calls` data with the maximum value found in each time series.
+8. `.max($mcalls).as($maxcalls)`: This finds the maximum value across all time series in `$mcalls` and assigns it to `$maxcalls`.
+9. `.assert($maxcalls < $limits).as($capacity_cloudwatch_ok)`: This performs an assertion to check if the maximum value of calls (`$maxcalls`) is less than the defined limits (`$limits`). The result is assigned to the variable `$capacity_cloudwatch_ok`.
+10. `.print($calls;$limits;$capacity_cloudwatch_ok)`: This prints the values of `$calls`, `$limits`, and `$capacity_cloudwatch_ok`.
+11. `.out("verify capacity against service limits")`: This specifies the output format and provides a description for the result.
+
