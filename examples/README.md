@@ -13,6 +13,8 @@ Here are a few brain teasers:
 
 [5. How close are you to hitting AWS quota limits?](#5-how-close-are-you-to-hitting-aws-quota-limits)
 
+---
+
 ### 1.  What's up with your AWS S3 buckets? 
 [aha-s3-changes.pql](./aha-s3-changes.pql)  retrieves metrics related to S3 bucket size and object count, calculates statistics and percentage changes, and generates charts to visualize the results. The program then outputs the analysis description "what changes in S3."
 
