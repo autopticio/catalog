@@ -3,9 +3,13 @@ You can accomplish wonderful things with PQL and we want to share our learnings 
 
 Here are a few brain teasers:
 [1. What's up with your AWS S3 buckets?](#1--whats-up-with-your-aws-s3-buckets)
+
 [2. What are the busiest EC2 CPU times across your AWS accounts and zones?](#2--what-are-the-busiest-ec2-cpu-times-across-your-aws-accounts-and-zones)
+
 [3. How much does a process running in EC2 cost you?](#3-how-much-does-a-process-running-in-ec2-cost-you)
+
 [4. Are you on track with Service Level Objectives?](#4-are-you-on-track-with-service-level-objectives)
+
 [5. How close are you to hitting AWS quota limits?](#5-how-close-are-you-to-hitting-aws-quota-limits)
 
 ### 1.  What's up with your AWS S3 buckets? 
