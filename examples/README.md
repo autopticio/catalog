@@ -120,3 +120,38 @@ Overall, this program provides a comprehensive and customizable approach to CPU 
 7. Outputs the result:
    - `.out("cpu utilization excluding the prometheus process")`: Displays the final result, which is the CPU utilization excluding the Prometheus process.
 
+### 4. Are we on track with our Service Level Objectives?
+[slo.pql](./slo.pql) enables you to monitor, analyze, and manage the performance of your API Gateway in a systematic and quantitative manner. It helps you identify performance issues, track progress towards performance goals, and ensure that your API Gateway meets the defined service level objectives and standards.
+
+#### When should I use it?
+Here are a few scenarios wher this would be handy:
+
+1. **Performance Monitoring**: The program collects metrics such as latency and error rates, allowing you to monitor the performance of your API Gateway. By analyzing these metrics, you can identify any performance issues or bottlenecks and take appropriate actions to improve the overall performance.
+
+2. **Service Level Objective (SLO) Calculation**: The program calculates the SLO, which represents the combined measure of error rate and latency performance. SLOs are essential for setting performance targets and ensuring that your API Gateway meets the defined service level agreements (SLAs). The SLO value gives you an overall indication of the service quality and helps you assess whether the system is meeting the desired performance standards.
+
+3. **Error Budget Calculation**: The program calculates the error budget, which represents the percentage of errors (4XX and 5XX) compared to the total count of requests. This information is valuable for tracking and managing errors in your API Gateway. It allows you to set thresholds for acceptable error rates and ensure that your system stays within the defined error budget.
+
+4. **Performance Budget Calculation**: The program calculates the performance budget, which represents the percentage of the difference between the desired latency and the actual latency of the API Gateway. This metric helps you understand the performance gap and set targets for latency improvements. By monitoring the performance budget, you can prioritize optimizations and ensure that your API Gateway meets the desired performance standards.
+
+5. **Visualization and Reporting**: The program provides the ability to print and output the calculated metrics, including the SLO, error budget, and performance budget. This allows you to visualize and report on the performance of your API Gateway over time. You can track the progress of performance improvements, share the results with stakeholders, and make data-driven decisions based on the insights gained from the metrics.
+
+#### How does it work?
+The program collects metrics related to latency, request count, and error rates (4XX and 5XX) for an API Gateway in the eu-west-1 region over the last 24 hours. It then calculates the error budget, performance budget, and service level objective (SLO) based on these metrics and displays the results. The SLO is a combined measure of error rate and latency performance. Here is the breakdown:
+
+1. The `where` clause specifies the location of the AWS service, which is `eu-west-1` in this case.
+2. The `what` clause defines the metrics to be collected. Four metrics are specified:
+   - `Latency` metric for API Gateway in the production stage.
+   - `Count` metric for API Gateway in the production stage.
+   - `4XXError` metric for API Gateway in the production stage.
+   - `5XXError` metric for API Gateway in the production stage.
+3. The `when` clause specifies the time range for the metrics collection. In this case, it is set to the last 24 hours.
+4. The `window` clause defines the time window for aggregating the metrics. Here, it is set to 8 hours.
+5. The program then executes four requests using the specified parameters to collect the metrics data and assigns them to variables: `$l`, `$c`, `$e4`, and `$e5`.
+6. The `percentile` function calculates the 90th percentile value of the latency metric and assigns it to the variable `$latency`.
+7. The `average` function calculates the average value of the count metric and assigns it to the variable `$count`.
+8. Two more `average` functions calculate the average values of the 4XXError and 5XXError metrics, assigning them to the variables `$err4xx` and `$err5xx`, respectively.
+9. The `math` function is used to perform calculations on the metrics. It calculates the error budget as a percentage of errors (4XX and 5XX) divided by the count, the performance budget as a percentage of the difference between 1500 and the latency divided by 1500, and the overall service level objective (SLO) as the average of the error budget and performance budget. These values are assigned to the variables `$err_budget`, `$perf_budget`, and `$slo`, respectively.
+10. The `print` function is used to display the values of `$perf_budget`, `$err_budget`, and `$slo`.
+11. The `out` function is used to output the values of `$perf_budget`, `$err_budget`, and `$slo` along with the label "service level objective" and the abbreviation "slo".
+
