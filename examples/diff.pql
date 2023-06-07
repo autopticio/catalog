@@ -1,0 +1,15 @@
+where(@cw_aws;@cw_aws_x)
+.what("MetricName='CPUUtilization';InstanceId='*'; Namespace='AWS/EC2'")
+.when(24h)
+.request($where[0];$what[0];$when[0]).as($a1)
+.request($where[1];$what[0];$when[0]).as($a2)
+
+.merge($a1;average).as($a1_merged)
+.merge($a2;average).as($a2_merged)
+
+.diff($a1_merged;$a2_merged;percent).as($ts_d1; unit='percent')
+.diff($a1_merged;$a2_merged;numeric).as($ts_d2; unit='numeric')
+
+.chart($ts_d1;@line)
+.chart($ts_d2;@line)
+.out("diff example")
