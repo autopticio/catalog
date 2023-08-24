@@ -19,8 +19,8 @@ where(@cw_aws)
 .percentile($ts_cpu_evening_1;0.75).as($perc_cpu_e1)
 .percentile($ts_cpu_evening_2;0.75).as($perc_cpu_e2)
 
-.math($perc_cpu_m1+$perc_cpu_m2).as($cpu_morning)
-.math($perc_cpu_e1+$perc_cpu_e2).as($cpu_evening)
+.merge($perc_cpu_m1; $perc_cpu_m2; sum).as($cpu_morning)
+.merge($perc_cpu_e1; $perc_cpu_e2; sum).as($cpu_evening)
 
 .assert($cpu_morning > $cpu_evening).as($mornings_are_busier_than_evenings)
 
