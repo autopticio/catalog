@@ -20,9 +20,9 @@ where(@cw_aws)
 
 Add your account credentials in the "aws_access_key_id" and "aws_secret_access_key". The account must have read access to CloudWatch. For more information check the [AWS guide on access credentials](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html). Autoptic does not cache or store the credentials you submit over the API.
 
-The sample query is looking up "CPUUtilization" of an EC2 instance. [Check the full CloudWatch metrics list](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/viewing_metrics_with_cloudwatch.html) for more options. Check out the [example programs](./examples/) for more ideas on how to use PQL for more programmable assessments.
+The sample query is retrieving the "CPUUtilization" of an EC2 instance. [Check the full CloudWatch metrics list](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/viewing_metrics_with_cloudwatch.html) for more options. Check out the [example programs](./examples/) for more ideas on how to use PQL for more programmable assessments.
 
-Here the response you would expect in a json format: [Sample results](./examples/sample_result.json)
+Here is the response you would expect in a json format: [Sample results](./examples/sample_result.json)
 
 #### 2. Install the VSCode Autoptic extension 
 You can download and install a [VSCode exension](https://github.com/autopticio/vscode-pql) and edit/run PQL programs from the IDE.
@@ -43,7 +43,7 @@ Query functions describe data inputs from the data sources:
 ### Modification
 Modification functions handle time series data reduction, filtering and summation:
 
-[filter](#filter) | [merge](#merge)
+[filter](#filter) | [merge](#merge) | [group](#group)
 
 ### Compute
 Compute functions allow computing aggregates for simple or more complex statistics: 
@@ -209,6 +209,14 @@ Computes the difference between every data point in two time series. The resutli
 - use:
 	- compute the the percent difference `diff("$cpu_today; $cpu_yesterday; percent")`
 	- compute the the absolute difference `diff("$cpu_today; $cpu_yesterday; numeric")`
+---
+#### group
+Creates a new variable from a collection of time series or aggregate variables. Only one data type is allowed per function call.
+- parameters: N time series or aggregate variables
+- returns: 1 time series[] or aggregate[] collection 
+- use:
+	- group time series  `.group($instance_cpu_a1; $instance_cpu_a2).as($cpu_all)`
+	- group aggregates `.group($cpu_perc;$cpu_max;$cpu_avg).as($stats_all)`
 ---
 #### head
 Selects the first set of data points from a time series variable.
