@@ -24,7 +24,7 @@ The sample query is looking up "CPUUtilization" of an EC2 instance. [Check the f
 
 Here the response you would expect in a json format: [Sample results](./examples/sample_result.json)
 
-#### 2. Install the vscode Autoptic extension 
+#### 2. Install the VSCode Autoptic extension 
 You can download and install a [VSCode exension](https://github.com/autopticio/vscode-pql) and edit/run PQL programs from the IDE.
 
 ## Autoptic Architecture
@@ -48,12 +48,12 @@ Modification functions handle time series data reduction, filtering and summatio
 ### Compute
 Compute functions allow computing aggregates for simple or more complex statistics: 
 
-[average](#average) | [min](#min) | [max](#max) | [count](#count) | [percentile](#percentile) | [assert](#assert) | [math](#math) | [correlate](#correlate)
+[average](#average) | [min](#min) | [max](#max) | [count](#count) | [percentile](#percentile) | [assert](#assert) | [math](#math) | [correlate](#correlate) | [diff](#diff)
 
 ### Output
 Output functions direct how the resulting output will be handled:
 
-[sort](#sort) | [head](#head) | [tail](#tail) | [print](#print) | [chart](#chart) | [out](#out) 
+[sort](#sort) | [head](#head) | [tail](#tail) | [print](#print) | [chart](#chart) | [out](#out) | [note](#note)
 
 ### Data Source Reference
 Data source references specify which data sources will be used from the environment definition:
@@ -115,8 +115,81 @@ Computes the average value for a time series.
 - use:
 	- compute the average `average($cpu_utilization)`
 ---
+#### chart 
+Creates a graph visualization for the variables in scope. The graphs are rendered as html in the output.
+- parameters: N time series or aggregate variables, and a graph template reference. Graph templates are configured in the env.json.
+- returns: inserts the rendered graph in html format. Multiple chart calls append their output in the order they appear in PQL.
+- use:
+	- graph time series variables as individual  line charts `.chart($ts_cpu; $ts_mem; @line)`
+	- graph aggregate variables as a stacked bar chart `.chart($cpu_idle_avg; $cpu_sys_avg; @barStacked)`
+- graph templates: Graph templates are configured in the env.json and can be referenced in function calls. Here is are some template examples:
+	```
+  "chart":
+  [
+    {
+      "name": "line",
+      "type": "line",
+      "vars": {
+          "backgroundColor": "rgb(99, 99, 132)",
+          "borderColor": "rgb(99, 99, 132)",
+          "stacked": false
+      }
+    },
+    {
+      "name": "lineNotStacked",
+      "type": "line",
+      "vars": {
+          "backgroundColor": "#99d376",
+          "borderColor": "#3158f9",
+          "stacked": false
+      }
+    },
+    {
+      "name": "lineDefault",
+      "type": "line"
+    },
+    {
+      "name": "linestack",
+      "type": "line",
+      "vars": {
+          "backgroundColor": "rgb(99, 99, 132)",
+          "borderColor": "rgb(99, 99, 132)",
+          "stacked": "1"
+      }
+    },
+    {
+      "name": "barStacked",
+      "type": "bar",
+      "vars": {
+          "backgroundColor": "rgb(255, 99, 132)",
+          "borderColor": "rgb(255, 99, 132)",
+          "stacked": "1"
+      }
+    },
+    {
+      "name": "pie",
+      "type": "pie",
+      "vars": {
+          "backgroundColor": "rgb(99, 99, 132)",
+          "borderColor": "rgb(99, 99, 132)",
+          "stacked": true
+      }
+    },
+    {
+      "name": "pie-not-stacked",
+      "type": "pie",
+      "vars": {
+          "backgroundColor": "rgb(99, 99, 132)",
+          "borderColor": "rgb(99, 99, 132)",
+          "stacked": false
+      }
+    }
+  ]
+	``` 
+
+---
 #### correlate
-Computes the number of data points in a time series.
+Computes the degree of correlation between two time series variables.
 - parameters: 2 time series variables
 - returns: aggregate for degree of correlation. 1 is highest correlation to -1 for inverse correlation. Numbers closer to 0 indicate low or no correlation.
 - use:
@@ -128,6 +201,14 @@ Computes the number of data points in a time series.
 - returns: aggregate[] collection
 - use:
 	- compute the number of data points `count("$cpu_utilization")`
+---
+#### diff 
+Computes the difference between every data point in two time series. The resutling time series can contain positive or negative values based on the differential result.
+- parameters: 2 time series variables
+- returns: 1 time series 
+- use:
+	- compute the the percent difference `diff("$cpu_today; $cpu_yesterday; percent")`
+	- compute the the absolute difference `diff("$cpu_today; $cpu_yesterday; numeric")`
 ---
 #### head
 Selects the first set of data points from a time series variable.
@@ -160,7 +241,7 @@ Computes a value from a mathematical expression.
 	```
 	math(($avg_cpu0_user + $avg_cpu0_system))
 	```
-	- Network Bytes in to out throughput ratio in percent
+	- Network Bytes in-to-out throughput ratio in percent
 	```
 	math((1 - $net_in/$net_out))
 	```
@@ -196,6 +277,13 @@ Computes the minimum value for a time series.
 - returns: aggregate[] collection
 - use:
 	- compute the minimum `min($cpu_utilization)`
+---
+#### note 
+Inserts html formatted text in the output.
+- parameters: Text or html.
+- returns: appends the contents to the output. Notes are displayed in the order they appear in PQL. 
+- use:
+	- display text `note("Hello! This is my first note. We love <b>PQL</b>!")`
 ---
 #### open
 Opens a saved PQL results resource from a URI.
