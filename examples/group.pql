@@ -18,5 +18,5 @@ where(@cw_aws; @cw_aws_x)
 .group($cpu_perc;$cpu_max;$cpu_avg).as($stats)
 
 .chart($cpu_avg;@line)
-.chart($stats;@pie)
+.chart($stats;@bar)
 .out("cpu utilization across accounts")
