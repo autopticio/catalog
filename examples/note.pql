@@ -1,0 +1,29 @@
+where(@cw_aws;@cw_aws_x)
+.what("MetricName='CPUUtilization';InstanceId='*'; Namespace='AWS/EC2'")
+.when(24h)
+.request($where[0];$what[0];$when[0]).as($a1)
+.request($where[1];$what[0];$when[0]).as($a2)
+
+.merge($a1;average).as($a1_merged)
+.merge($a2;average).as($a2_merged)
+
+.diff($a1_merged;$a2_merged;percent).as($ts_d1; unit='percent')
+.diff($a1_merged;$a2_merged;numeric).as($ts_d2; unit='numeric')
+
+.average($ts_d1).as($avg_diff; unit='percent_diff')
+.assert($avg_diff < 0).as($account_diff_utilization)
+
+.note("This PQL program computes the aggregate CPU utilization across two accounts and computes a differential timeseries")
+
+.note("<h2>CPU Utilizations PERCENT differential between two AWS accounts.</h2>")
+.chart($ts_d1;@bar)
+.note("Doing a diff comparison is a good way to identify periods of change or difference between resources.")
+
+.note("<h2>This is the same comparison as the previous graph but expressed as absolute values.</h2>")
+.chart($ts_d2;@bar)
+
+.note("<h2>Account utilization index</h2>")
+.chart($avg_diff;$account_diff_utilization;@bar)
+.note("Need more examples? <a href='https://github.com/autopticio/catalog'>Check the catalog</a>")
+
+.out("diff example")
