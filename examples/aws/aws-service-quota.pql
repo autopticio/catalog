@@ -14,5 +14,9 @@ where(@cw_aws_x)
 .assert($maxcalls < $limits).as($capacity_cloudwatch_ok)
 
 //print the percentile values, and all cpu timeseries data points.
-.print($calls;$limits;$capacity_cloudwatch_ok)
-        .out("verify capacity against service limits")
+.note("Callcounts across AWS services")
+.chart($calls;@line)
+.note("Service limits")
+.chart($limits;@bar)
+.note("Capacity limits are acceptable")
+.chart($capacity_cloudwatch_ok;@pie-not-stacked)

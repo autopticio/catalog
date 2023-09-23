@@ -1,5 +1,5 @@
 where(@cw_aws)
-.what("MetricName='CPUUtilization';InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'")
+.what("MetricName='CPU*';InstanceId='*'; Namespace='AWS/EC2'")
 .when(24h)
 .request($where[0];$what[0];$when[0]).as($data)
 
@@ -10,4 +10,5 @@ where(@cw_aws)
 .percentile($data; 0.25; 0.5; 0.75; 0.99).as($perc)
 
 .chart($avg;$min;$max;$count;$perc;@bar)
+
 .out("stats basics")

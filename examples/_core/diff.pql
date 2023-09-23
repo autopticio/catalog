@@ -10,6 +10,11 @@ where(@cw_aws;@cw_aws_x)
 .diff($a1_merged;$a2_merged;percent).as($ts_d1; unit='percent')
 .diff($a1_merged;$a2_merged;numeric).as($ts_d2; unit='numeric')
 
+.average($ts_d1).as($avg_diff; unit='percent_diff')
+.assert($avg_diff < 0).as($account_diff_utilization)
+
 .chart($ts_d1;@line)
-.chart($ts_d2;@line)
+.chart($ts_d2;@bar)
+.chart($avg_diff;$account_diff_utilization;@bar)
+
 .out("diff example")

@@ -1,0 +1,40 @@
+//Query multiple aws accounts and regions
+where(@cw_aws;@cw_aws_x)
+.what("MetricName='CPUUtilization';InstanceId='*';Region='eu-*|us-*';Namespace='AWS/EC2'")
+.when(7d)
+.window(1h)
+    .request($where[0];$what[0];$when[0];$window[0]).as($ts_cpu_acct_1)
+    .request($where[1];$what[0];$when[0];$window[0]).as($ts_cpu_acct_2)
+
+//Group the account data into a single reference variable
+.group($ts_cpu_acct_1;$ts_cpu_acct_2).as($cpus)
+//Combine CPU data across accounts and regions the into a single time series
+.merge($cpus; max).as($cpus_ts)
+
+//.style(@bootstrap)
+.style(@demo)
+.note("<h3 style='color:Tomato;'>Periods with highest CPU utilization across accounts and regions.</h3>")    
+    .sort($cpus_ts; 1).as($sorted)
+    .head($sorted; 2%).as($top_times)
+    .chart($top_times;@bar)
+
+.note("<h3 style='color:Tomato;'>CPU volatility index for this period.</h3>")
+    .percentile($cpus_ts;0.99).as($cpus_perc)
+    .percentile($cpus_ts;0.50).as($cpus_med)
+    .math((1-$cpus_med/$cpus_perc)*100).as($volatility_index)
+    .chart($volatility_index;@bar)
+
+ .note("<h3 style='color:Tomato;'>Aggregate CPU utilization</h3>")
+    .chart($cpus_ts;@bar)
+
+.note("<h3 style='color:Tomato;'>Top 3 utilized EC2 instances.</h3>")
+    .average($cpus).as($aggregates)
+    .sort($aggregates; 1).as($sorted_desc)
+    .tail($sorted_desc;3).as($top3 ; description='the top utilized instances')
+    .chart($top3;@piestack)
+
+.note("<h3 style='color:Tomato;'>CPU Utilization per instance.</h3>")
+    .filter($cpus; "MetricName='CPUUtilization'").as($cpus_filtered)
+    .chart($cpus_filtered;@line)
+
+

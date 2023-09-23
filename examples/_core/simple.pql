@@ -1,0 +1,10 @@
+//query cloudwatch and get CPU utilization
+where(@cw_aws)
+.what("MetricName='CPUUtilization';Region='us-east-1|eu-west-1'; Namespace='AWS/EC2'")
+.when(1h)
+.window(5m)
+.request($where[0];$what[0];$when[0];$window[0]).as($ts_cpu)
+
+
+//chart cpu utilization for different regions.
+.chart($ts_cpu ; @linestack)

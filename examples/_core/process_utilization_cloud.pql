@@ -6,8 +6,8 @@ where(@cw_aws; @prometheus ; @cw_aws_x)
 )
 .when(3h)
 .window(10m)
-.request($where[0];$what[0];$when[0];$window[0]).as($instance_cpu)
-.request($where[2];$what[0];$when[0];$window[0]).as($instance_cpu_pk)
+.request($where[0];$what[0];$when[0];$window[0]).as($instance_cpu_a1)
+.request($where[2];$what[0];$when[0];$window[0]).as($instance_cpu_a2)
 .request($where[1];$what[1];$when[0];$window[0]).as($node_cpu_seconds)
 .request($where[1];$what[2];$when[0];$window[0]).as($process_cpu_seconds)
 
@@ -27,14 +27,13 @@ where(@cw_aws; @prometheus ; @cw_aws_x)
 .average($prometheus_seconds).as($prom_avg)
 .math(($prom_avg/$cpu_avg)*100).as($prometheus_utilization)
 
-//Compute the average EC2 CPU utilization percent
-.merge($instance_cpu;$instance_cpu_pk;average).as($ec2_cpu_utilization)
+//Compute the average EC2 CPU utilization percent from multiple accounts across instances
+.merge($instance_cpu_a1;$instance_cpu_a2;average).as($ec2_cpu_utilization)
 .average($ec2_cpu_utilization).as($ec2_avg_cpu)
 
-//Compute CPU utilization that is NOT taken up by the prometheus process across regions and accounts
-.math((1-$prometheus_utilization/$ec2_avg_cpu)*100).as($workload_waste)
-
+//Compute EC2 CPU utilization that is NOT taken up by the prometheus process across regions and accounts
+.math((1-$prometheus_utilization/$ec2_avg_cpu)*100).as($non_prometheus_workload)
 
 .print($cpu_total_seconds;$ec2_cpu_utilization)
-.print($workload_waste;$prometheus_utilization;$ec2_avg_cpu)
-.out("processing_waste")
+.print($non_prometheus_workload;$prometheus_utilization;$ec2_avg_cpu)
+.out("cpu utilization excluding the prometheus process")
