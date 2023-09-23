@@ -6,7 +6,6 @@ where(@cw_aws)
 //compute the 15th and 99th percentile summary statistics for the last hour
 .percentile($ts_cpu;0.15;0.99).as($perc_cpu)
 
-//print json of the percentile values, and all cpu timeseries data points.
-.print($perc_cpu;$ts_cpu)
+//chart of the percentile values, and all cpu timeseries data points.
+.chart($perc_cpu;@pie)
 
-.out("cloudwatch_cpu_results")
