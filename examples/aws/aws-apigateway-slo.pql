@@ -1,0 +1,37 @@
+where(@cw_aws)
+.what(	"MetricName='Latency';Stage='*';ApiName='*';Namespace='AWS/ApiGateway'";
+	"MetricName='Count';Stage='*';ApiName='*';Stat='Sum';Namespace='AWS/ApiGateway'";
+	"MetricName='4XXError';Stage='*';ApiName='*';Stat='Sum';Namespace='AWS/ApiGateway'";
+	"MetricName='5XXError';Stage='*';ApiName='*';Stat='Sum';Namespace='AWS/ApiGateway'"
+	)
+.when(48h)
+.window(1h)
+        .request($where[0];$what[0];$when[0];$window[0]).as($request_latency;unit='ms')
+        .request($where[0];$what[1];$when[0];$window[0]).as($request_count)
+        .request($where[0];$what[2];$when[0];$window[0]).as($errors_4xx)
+        .request($where[0];$what[3];$when[0];$window[0]).as($errors_5xx)
+
+.percentile($request_latency;0.9).as($latency)
+.average($request_count).as($count)
+.average($errors_4xx).as($err4xx)
+.average($errors_5xx).as($err5xx)
+
+.math(1000).as($ok)
+.math($ok*3).as($abandon)
+.assert($latency > $ok).as($suffering)
+.assert($latency < $abandon ).as($tolerating)
+
+//If latency is above the abandon threshold the performance SLA is set to 0
+//If latency is greater than the "ok" threshold the performance SLA is decreasing proportionally to the latency above the ok threshold, otherwise the SLA is 100%
+.math( (100-(($latency - $ok)/(($abandon - $ok)*0.01))*$suffering)*$tolerating ).as($perf_sla)
+
+//Calculate the error SLA based on 4xx and 5xx errors for the service.
+.math((1-($err4xx+$err5xx)/$count)*100).as($err_sla)
+
+//Calculate the combined performance and error SLA. Performance and errors have equal weights
+.math(($err_sla+$perf_sla)/2).as($slo)
+
+.chart($slo;@barstack)
+.chart($perf_sla;$err_sla;@pie)
+.chart($request_latency;$errors_4xx;$errors_5xx;$request_count;@bar)
+        .out("service level objective slo")

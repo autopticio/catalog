@@ -1,0 +1,12 @@
+//query cloudwatch and get a list of active services 
+where(@cw_aws_x)
+.what("MetricName='CallCount';Region='eu-*|us-*';Service='*';Resource='*';Namespace='AWS/Usage'")
+
+.when(30d)
+.window(24h)
+        .request($where[0];$what[0];$when[0];$window[0]).as($calls)
+
+.filter($calls;"Service='CloudWatch'").as($cw)
+.chart($cw;@bar)
+
+.chart($calls;@line)

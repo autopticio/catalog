@@ -8,6 +8,9 @@ where(@cw_aws)
 .request($where[0] ; $what[0] ; $when[0] ; $window[0]).as($size)
 .request($where[0] ; $what[1] ; $when[0] ; $window[0]).as($count)
 
-.chart($size;@line)
-.chart($count;@line)
-.out("cloudwatch-s3")
+.group($size;$count).as($s3)
+.filter($s3;"Stat='Average'").as($S3_metrics)
+
+.note("<h2>S3 buckets and objects across regions</h2>")
+.chart($S3_metrics;@line)
+

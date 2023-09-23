@@ -16,7 +16,7 @@ then
 	echo "Missing inputs: AUTOPTIC_ENV or AUTOPTIC_EP environment variables were not set, or a PQL program  was not provided as an input parameter."
 	exit 1
 else
-	curl -H "content-type: application/json" -X POST  \
+	curl -H "content-type:application/json" -X POST  \
 	--data '{"vars": "'$(cat $AUTOPTIC_ENV | base64 $base_params)'", "pql": "'$(cat $PQL_PROGRAM | base64 $base_params)'"}' $AUTOPTIC_EP 
 fi
-
+echo '{"vars": "'$(cat $AUTOPTIC_ENV | base64 $base_params)'", "pql": "'$(cat $PQL_PROGRAM | base64 $base_params)'"}'
