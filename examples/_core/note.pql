@@ -25,5 +25,3 @@ where(@cw_aws;@cw_aws_x)
 .note("<h2>Account utilization index</h2>")
 .chart($avg_diff;$account_diff_utilization;@bar)
 .note("Need more examples? <a href='https://github.com/autopticio/catalog'>Check the catalog</a>")
-
-.out("diff example")

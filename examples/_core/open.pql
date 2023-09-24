@@ -2,4 +2,4 @@ open("https://autoptic-demo.s3.us-west-2.amazonaws.com/snaps/multisource.json"; 
 
 .average($total_seconds).as($avg_cpu)
 .print($avg_cpu; $total_seconds)
-.out("snapshot on s3")
+.out("snapshot")

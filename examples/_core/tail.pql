@@ -7,4 +7,4 @@ where(@cw_aws)
 .tail($data; 25%).as($perc)
 
 .print($abs ; $perc)
-.out("tail basic example")
+.out("tail")

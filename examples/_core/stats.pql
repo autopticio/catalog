@@ -11,4 +11,4 @@ where(@cw_aws)
 
 .chart($avg;$min;$max;$count;$perc;@bar)
 
-.out("stats basics")
+.out("stats")

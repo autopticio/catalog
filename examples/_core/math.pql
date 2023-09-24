@@ -15,4 +15,4 @@ where(@cw_aws)
 .math(($perc_pin - $perc_pout)).as($packet_io_diff)
 
 .print($packet_io_diff)
-.out("maths")
+.out("math")

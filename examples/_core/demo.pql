@@ -7,5 +7,6 @@ where(@cw_aws)
 .percentile($ts_cpu;0.15;0.99).as($perc_cpu)
 
 //chart of the percentile values, and all cpu timeseries data points.
-.chart($perc_cpu;@pie)
+.print($perc_cpu)
+.out("demo")
 

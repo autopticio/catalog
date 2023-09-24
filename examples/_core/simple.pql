@@ -5,6 +5,5 @@ where(@cw_aws)
 .window(5m)
 .request($where[0];$what[0];$when[0];$window[0]).as($ts_cpu)
 
-
 //chart cpu utilization for different regions.
 .chart($ts_cpu ; @linestack)

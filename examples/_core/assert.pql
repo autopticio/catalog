@@ -10,5 +10,4 @@ where(@cw_aws)
 .assert($avg_cpu > 0 ).as($cpu_check)
 
 .print($health_check; $cpu_check)
-
-.out("asserts")
+.out("assert")

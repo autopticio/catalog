@@ -1,7 +1,7 @@
 where(@cw_aws)
 .what(
-    "MetricName='DiskWriteOps';InstanceId='*'; Namespace='AWS/EC2'" ;
-    "MetricName='NetworkPacketsIn';InstanceId='*'; Namespace='AWS/EC2'"
+    "MetricName='DiskWriteOps';InstanceId='*';Region='us-*';Namespace='AWS/EC2'" ;
+    "MetricName='NetworkPacketsIn';InstanceId='*';Region='us-*';Namespace='AWS/EC2'"
 )
 .when(24h)
 .window(15m)
@@ -16,6 +16,5 @@ where(@cw_aws)
 
 .assert($network_to_disk > 0.75).as($highly_persistent_workload)
 
-//.print($network_throughput_is_in_balance)
-.print($network_to_disk;$highly_persistent_workload)
-.out("merge")
+.print($highly_persistent_workload;$network_to_disk)
+.out("correlate")

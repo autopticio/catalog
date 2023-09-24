@@ -7,4 +7,4 @@ where(@cw_aws)
 .sort($data; 0).as($sorted_asc)
 
 .print($sorted_desc;$sorted_asc)
-.out("sort example")
+.out("sort")

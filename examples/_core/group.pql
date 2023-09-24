@@ -17,6 +17,5 @@ where(@cw_aws; @cw_aws_x)
 //Grouping aggregates
 .group($cpu_perc;$cpu_max;$cpu_avg).as($stats)
 
-.chart($cpu_avg;@line)
-.chart($stats;@bar)
-.out("cpu utilization across accounts")
+.print($cpu_total;$stats)
+.out("group")
