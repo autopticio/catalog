@@ -20,4 +20,3 @@ else
 	curl -H "content-type:application/json" -X POST  \
 	--data '{"vars": "'$(cat $AUTOPTIC_ENV | base64 $base_params)'", "pql": "'$(cat $PQL_PROGRAM | base64 $base_params)'"}' $AUTOPTIC_EP_URL 
 fi
-echo '{"vars": "'$(cat $AUTOPTIC_ENV | base64 $base_params)'", "pql": "'$(cat $PQL_PROGRAM | base64 $base_params)'"}'
