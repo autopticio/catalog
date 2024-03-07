@@ -1,5 +1,3 @@
-#!/bin/bash
-
 AUTOPTIC_HOME=~/autoptic
 AUTOPTIC_RUN=$AUTOPTIC_HOME/run
 AUTOPTIC_ENV=$AUTOPTIC_HOME/env.json
@@ -9,7 +7,8 @@ AUTOPTIC_TRUN=/tmp/run
 curl -s --create-dirs -o $AUTOPTIC_TRUN "https://raw.githubusercontent.com/autopticio/catalog/main/examples/_core/run"
 curl -s --create-dirs -o $AUTOPTIC_ENV "https://raw.githubusercontent.com/autopticio/catalog/main/examples/_core/env_template.json"
 curl -s --create-dirs -o $AUTOPTIC_PQL "https://raw.githubusercontent.com/autopticio/catalog/main/examples/_core/demo.pql"
-echo "AUTOPTIC_EP=$AUTOPTIC_EP\n$(cat $AUTOPTIC_TRUN)" > $AUTOPTIC_RUN
+echo "AUTOPTIC_EP=$AUTOPTIC_EP" > $AUTOPTIC_RUN
+echo "$(cat $AUTOPTIC_TRUN)" >> $AUTOPTIC_RUN
 rm $AUTOPTIC_TRUN
 
 echo "-------------------------------------------------------------------------------------"
