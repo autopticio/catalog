@@ -1,7 +1,8 @@
-#!/bin/bash
-
 PQL_PROGRAM=$1
+AUTOPTIC_ENV=~/autoptic/env.json
+AUTOPTIC_EP_URL="https://autoptic.io/pql/ep/$AUTOPTIC_EP/run"
 clientos="$(uname -s)"
+
 if [[ $clientos == *"Darwin"* ]]; then
 	base_params=""
 elif [[ $clientos == *"Linux"* ]]; then
@@ -11,12 +12,12 @@ else
 	exit 1
 fi
 
-if [ -z "$AUTOPTIC_EP" ] || [ -z "$PQL_PROGRAM" ] || [ -z "$AUTOPTIC_ENV" ]
+if [ -z "$AUTOPTIC_EP" ] || [ -z "$PQL_PROGRAM" ] ]
 then
-	echo "Missing inputs: AUTOPTIC_ENV or AUTOPTIC_EP environment variables were not set, or a PQL program  was not provided as an input parameter."
+	echo "Missing inputs: AUTOPTIC_EP variables was not set, or a PQL program  was not provided as an input parameter."
 	exit 1
 else
 	curl -H "content-type:application/json" -X POST  \
-	--data '{"vars": "'$(cat $AUTOPTIC_ENV | base64 $base_params)'", "pql": "'$(cat $PQL_PROGRAM | base64 $base_params)'"}' $AUTOPTIC_EP 
+	--data '{"vars": "'$(cat $AUTOPTIC_ENV | base64 $base_params)'", "pql": "'$(cat $PQL_PROGRAM | base64 $base_params)'"}' $AUTOPTIC_EP_URL 
 fi
 echo '{"vars": "'$(cat $AUTOPTIC_ENV | base64 $base_params)'", "pql": "'$(cat $PQL_PROGRAM | base64 $base_params)'"}'
