@@ -12,7 +12,7 @@ else
 	exit 1
 fi
 
-if [ -z "$AUTOPTIC_EP" ] || [ -z "$PQL_PROGRAM" ] ]
+if [ -z "$AUTOPTIC_EP" ] || [ -z "$PQL_PROGRAM" ]
 then
 	echo "Missing inputs: AUTOPTIC_EP variables was not set, or a PQL program  was not provided as an input parameter."
 	exit 1
