@@ -4,19 +4,21 @@ AUTOPTIC_HOME=~/autoptic
 AUTOPTIC_RUN=$AUTOPTIC_HOME/run
 AUTOPTIC_ENV=$AUTOPTIC_HOME/env.json
 AUTOPTIC_PQL=$AUTOPTIC_HOME/demo.pql
+AUTOPTIC_TRUN=/tmp/run
 
-curl -s --create-dirs -o $AUTOPTIC_RUN "https://raw.githubusercontent.com/autopticio/catalog/main/examples/_core/run"
+curl -s --create-dirs -o $AUTOPTIC_TRUN "https://raw.githubusercontent.com/autopticio/catalog/main/examples/_core/run"
 curl -s --create-dirs -o $AUTOPTIC_ENV "https://raw.githubusercontent.com/autopticio/catalog/main/examples/_core/env_template.json"
 curl -s --create-dirs -o $AUTOPTIC_PQL "https://raw.githubusercontent.com/autopticio/catalog/main/examples/_core/demo.pql"
+echo "AUTOPTIC_EP=$AUTOPTIC_EP\n$(cat $AUTOPTIC_TRUN)" > $AUTOPTIC_RUN
+rm $AUTOPTIC_TRUN
 
 echo "-------------------------------------------------------------------------------------"
-echo "Let's run your first PQL program with Amazon CloudWatch!"
+echo "Let's get started!"
 echo "1. Add your AWS keys with CloudWatch access to $AUTOPTIC_ENV"
-echo "2. Take a look at $AUTOPTIC_PQL, a simple PQL program to query EC2 CPUUtilization"
-echo "3. Execute the command below to run the PQL program"
+echo "2. Run a simple demo PQL program to query EC2 CPUUtilization from CloudWatch and chart the results:"
 echo ""
-echo "export AUTOPTIC_EP=$AUTOPTIC_EP && export AUTOPTIC_ENV=$AUTOPTIC_ENV && sh $AUTOPTIC_RUN $AUTOPTIC_PQL"
+echo "sh $AUTOPTIC_RUN $AUTOPTIC_PQL"
 echo ""
-echo "4. You can get more examples and docs from the Autoptic public repo https://github.com/autopticio/catalog"
-echo "5. Let us know what you think at support@autoptic.com! Happy PQL-ing!"
+echo "3. Find more examples and docs in our public repo https://github.com/autopticio/catalog"
+echo "Happy PQL-ing!"
 echo "-------------------------------------------------------------------------------------"
