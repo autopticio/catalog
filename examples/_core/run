@@ -1,5 +1,6 @@
 PQL_PROGRAM=$1
 AUTOPTIC_ENV=~/autoptic/env.json
+AUTOPTIC_DATA=~/autoptic/data
 AUTOPTIC_EP_URL="https://autoptic.io/pql/ep/$AUTOPTIC_EP/run"
 clientos="$(uname -s)"
 
@@ -12,11 +13,24 @@ else
 	exit 1
 fi
 
-if [ -z "$AUTOPTIC_EP" ] || [ -z "$PQL_PROGRAM" ]
+if [ -z "$AUTOPTIC_EP" ]
 then
-	echo "Missing inputs: AUTOPTIC_EP variables was not set, or a PQL program  was not provided as an input parameter."
+	echo "Missing inputs: AUTOPTIC_EP variables was not set"
 	exit 1
-else
-	curl -H "content-type:application/json" -X POST  \
-	--data '{"vars": "'$(cat $AUTOPTIC_ENV | base64 $base_params)'", "pql": "'$(cat $PQL_PROGRAM | base64 $base_params)'"}' $AUTOPTIC_EP_URL 
 fi
+
+if [ -z "$PQL_PROGRAM" ]
+then
+	echo "Missing inputs: a PQL program  was not provided as an input parameter."
+	exit 1
+fi
+
+# Submit the program to the PQL API and save the results
+pql_file=$(basename ${PQL_PROGRAM}).$(date +"%Y%m%d%H%M%S")
+mkdir -p "$AUTOPTIC_DATA"
+curl -H "content-type:application/json" -X POST  \
+	--data '{"vars": "'$(cat $AUTOPTIC_ENV | base64 $base_params)'", "pql": "'$(cat $PQL_PROGRAM | base64 $base_params)'"}' $AUTOPTIC_EP_URL \
+	> "$AUTOPTIC_DATA/$pql_file"
+
+# Open the results in a new chrome tab
+open -a "Google Chrome" $AUTOPTIC_DATA/$pql_file
