@@ -123,21 +123,32 @@ Creates a graph visualization for the variables in scope. The graphs are rendere
 - use:
 	- graph time series variables as individual  line charts `.chart($ts_cpu; $ts_mem; @line)`
 	- graph aggregate variables as a stacked bar chart `.chart($cpu_idle_avg; $cpu_sys_avg; @barStacked)`
-- graph templates: Graph templates are configured in the env.json and can be referenced in function calls. The following chart types are available:
-	- line
-	```
-	{
-      "name": "linestack",
-      "type": "line",
-      "vars": {
-          "backgroundColor": "rgb(99, 99, 132)",
-          "borderColor": "rgb(99, 99, 132)",
-          "stacked": true,
-          "style": "max-width: 600px",
-          "aspectRatio": "3"
-      }
-    }
-	``` 
+- templates
+Graph templates are configured in the env.json and can be referenced in function calls. 
+	- properties
+		- name: reference name that will be used in the PQL program
+		- type: type of chart
+		- backgroundColor: chart background color
+		- borderColor: chart frame color
+		- stacked: if true all variables are charted in the same chart and stacked.
+		- combo: this applies to bar charts only, if true all variables are charted side by side.
+		- style max width: determins the horizontal size / length of the chart. 
+		- aspectRatio: defines the size ratio of the chart and depends on the max-width. To get the expected height divide the width size by the aspect ratio. For example width of 200px with aspect ratio of 2 will draw a chart with 200px width and 100px height.
+	- example configurations
+		- line
+		```
+		{
+      	"name": "linestack",
+      	"type": "line",
+      	"vars": {
+        	"backgroundColor": "rgb(99, 99, 132)",
+        	"borderColor": "rgb(99, 99, 132)",
+        	"stacked": true,
+        	"style": "max-width: 600px",
+        	"aspectRatio": "3"
+      		}
+    	}
+		``` 
 	- bar
 	```
 	{
@@ -168,17 +179,30 @@ Creates a graph visualization for the variables in scope. The graphs are rendere
     }
 	``` 
 	- asserttable
-	```
-	{
-      "name": "tftable",
-      "type": "asserttable",
-      "vars": {
-          "row_dimension": "MetricName",
-          "true_label": "pass",
-          "false_label" : "fail",
-          "mark": "&#9679;"
-      }
-    }
+	The assertable charts a table of true and false values along with a total summary. This chart is useful to quickly visualize assertions.
+		- use:
+			```
+			.assert($errors_avg < 5 ).as($errors_asserts)
+			//FunctionName will specify the row dimension and will override the default MetricName in the asserttable
+			.chart($errors_asserts;@tftable["FunctionName"])
+			```
+		- environment configuration properties
+			- row_dimension: the default dimension to use for row labels.
+			- true_label: the column header for true values.
+			- false_label: the column header for false values.
+			- mark: the characted that will show if a value is true or false
+		- example environment configuration
+		```
+		{
+      	"name": "tftable",
+      	"type": "asserttable",
+      	"vars": {
+          	"row_dimension": "MetricName", //the default dimension to use for row labels.
+          	"true_label": "pass",
+          	"false_label" : "fail",
+          	"mark": "&#9679;"
+      		}
+    	}
 	```
 ---
 #### correlate
@@ -345,19 +369,19 @@ Sorts all data points in a timeseries.
 	- sort in descending order `sort($prom_cpu_5m_last30m_filtered; 0)`
 	---
 #### style
-Applies an external style sheet that overrides the default style of the html formatted storybooks. Only one style function call is allowed be PQL program. Style references are defined in the environment definition (env.json).
+Applies an external style sheet that overrides the default style of the html formatted storybooks. Only one style function call is allowed per PQL program. Style references are defined in the environment definition (env.json).
 - paramertes: 1 environment reference
 - returns: 
 - use:
-	- style `style(@demo)`
+	- add a new css style to the storybook `style(@darkmode)`
 	- sample environment configuration with 2 style options.
 	```
 	"style":[
     {
-      "name": "demo",
+      "name": "darkmode",
       "type": "CSS",
       "vars": {
-        "url": "https://autoptic-demo.s3.us-west-2.amazonaws.com/css/demo.css"
+        "url": "https://www.autoptic.io/assets/css/darkmode.css"
       }
     },
     {
