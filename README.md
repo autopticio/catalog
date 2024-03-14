@@ -1,4 +1,4 @@
-## Getting started with programmable assessments 
+## Getting started with PQL
 Autoptic PQL is a functional language for time series data analysis. Here is an example program for Amazon CloudWatch.
 ```
 //query cloudwatch and get instance CPU utilization for the last hour
@@ -16,7 +16,7 @@ where(@cw_aws)
 .chart($perc_cpu_99;$perc_cpu_90 ; @barcombo)
 .chart($ts_cpu ; @line)
 ```
-Here is the resulting html you would expect: [Sample results](./examples/sample_result.html)
+Here is the resulting html you would expect: [Sample results](https://autoptic-www.s3.eu-west-1.amazonaws.com/assets/html/sample_result.html)
 
 #### 1. Sign-up and run the demo program
 [Signup and activate an Autoptic endpoint](https://www.autoptic.io/#signup). Follow the instructions to setup your environment and run the demo program. 
@@ -54,7 +54,7 @@ Compute functions allow computing aggregates for simple or more complex statisti
 ### Output
 Output functions direct how the resulting output will be handled:
 
-[note](#note) | [sort](#sort) | [head](#head) | [tail](#tail) | [print](#print) | [chart](#chart) | [out](#out) | [style](#style)
+[note](#note) | [chart](#chart) | [sort](#sort) | [head](#head) | [tail](#tail) | [print](#print) | [out](#out) | [style](#style)
 
 ### Data Source Reference
 Data source references specify which data sources will be used from the environment definition:
