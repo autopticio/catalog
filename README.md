@@ -1,31 +1,32 @@
 ## Getting started with programmable assessments 
-Autoptic PQL is a functional language for time series data analysis. Here is a simple example with Amazon CloudWatch.
+Autoptic PQL is a functional language for time series data analysis. Here is an example program for Amazon CloudWatch.
 ```
 //query cloudwatch and get instance CPU utilization for the last hour
 where(@cw_aws)
-.what("MetricName='CPUUtilization';InstanceId='i-a0f8880d7a4d502db'; Namespace='AWS/EC2'")
+.what("MetricName='CPUUtilization';InstanceId='*'; Namespace='AWS/EC2'")
 .when(1h)
         .request($where[0];$what[0];$when[0]).as($ts_cpu)
 
 //compute the 15th and 99th percentile summary statistics
-.percentile($ts_cpu;0.15;0.99).as($perc_cpu)
+.percentile($ts_cpu;0.99).as($perc_cpu_99)
+.percentile($ts_cpu;0.90).as($perc_cpu_90)
 
-//print the percentile values, and all cpu time series data points.
-.print($perc_cpu ; $ts_cpu)
-        .out("cloudwatch cpu results")
+//chart the percentile values, and all cpu time series data points.
+.note("### CPU Utilization for EC2 instances")
+.chart($perc_cpu_99;$perc_cpu_90 ; @barcombo)
+.chart($ts_cpu ; @line)
 ```
+Here is the resulting html you would expect: [Sample results](./examples/sample_result.html)
 
 #### 1. Sign-up and run the demo program
 [Signup and activate an Autoptic endpoint](https://www.autoptic.io/#signup). Follow the instructions to setup your environment and run the demo program. 
 
-Add your account credentials in the "aws_access_key_id" and "aws_secret_access_key". The account must have read access to CloudWatch. For more information check the [AWS guide on access credentials](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html). Autoptic does not cache or store the credentials you submit over the API.
+Add your account credentials "aws_access_key_id" and "aws_secret_access_key" in the env.json property file. The account must have read access to CloudWatch. For more information check the [AWS guide on access credentials](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html). Autoptic does not cache or store the credentials you submit over the API.
 
 The sample query is retrieving the "CPUUtilization" of an EC2 instance. [Check the full CloudWatch metrics list](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/viewing_metrics_with_cloudwatch.html) for more options. Check out the [example programs](./examples/) for more ideas on how to use PQL for more programmable assessments.
 
-Here is the response you would expect in a json format: [Sample results](./examples/sample_result.json)
-
-#### 2. Install the VSCode Autoptic extension 
-You can download and install a [VSCode exension](https://github.com/autopticio/vscode-pql) and edit/run PQL programs from the IDE.
+#### 2. Use the VSCode Autoptic extension 
+You can download and install our [VSCode exension](https://github.com/autopticio/vscode-pql) and edit/run PQL programs from the IDE. Using VSCode is very convenient when you are iterating and building a collection of programs or writing more extensive storybooks. The extension provides syntax highlighting and runtime access to run PQL programs. You can edit,run and view results directly from Visual Studio Code.
 
 ## Autoptic Architecture
 PQL programs are edited locally and posted through a secure API endpoint to the Autoptic PQL runtime where code is executed. The runtime will get time series data from the remote sources configured in the program and return the computed results in html or json to the requesting client.  
@@ -53,7 +54,7 @@ Compute functions allow computing aggregates for simple or more complex statisti
 ### Output
 Output functions direct how the resulting output will be handled:
 
-[sort](#sort) | [head](#head) | [tail](#tail) | [print](#print) | [chart](#chart) | [out](#out) | [note](#note)
+[note](#note) | [sort](#sort) | [head](#head) | [tail](#tail) | [print](#print) | [chart](#chart) | [out](#out) | [style](#style)
 
 ### Data Source Reference
 Data source references specify which data sources will be used from the environment definition:
@@ -122,71 +123,63 @@ Creates a graph visualization for the variables in scope. The graphs are rendere
 - use:
 	- graph time series variables as individual  line charts `.chart($ts_cpu; $ts_mem; @line)`
 	- graph aggregate variables as a stacked bar chart `.chart($cpu_idle_avg; $cpu_sys_avg; @barStacked)`
-- graph templates: Graph templates are configured in the env.json and can be referenced in function calls. Here is are some template examples:
+- graph templates: Graph templates are configured in the env.json and can be referenced in function calls. The following chart types are available:
+	- line
 	```
-  "chart":
-  [
-    {
-      "name": "line",
-      "type": "line",
-      "vars": {
-          "backgroundColor": "rgb(99, 99, 132)",
-          "borderColor": "rgb(99, 99, 132)",
-          "stacked": false
-      }
-    },
-    {
-      "name": "lineNotStacked",
-      "type": "line",
-      "vars": {
-          "backgroundColor": "#99d376",
-          "borderColor": "#3158f9",
-          "stacked": false
-      }
-    },
-    {
-      "name": "lineDefault",
-      "type": "line"
-    },
-    {
+	{
       "name": "linestack",
       "type": "line",
       "vars": {
           "backgroundColor": "rgb(99, 99, 132)",
           "borderColor": "rgb(99, 99, 132)",
-          "stacked": "1"
+          "stacked": true,
+          "style": "max-width: 600px",
+          "aspectRatio": "3"
       }
-    },
-    {
-      "name": "barStacked",
+    }
+	``` 
+	- bar
+	```
+	{
+      "name": "barcombo",
       "type": "bar",
       "vars": {
           "backgroundColor": "rgb(255, 99, 132)",
           "borderColor": "rgb(255, 99, 132)",
-          "stacked": "1"
-      }
-    },
-    {
-      "name": "pie",
-      "type": "pie",
-      "vars": {
-          "backgroundColor": "rgb(99, 99, 132)",
-          "borderColor": "rgb(99, 99, 132)",
-          "stacked": true
-      }
-    },
-    {
-      "name": "pie-not-stacked",
-      "type": "pie",
-      "vars": {
-          "backgroundColor": "rgb(99, 99, 132)",
-          "borderColor": "rgb(99, 99, 132)",
-          "stacked": false
+          "stacked": true,
+          "combo":true,
+          "style": "max-width: 600px",
+          "aspectRatio": "2.5"
       }
     }
-  ]
 	``` 
-
+	- pie
+	``` 
+	{
+      "name": "piestack",
+      "type": "pie",
+      "vars": {
+          "backgroundColor": "rgb(99, 99, 132)",
+          "borderColor": "rgb(99, 99, 132)",
+          "stacked": true,
+          "style": "max-width: 400px",
+          "aspectRatio": "1"
+      }
+    }
+	``` 
+	- asserttable
+	```
+	{
+      "name": "tftable",
+      "type": "asserttable",
+      "vars": {
+          "row_dimension": "MetricName",
+          "true_label": "pass",
+          "false_label" : "fail",
+          "mark": "&#9679;"
+      }
+    }
+	```
 ---
 #### correlate
 Computes the degree of correlation between two time series variables.
@@ -288,10 +281,16 @@ Computes the minimum value for a time series.
 ---
 #### note 
 Inserts html formatted text in the output.
-- parameters: Text or html.
+- parameters: markdown or plain text. Note supports templating with providing optional aggregate variables and dimension references that get substituted in the markdown.
 - returns: appends the contents to the output. Notes are displayed in the order they appear in PQL. 
 - use:
-	- display text `note("Hello! This is my first note. We love <b>PQL</b>!")`
+	- renders markdown `note("### Hello! This is my first note. We love <b>PQL</b>!")`
+	- the markdown template below renders the sentence "Average CPUUtilization is 0.19249771467106416 in eu-west-1"
+	```
+	.note($cpu_avg;$cpu_avg.Region;$cpu_avg.MetricName;"
+	Average {{3}} is {{1}} in {{2}}
+	")
+	```
 ---
 #### open
 Opens a saved PQL results resource from a URI.
@@ -344,6 +343,32 @@ Sorts all data points in a timeseries.
 - use:
 	- sort in ascending order `sort($prom_cpu_5m_last30m_filtered; 1)`
 	- sort in descending order `sort($prom_cpu_5m_last30m_filtered; 0)`
+	---
+#### style
+Applies an external style sheet that overrides the default style of the html formatted storybooks. Only one style function call is allowed be PQL program. Style references are defined in the environment definition (env.json).
+- paramertes: 1 environment reference
+- returns: 
+- use:
+	- style `style(@demo)`
+	- sample environment configuration with 2 style options.
+	```
+	"style":[
+    {
+      "name": "demo",
+      "type": "CSS",
+      "vars": {
+        "url": "https://autoptic-demo.s3.us-west-2.amazonaws.com/css/demo.css"
+      }
+    },
+    {
+      "name": "bootstrap",
+      "type": "CSS",
+      "vars": {
+        "url": "https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
+      }
+    }
+  ]
+	```
 ---
 #### tail
 Selects the last set of data points from a time series.

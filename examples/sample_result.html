@@ -1,0 +1,433 @@
+
+<head><link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> 
+<style>
+* {
+	font-family: Verdana, sans-serif;
+	vertical-align: text-top;
+}
+
+.heading {
+	grid-row-start: 1;
+	grid-row-end: 3;
+	display: grid;
+	grid-template-columns: 55% 45%;
+	height: 200px;
+	font-size: small;
+	overflow: scroll;
+}
+
+.chart {
+	display: grid;
+	grid-template-columns: 1fr 1.2fr;
+}
+
+.container {
+	display: grid;
+}
+
+.content {
+	border: 1px solid #9a9a9a;
+	border-radius: 20px;
+	background-color: #fefefe;
+	padding: 5px;
+	margin-bottom: 15px;
+	grid-column-start: 1;
+	grid-column-end: 3;
+	overflow: hidden;
+}
+
+.shared {
+	grid-area: 1 / 1 / 1 / span 2;
+	overflow-x: scroll;
+}
+
+.item {
+	border-bottom: 0.75px solid #cacaca;
+	border-radius: 25px;
+	padding: 15px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 5px;
+	overflow-y: scroll;
+}
+
+.dim_c {
+	padding: 10px;
+	font-size: small;
+	white-space: normal;
+	overflow: auto;
+	max-height: 5em;
+}
+
+.dim_k {
+	color: rgb(177, 179, 181);
+}
+
+.dim_v {
+	color: slategray;
+	max-height: 5em;
+	text-wrap: wrap;
+}
+
+.logdivider {
+	width: 100%;
+	padding: 0.75em;
+	max-height: 5em;
+}
+
+.table {
+	display: table;
+	width: 100%;
+	border-top: 1px solid #1a0dab;
+	padding-top:0.5em;
+}
+
+.table_heading{
+	display: table-header-group;
+}
+
+.row {
+	display: table-row;
+	padding-left: 2em;
+}
+
+.cell {
+	display: table-cell;
+	padding-right: 2em;
+	padding-bottom: 1em;
+	font-size: 0.9em;
+	white-space: nowrap;
+}
+
+.varlink {
+	width: 100%;
+	color: #1a0dab;
+	margin-bottom: -20px;
+}
+
+.scroll-shadows {
+	overflow: auto;
+	background:
+		/* Shadow Cover TOP */
+		linear-gradient(white 30%,
+			rgba(255, 255, 255, 0)) center top,
+
+		/* Shadow Cover BOTTOM */
+		linear-gradient(rgba(255, 255, 255, 0),
+			white 70%) center bottom,
+
+		/* Shadow TOP */
+		radial-gradient(farthest-side at 50% 0,
+			rgba(75, 115, 240, 0.2),
+			rgba(0, 0, 0, 0)) center top,
+
+		/* Shadow BOTTOM */
+		radial-gradient(farthest-side at 50% 100%,
+			rgba(75, 115, 240, 0.2),
+			rgba(0, 0, 0, 0)) center bottom;
+
+	background-repeat: no-repeat;
+	background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px;
+	background-attachment: local, local, scroll, scroll;
+}
+
+pre {
+	margin: unset;
+	background-color: unset;
+	margin-top: -2em;
+}
+
+pre code.hljs {
+	padding: unset !important;
+	background-color: unset;
+}
+
+.asserttable_table {
+	border-collapse: collapse;
+	width: 30%;
+	margin: 20px auto;
+}
+.asserttable_table th, .asserttable_table td {
+	border: 1px solid #e9e9e9;
+	padding: 8px;
+	text-align: center;
+}
+.asserttable_table th {
+	background-color: #f2f2f2;
+}
+
+.fc {
+	text-align: right;
+}
+</style>
+<link href="https://www.autoptic.io/assets/img/favicon.png" rel="icon">
+</head>
+
+<body>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@4.0.1/dist/chart.umd.min.js"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.1/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+	<script>
+		let f = (arr) => { arr.forEach(element => { element.x *= 1000 }); return arr }
+		let f1 = (arr) => { arr.forEach(element => { element.ts *= 1000 }); return arr }
+	</script>
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+	<script>hljs.highlightAll();</script>
+
+	<div class="container">
+
+		<div class="content heading">
+			<div class="item scroll-shadows">
+				<pre><code class="language-javascript">
+//query cloudwatch and get instance CPU utilization for the last hour
+where(@cw_aws)
+.what("MetricName='CPUUtilization';InstanceId='*'; Namespace='AWS/EC2'")
+.when(1h)
+        .request($where[0];$what[0];$when[0]).as($ts_cpu)
+
+//compute the 15th and 99th percentile summary statistics
+.percentile($ts_cpu;0.99).as($perc_cpu_99)
+.percentile($ts_cpu;0.90).as($perc_cpu_90)
+
+//chart the percentile values, and all cpu time series data points.
+.note("### CPU Utilization for EC2 instances")
+.chart($perc_cpu_99;$perc_cpu_90 ; @barcombo)
+.chart($ts_cpu ; @line)
+				</code></pre>
+			</div>
+    	
+			<div class="item scroll-shadows">
+			
+				<div class="dim_c">
+					<div class="dim_k">pql</div>
+					<div class="dim_v">N/A</div>
+				</div>
+				<div class="dim_c">
+					<div class="dim_k">completed</div>
+					<div class="dim_v">13.03.2024 13:04:11 +0000</div>
+				</div>
+				<div class="dim_c">
+					<div class="dim_k">status</div>
+					<div class="dim_v">ok</div>
+				</div>
+				<div class="dim_c">
+					<div class="dim_k">errors</div>
+					<div class="dim_v">0</div>
+				</div>
+				<div class="dim_c">
+					<div class="dim_k">time</div>
+					<div class="dim_v">140.434452ms</div>
+				</div>
+				<div class="dim_c">
+					<div class="dim_k">api_calls</div>
+					<div class="dim_v">1</div>
+				</div>
+				<div class="dim_c">
+					<div class="dim_k">time_series</div>
+					<div class="dim_v">-</div>
+				</div>
+				<div class="dim_c">
+					<div class="dim_k">function_calls</div>
+					<div class="dim_v">12</div>
+				</div>
+				<div class="dim_c">
+					<div class="dim_k">variables</div>
+					<div class="dim_v">4 where, 2 style,9 chart</div>
+				</div>
+				<div class="item">
+					<div class="table">
+						<div class="table_heading">
+							<div class="cell dim_k">time</div>
+							<div class="cell dim_k">stat</div>
+							<div class="cell dim_k">function</div>
+							<div class="cell dim_k">as</div>
+							<div class="cell dim_k">in</div>
+							<div class="cell dim_k">out</div>
+							<div class="cell dim_k">message</div>
+						</div>
+						
+						<div class="row">
+							<div class="cell">27.619µs</div>
+							<div class="cell">ok</div>
+							<div class="cell">note("### CPU Utilization for EC2 instan...</div>
+							<div class="cell">-</div>
+							<div class="cell"></div>
+							<div class="cell"></div>
+							<div class="cell">-</div>
+						</div>
+						<div class="row">
+							<div class="cell">116.714223ms</div>
+							<div class="cell">ok</div>
+							<div class="cell">request($where[0];$what[0];$when[0])</div>
+							<div class="cell">$ts_cpu</div>
+							<div class="cell"> 1:T</div>
+							<div class="cell"> 1:T</div>
+							<div class="cell">Got 1 time series from CloudWatch(eu-west-1);Become 1 as PQL time series (eu-west-1)</div>
+						</div>
+						<div class="row">
+							<div class="cell">24.431µs</div>
+							<div class="cell">ok</div>
+							<div class="cell">percentile($ts_cpu;0.99)</div>
+							<div class="cell">$perc_cpu_99</div>
+							<div class="cell"> 1:T</div>
+							<div class="cell"> 1:A</div>
+							<div class="cell">Got 1 time series from CloudWatch(eu-west-1);Become 1 as PQL time series (eu-west-1);Processed request($where[0];$what[0];$when[0]);Calling statistic function percentile($ts_cpu;0.99)</div>
+						</div>
+						<div class="row">
+							<div class="cell">253.812µs</div>
+							<div class="cell">ok</div>
+							<div class="cell">chart($ts_cpu;@line)</div>
+							<div class="cell">-</div>
+							<div class="cell"> 1:T</div>
+							<div class="cell"></div>
+							<div class="cell">-</div>
+						</div>
+						<div class="row">
+							<div class="cell">127.7µs</div>
+							<div class="cell">ok</div>
+							<div class="cell">percentile($ts_cpu;0.90)</div>
+							<div class="cell">$perc_cpu_90</div>
+							<div class="cell"> 1:T</div>
+							<div class="cell"> 1:A</div>
+							<div class="cell">Got 1 time series from CloudWatch(eu-west-1);Become 1 as PQL time series (eu-west-1);Processed request($where[0];$what[0];$when[0]);Calling statistic function percentile($ts_cpu;0.90)</div>
+						</div>
+						<div class="row">
+							<div class="cell">339.722µs</div>
+							<div class="cell">ok</div>
+							<div class="cell">chart($perc_cpu_99;$perc_cpu_90;@barcombo)</div>
+							<div class="cell">-</div>
+							<div class="cell"> 2:A</div>
+							<div class="cell"></div>
+							<div class="cell">-</div>
+						</div></div>
+				</div>
+			</div>
+  		</div>
+
+		
+		<div class="content">
+		<div class="item" style="display:block"><h3 id="cpu-utilization-for-ec2-instances">CPU Utilization for EC2 instances</h3>
+</div>
+		</div>
+		
+
+<div class="content chart">
+
+	<div class="item shared">
+		<div class="dim_c">	
+			<div class="dim_k">MetricName</div>
+			<div class="dim_v">CPUUtilization</div>
+		</div>
+		<div class="dim_c">	
+			<div class="dim_k">Namespace</div>
+			<div class="dim_v">AWS/EC2</div>
+		</div>
+		<div class="dim_c">	
+			<div class="dim_k">Region</div>
+			<div class="dim_v">eu-west-1</div>
+		</div>
+		<div class="dim_c">	
+			<div class="dim_k">Stat</div>
+			<div class="dim_v">Average</div>
+		</div>
+		<div class="dim_c">	
+			<div class="dim_k">InstanceId</div>
+			<div class="dim_v">i-00f8880d7a4d502db</div>
+		</div>
+	</div>
+	
+	<div class="item" style="max-width: 600px"><canvas id="ch_20" ></canvas></div>
+
+	<div class="item">
+		
+		<div class="dim_c varlink"><a href="#">$perc_cpu_99</a></div>
+		<div class="item">
+			<div class="dim_c">	
+				<div class="dim_k" style="color:rgb(255, 99, 132);font-weight: bold;">[1]</div>
+			</div></div>
+		
+		<div class="dim_c varlink"><a href="#">$perc_cpu_90</a></div>
+		<div class="item">
+			<div class="dim_c">	
+				<div class="dim_k" style="color:green;font-weight: bold;">[2]</div>
+			</div></div></div>
+</div>
+
+	<script>
+	const ch_20 = document.getElementById('ch_20');
+	new Chart(ch_20, {type: 'bar',
+		data: {
+			datasets:[
+					{
+						label: '$perc_cpu_99[1]',
+						data: [0.213333],
+						backgroundColor: 'rgb(255, 99, 132)',
+						borderColor: 'rgb(255, 99, 132)',
+					},
+					{
+						label: '$perc_cpu_90[2]',
+						data: [0.183333],
+						backgroundColor: 'green',
+						borderColor: 'green',
+					},]
+					,labels:['','']} ,options:{aspectRatio:2.5,plugins:{legend:{display:false}},scales:{x:{display:false}}}});
+	</script>
+
+		
+
+	<div class="content chart">
+		
+		<div class="item shared">
+			<div class="dim_c">	
+				<div class="dim_k">MetricName</div>
+				<div class="dim_v">CPUUtilization</div>
+			</div>
+			<div class="dim_c">	
+				<div class="dim_k">Namespace</div>
+				<div class="dim_v">AWS/EC2</div>
+			</div>
+			<div class="dim_c">	
+				<div class="dim_k">Region</div>
+				<div class="dim_v">eu-west-1</div>
+			</div>
+			<div class="dim_c">	
+				<div class="dim_k">Stat</div>
+				<div class="dim_v">Average</div>
+			</div>
+			<div class="dim_c">	
+				<div class="dim_k">InstanceId</div>
+				<div class="dim_v">i-00f8880d7a4d502db</div>
+			</div>
+		</div>
+		
+		<div class="item" style="max-width: 600px"><canvas id="ch_2200" ></canvas></div>
+
+		<div class="item">
+			<div class="dim_c varlink"><a href="#">$ts_cpu</a></div><div>
+
+				<div class="item">
+					<div class="dim_c">	
+						<div class="dim_k" style="color:rgb(99, 99, 132);font-weight: bold;">[0]</div>
+					</div></div></div>
+		</div>
+			<script>
+				const ch_2200 = document.getElementById('ch_2200');
+				new Chart(ch_2200, {type: 'line',
+					data: {
+						datasets:[
+								{
+									data: f1([{"ts":1710331440,"v":0.16724090025002064},{"ts":1710331740,"v":0.1653288110040887},{"ts":1710332040,"v":0.16669445216255724},{"ts":1710332340,"v":0.166703713994548},{"ts":1710332640,"v":0.18333333333430363},{"ts":1710332940,"v":0.15001852366309137},{"ts":1710333240,"v":0.166430489950734},{"ts":1710333540,"v":0.183087894786462},{"ts":1710333840,"v":0.16666666666666682},{"ts":1710334140,"v":0.1661480040753351},{"ts":1710334440,"v":0.2166666666695772}]),
+									backgroundColor: 'rgb(99, 99, 132)',
+									borderColor: 'rgb(99, 99, 132)',
+								},
+						]
+					},options: {aspectRatio:3.5,plugins:{legend:{display: false}},parsing: {xAxisKey: 'ts',yAxisKey: 'v'},scales: {y: {beginAtZero: true},x: {type: 'time',}}}});
+			</script>
+	</div>
+
+  		
+	</div>
+
+</body>
