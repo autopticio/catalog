@@ -183,21 +183,21 @@ Graph templates are configured in the env.json and can be referenced in function
 		- use:
 			```
 			.assert($errors_avg < 5 ).as($errors_asserts)
-			//FunctionName will specify the row dimension and will override the default MetricName in the asserttable
+			//FunctionName will override the default MetricName in the asserttable as the row dimension
 			.chart($errors_asserts;@tftable["FunctionName"])
 			```
 		- environment configuration properties
 			- row_dimension: the default dimension to use for row labels.
 			- true_label: the column header for true values.
 			- false_label: the column header for false values.
-			- mark: the characted that will show if a value is true or false
+			- mark: the characted that will show in the table if a value is true or false
 		- example environment configuration
 		```
 		{
       	"name": "tftable",
       	"type": "asserttable",
       	"vars": {
-          	"row_dimension": "MetricName", //the default dimension to use for row labels.
+          	"row_dimension": "MetricName",
           	"true_label": "pass",
           	"false_label" : "fail",
           	"mark": "&#9679;"
