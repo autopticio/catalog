@@ -1,7 +1,7 @@
 where(@cw_aws)
 .what(
-    "MetricName='NetworkPacketsIn'; InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'";
-    "MetricName='NetworkPacketsIn'; InstanceId='i-00f9990d7a4d502xy'; Namespace='AWS/EC2'"
+    "MetricName='NetworkPacketsIn'; InstanceId='*';Region='us-*'; Namespace='AWS/EC2'";
+    "MetricName='NetworkPacketsIn'; InstanceId='*';Region='eu-*'; Namespace='AWS/EC2'"
 )
 .when(24h)
 .window(15m)
@@ -14,5 +14,4 @@ where(@cw_aws)
 .merge($netin_a;$netin_b; min).as($netin_min)
 .merge($netin_a;$netin_b; average).as($netin_average)
 
-.print($netin_max;$netin_sum;$netin_average;$netin_min)
-.out("merge")
+.chart($netin_max;$netin_sum;$netin_average;$netin_min;@line)

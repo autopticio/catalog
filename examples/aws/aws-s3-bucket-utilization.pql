@@ -3,14 +3,14 @@ where(@cw_aws)
     "MetricName='BucketSizeBytes';BucketName='*';Namespace='AWS/S3';Region='eu-*|us-*'" ;
     "MetricName='NumberOfObjects';BucketName='*';Namespace='AWS/S3';Region='eu-*|us-*'"
 )
-.when(3600h)
-.window(168h)
+.when(180d)
+.window(30d)
 .request($where[0] ; $what[0] ; $when[0] ; $window[0]).as($size)
 .request($where[0] ; $what[1] ; $when[0] ; $window[0]).as($count)
 
 .group($size;$count).as($s3)
 .filter($s3;"Stat='Average'").as($S3_metrics)
 
-.note("<h2>S3 buckets and objects across regions</h2>")
+.note("## S3 buckets and objects across regions")
 .chart($S3_metrics;@line)
 

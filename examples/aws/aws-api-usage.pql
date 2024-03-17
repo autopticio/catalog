@@ -1,12 +1,15 @@
 //query cloudwatch and get a list of active services 
-where(@cw_aws_x)
+where(@cw_aws)
 .what("MetricName='CallCount';Region='eu-*|us-*';Service='*';Resource='*';Namespace='AWS/Usage'")
 
 .when(30d)
-.window(24h)
+.window(1d)
         .request($where[0];$what[0];$when[0];$window[0]).as($calls)
 
 .filter($calls;"Service='CloudWatch'").as($cw)
-.chart($cw;@bar)
 
+.count($calls).as($callcount_avg)
+
+.chart($callcount_avg;@piestack)
+.chart($cw;@bar)
 .chart($calls;@line)

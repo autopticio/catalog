@@ -1,5 +1,3 @@
-open("https://autoptic-demo.s3.us-west-2.amazonaws.com/snaps/multisource.json"; $cpu_total_seconds).as($total_seconds)
+open("https://autoptic-demo.s3.us-west-2.amazonaws.com/snaps/prometheus.json"; $p_cpu).as($total_seconds)
 
-.average($total_seconds).as($avg_cpu)
-.print($avg_cpu; $total_seconds)
-.out("snapshot")
+chart($total_seconds;@bar)

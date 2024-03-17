@@ -1,10 +1,10 @@
 where(@cw_aws)
-.what("MetricName='CPUUtilization';InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'")
+.what("MetricName='CPUUtilization';InstanceId='*'; Namespace='AWS/EC2'")
 .when(24h)
-.request($where[0];$what[0];$when[0]).as($data)
+.window(1h)
+.request($where[0];$what[0];$when[0];$window[0]).as($data)
 
 .sort($data; 1).as($sorted_desc)
 .sort($data; 0).as($sorted_asc)
 
-.print($sorted_desc;$sorted_asc)
-.out("sort")
+.chart($sorted_desc;$sorted_asc;@barcombo)

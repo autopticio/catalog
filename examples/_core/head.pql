@@ -7,4 +7,3 @@ where(@cw_aws)
 .head($data; 50%).as($head_perc)
 
 .chart($head_abs;$head_perc;@bar)
-.out("head")

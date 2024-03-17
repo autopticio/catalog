@@ -13,5 +13,5 @@ where(@cw_aws;@cw_aws_x)
 .average($ts_d1).as($diff1; unit='percent_diff')
 .average($ts_d2).as($diff2; unit='numeric_diff')
 
-.print($diff1;$diff2)
-.out("diff")
+.chart($diff1;@line)
+.chart($diff2;@line)

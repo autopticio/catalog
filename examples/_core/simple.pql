@@ -1,9 +1,14 @@
-//query cloudwatch and get CPU utilization
+//query cloudwatch and get instance CPU utilization for the last hour
 where(@cw_aws)
-.what("MetricName='CPUUtilization';Region='us-east-1|eu-west-1'; Namespace='AWS/EC2'")
+.what("MetricName='CPUUtilization';InstanceId='*'; Namespace='AWS/EC2'")
 .when(1h)
-.window(5m)
-.request($where[0];$what[0];$when[0];$window[0]).as($ts_cpu)
+        .request($where[0];$what[0];$when[0]).as($ts_cpu)
 
-//chart cpu utilization for different regions.
-.chart($ts_cpu ; @linestack)
+//compute the 15th and 99th percentile summary statistics
+.percentile($ts_cpu;0.99).as($perc_cpu_99)
+.percentile($ts_cpu;0.90).as($perc_cpu_90)
+
+//chart the percentile values, and all cpu time series data points.
+.note("### CPU Utilization for EC2 instances")
+.chart($perc_cpu_99;$perc_cpu_90 ; @barcombo)
+.chart($ts_cpu ; @line)

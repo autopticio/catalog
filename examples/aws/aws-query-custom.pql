@@ -8,5 +8,4 @@ where(@cw_aws)
 .request($where[0];$what[0];$when[0];$window[0]).as($calls)
 .request($where[0];$what[1];$when[0];$window[0]).as($activeep)
 
-.print($calls;$activeep)
-.out("custom metrics")
+.chart($calls;$activeep;@line)

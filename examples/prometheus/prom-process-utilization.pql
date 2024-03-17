@@ -14,6 +14,7 @@ where(@cw_aws; @prometheus ; @cw_aws_x)
 //Compute total CPU seconds across 2 CPUs from Prometheus
 .filter($node_cpu_seconds; "cpu='0'").as($cpu0)
 .filter($node_cpu_seconds; "cpu='1'").as($cpu1)
+.filter($node_cpu_seconds; "{cpu='1' OR cpu='0'} AND mode!='idle'").as($cpu_active)
 
 .merge($cpu0; sum).as($cpu0_total_seconds)
 .merge($cpu1; sum).as($cpu1_total_seconds)
@@ -34,6 +35,7 @@ where(@cw_aws; @prometheus ; @cw_aws_x)
 //Compute EC2 CPU utilization that is NOT taken up by the prometheus process across regions and accounts
 .math((1-$prometheus_utilization/$ec2_avg_cpu)*100).as($non_prometheus_workload)
 
-.print($cpu_total_seconds;$ec2_cpu_utilization)
-.print($non_prometheus_workload;$prometheus_utilization;$ec2_avg_cpu)
-.out("cpu utilization excluding the prometheus process")
+.chart($cpu_total_seconds;$ec2_cpu_utilization;@bar)
+.chart($non_prometheus_workload;$prometheus_utilization;@piestack)
+.chart($ec2_cpu_utilization;@line)
+.chart($cpu_active;@barstack)

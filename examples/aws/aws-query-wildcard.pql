@@ -7,14 +7,15 @@ where(@cw_aws)
     "MetricName='Latency*';TableName='Endpoint*';Namespace='AWS/DynamoDB';Region='eu-west-1'";
     "MetricName='Latency*';TableName='Endpoint*';Operation='*';Namespace='AWS/DynamoDB';Region='eu-west-1'"
 )
-.when(30m)
-.window(30m)
+.when(24h)
+.window(1h)
 .request($where[0];$what[0];$when[0];$window[0]).as($a)
 .request($where[0];$what[1];$when[0];$window[0]).as($b)
 .request($where[0];$what[2];$when[0];$window[0]).as($c)
 .request($where[0];$what[3];$when[0];$window[0]).as($d)
 .request($where[0];$what[4];$when[0];$window[0]).as($e)
-.request($where[0];$what[4];$when[0];$window[0]).as($f)
+.request($where[0];$what[5];$when[0];$window[0]).as($f)
 
-.print($a ; $b ; $c ; $d ; $e ; $f)
-.out("cloudwatch wildcard examples")
+.note("cloudwatch wildcard examples")
+.chart($a ; $b ; $c ; $d ; $e ; $f; @barstack)
+

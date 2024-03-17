@@ -1,10 +1,11 @@
 where(@cw_aws)
 .what("MetricName='CPUUtilization';InstanceId='i-00f8880d7a4d502db'; Namespace='AWS/EC2'")
 .when(24h)
-.request($where[0] ;$what[0];$when[0]).as($data)
+.window(1h)
+.request($where[0] ;$what[0];$when[0];$window[0]).as($data)
 
-.sort($data; 1).as($sorted)
+//find the 3 periods with lowest CPU utilization
+.sort($data; 0).as($sorted)
 .tail($sorted; 3).as($bottom3 ; unit='percent')
 
-.print($bottom3)
-.out("bottom3")
+.chart($bottom3;$data;@barcombo)

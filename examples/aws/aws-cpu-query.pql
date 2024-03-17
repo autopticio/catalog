@@ -14,5 +14,5 @@ where(@cw_aws)
 .request($where[0];$what[3];$when[0];$window[0]).as($i_netin_p)
 .request($where[0];$what[4];$when[0];$window[0]).as($i_netout_p)
 
-.print($i_cpu; $i_netin_p ; $i_netout_p ; $i_netin_b ; $i_netout_b)
-.out("cloudwatch queries")
+//.print($i_cpu; $i_netin_p ; $i_netout_p ; $i_netin_b ; $i_netout_b).out("cloudwatch queries")
+.chart($i_cpu; $i_netin_p ; $i_netout_p ; $i_netin_b ; $i_netout_b ; @bar)

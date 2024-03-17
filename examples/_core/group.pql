@@ -10,12 +10,12 @@ where(@cw_aws; @cw_aws_x)
 //Grouping time series
 .group($instance_cpu_a1; $instance_cpu_a2).as($cpu_total)
 
-.average($cpu_total).as($cpu_avg)
-.max($cpu_total).as($cpu_max)
-.percentile($cpu_total;0.9).as($cpu_perc)
+.average($cpu_total).as($cpu_avg;Stat='avg')
+.max($cpu_total).as($cpu_max;Stat='max')
+.percentile($cpu_total;0.9).as($cpu_perc;Stat='90th percentile')
 
 //Grouping aggregates
 .group($cpu_perc;$cpu_max;$cpu_avg).as($stats)
 
-.print($cpu_total;$stats)
-.out("group")
+.chart($stats;@barcombo)
+.chart($cpu_total;@barcombo)

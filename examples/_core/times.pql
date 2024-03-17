@@ -1,17 +1,21 @@
 //query cloudwatch and get CPU utilization
 where(@cw_aws)
-.what("MetricName='CPUUtilization';InstanceId='*'; Namespace='AWS/EC2'")
-	.when("start = '29-11-2022 00:00:00 +00'; end = '29-11-2022 11:59:59 +00'")
-	.when("start = '30-11-2022 00:00:00 +00'; end = '30-11-2022 11:59:59 +00'")
-	.when("start = '29-11-2022 17:00:00 +00'; end = '29-11-2022 23:59:59 +00'")
-	.when("start = '30-11-2022 17:00:00 +00'; end = '30-11-2022 23:59:59 +00'")
+.what("MetricName='CPUUtilization';InstanceId='*'; Region='us-*';Namespace='AWS/EC2'")
+	.when("start = '29-11-2023 00:00:00 +00'; end = '29-11-2023 11:59:59 +00'")
+	.when("start = '30-11-2023 00:00:00 +00'; end = '30-11-2023 11:59:59 +00'")
+	.when("start = '29-11-2023 12:00:00 +00'; end = '29-11-2023 23:59:59 +00'")
+	.when("start = '30-11-2023 12:00:00 +00'; end = '30-11-2023 23:59:59 +00'")
 
-.window(15m)
-        .request($where[0];$what[0];$when[0]).as($ts_cpu_morning_1)
-        .request($where[0];$what[0];$when[1]).as($ts_cpu_morning_2)
-        .request($where[0];$what[0];$when[2]).as($ts_cpu_evening_1)
-        .request($where[0];$what[0];$when[3]).as($ts_cpu_evening_2)
+.window(1h)
+        .request($where[0];$what[0];$window[0];$when[0]).as($ts_cpu_mornings_p1)
+        .request($where[0];$what[0];$window[0];$when[1]).as($ts_cpu_mornings_p2)
+        .request($where[0];$what[0];$window[0];$when[2]).as($ts_cpu_evenings_p1)
+        .request($where[0];$what[0];$window[0];$when[3]).as($ts_cpu_evenings_p2)
 
+.merge($ts_cpu_mornings_p1;average).as($ts_cpu_morning_1)
+.merge($ts_cpu_mornings_p2;average).as($ts_cpu_morning_2)
+.merge($ts_cpu_evenings_p1;average).as($ts_cpu_evening_1)
+.merge($ts_cpu_evenings_p2;average).as($ts_cpu_evening_2)
 
 //compute the 75th percentile summary statistics for the periods 
 .percentile($ts_cpu_morning_1;0.75).as($perc_cpu_m1)
@@ -24,5 +28,5 @@ where(@cw_aws)
 
 .assert($cpu_morning > $cpu_evening).as($mornings_are_busier_than_evenings)
 
-.print($mornings_are_busier_than_evenings)
-        .out("busy times")
+.chart($mornings_are_busier_than_evenings;@tftable)
+.chart($ts_cpu_morning_1;$ts_cpu_evening_1;$ts_cpu_morning_2;$ts_cpu_evening_2;@barcombo)

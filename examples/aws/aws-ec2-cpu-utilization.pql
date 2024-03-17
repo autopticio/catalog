@@ -1,40 +1,46 @@
 //Query multiple aws accounts and regions
 where(@cw_aws;@cw_aws_x)
 .what("MetricName='CPUUtilization';InstanceId='*';Region='eu-*|us-*';Namespace='AWS/EC2'")
-.when(7d)
+.when(30d)
 .window(1h)
     .request($where[0];$what[0];$when[0];$window[0]).as($ts_cpu_acct_1)
     .request($where[1];$what[0];$when[0];$window[0]).as($ts_cpu_acct_2)
 
 //Group the account data into a single reference variable
 .group($ts_cpu_acct_1;$ts_cpu_acct_2).as($cpus)
-//Combine CPU data across accounts and regions the into a single time series
-.merge($cpus; max).as($cpus_ts)
 
-//.style(@bootstrap)
-.style(@demo)
-.note("<h3 style='color:Tomato;'>Periods with highest CPU utilization across accounts and regions.</h3>")    
-    .sort($cpus_ts; 1).as($sorted)
-    .head($sorted; 2%).as($top_times)
-    .chart($top_times;@bar)
+//Aggregate CPU data across accounts and regions the into a single time series
+.merge($cpus; average).as($cpus_ts)
 
-.note("<h3 style='color:Tomato;'>CPU volatility index for this period.</h3>")
+//Get the averages for each instance and sort the set
+.average($cpus).as($cpu_instance_avg)
+.sort($cpu_instance_avg; 0).as($sorted_desc)
+
+
+//Slice the time series and get the lowest/highest value samples
+.note("Periods with highest and lowest CPU utilization across accounts and regions")    
+    .sort($cpus_ts; 0).as($sorted)
+    .head($sorted; 3%).as($high_times)
+    .tail($sorted; 3%).as($low_times)
+    .chart($high_times;$low_times;@bar)
+
+.note("CPU volatility index for this period")
+    //Compute the volatility is computed based on percentile distance to median
     .percentile($cpus_ts;0.99).as($cpus_perc)
     .percentile($cpus_ts;0.50).as($cpus_med)
     .math((1-$cpus_med/$cpus_perc)*100).as($volatility_index)
     .chart($volatility_index;@bar)
 
- .note("<h3 style='color:Tomato;'>Aggregate CPU utilization</h3>")
-    .chart($cpus_ts;@bar)
+ .note("Aggregate CPU utilization")
+    .chart($cpus_ts;@line)
 
-.note("<h3 style='color:Tomato;'>Top 3 utilized EC2 instances.</h3>")
-    .average($cpus).as($aggregates)
-    .sort($aggregates; 1).as($sorted_desc)
-    .tail($sorted_desc;3).as($top3 ; description='the top utilized instances')
-    .chart($top3;@piestack)
+.note("EC2 instance utilization")
+    .head($sorted_desc;3).as($top_instances; description='Most utilized instances')
+    .tail($sorted_desc;3).as($bottom_instances ; description='Least utilized instances')
+    .chart($top_instances;@piestack)
+    .chart($bottom_instances;@piestack)
 
-.note("<h3 style='color:Tomato;'>CPU Utilization per instance.</h3>")
-    .filter($cpus; "MetricName='CPUUtilization'").as($cpus_filtered)
-    .chart($cpus_filtered;@line)
+.note("CPU Utilization per instance")
+   .chart($cpus;@line)
 
 

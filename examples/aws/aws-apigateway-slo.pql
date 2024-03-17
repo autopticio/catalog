@@ -1,37 +1,61 @@
+
 where(@cw_aws)
-.what(	"MetricName='Latency';Stage='*';ApiName='*';Namespace='AWS/ApiGateway'";
-	"MetricName='Count';Stage='*';ApiName='*';Stat='Sum';Namespace='AWS/ApiGateway'";
-	"MetricName='4XXError';Stage='*';ApiName='*';Stat='Sum';Namespace='AWS/ApiGateway'";
-	"MetricName='5XXError';Stage='*';ApiName='*';Stat='Sum';Namespace='AWS/ApiGateway'"
+.what(	"MetricName='Latency';Stage='production';ApiName='*';Namespace='AWS/ApiGateway'";
+	"MetricName='Count';Stage='production';ApiName='*';Stat='Sum';Namespace='AWS/ApiGateway'";
+	"MetricName='4XXError';Stage='production';ApiName='*';Stat='Sum';Namespace='AWS/ApiGateway'";
+	"MetricName='5XXError';Stage='production';ApiName='*';Stat='Sum';Namespace='AWS/ApiGateway'";
+        "MetricName='IntegrationLatency';Stage='production';ApiName='*';Namespace='AWS/ApiGateway'"
 	)
-.when(48h)
-.window(1h)
+.when(30d)
+.window(1d)
         .request($where[0];$what[0];$when[0];$window[0]).as($request_latency;unit='ms')
         .request($where[0];$what[1];$when[0];$window[0]).as($request_count)
         .request($where[0];$what[2];$when[0];$window[0]).as($errors_4xx)
         .request($where[0];$what[3];$when[0];$window[0]).as($errors_5xx)
+        .request($where[0];$what[4];$when[0];$window[0]).as($integration_latency;unit='ms')
 
-.percentile($request_latency;0.9).as($latency)
+.percentile($request_latency;0.9).as($latency;Stat='p90';description='this is a cool metric')
 .average($request_count).as($count)
 .average($errors_4xx).as($err4xx)
 .average($errors_5xx).as($err5xx)
+.percentile($integration_latency;0.9).as($latency_backend;Stat='p90')
 
-.math(1000).as($ok)
+.math(1500).as($ok)
+.math(100).as($desired_slo;description='target percent')
 .math($ok*3).as($abandon)
 .assert($latency > $ok).as($suffering)
 .assert($latency < $abandon ).as($tolerating)
 
 //If latency is above the abandon threshold the performance SLA is set to 0
 //If latency is greater than the "ok" threshold the performance SLA is decreasing proportionally to the latency above the ok threshold, otherwise the SLA is 100%
-.math( (100-(($latency - $ok)/(($abandon - $ok)*0.01))*$suffering)*$tolerating ).as($perf_sla)
+.math( (100-(($latency - $ok)/(($abandon - $ok)*0.01))*$suffering)*$tolerating ).as($perf_slo)
 
 //Calculate the error SLA based on 4xx and 5xx errors for the service.
-.math((1-($err4xx+$err5xx)/$count)*100).as($err_sla)
+.math((1-($err4xx+$err5xx)/$count)*100).as($err_slo)
 
-//Calculate the combined performance and error SLA. Performance and errors have equal weights
-.math(($err_sla+$perf_sla)/2).as($slo)
+//Calculate the combined performance and error rates and roll up into SLO. Performance and errors have equal weights
+.math(($err_slo+$perf_slo)/2).as($current_slo;op='!')
 
-.chart($slo;@barstack)
-.chart($perf_sla;$err_sla;@pie)
-.chart($request_latency;$errors_4xx;$errors_5xx;$request_count;@bar)
-        .out("service level objective slo")
+.note("
+The program evaluates the operational efficiency and reliability of the API in a production environment. 
+It assesses key metrics like ***latency, error rates (both 4XX and 5XX), integration latency, and request count*** over a 30-day period. 
+The metrics provide insights into the API's performance, throughput, error occurrences, and integration delays.
+
+The program uses defined thresholds 'ok' and 'abandon' for latency, asserting acceptable and unacceptable performance levels. 
+It calculates a performance SLA based on these thresholds: when latency surpasses the 'ok' level, the SLA decreases proportionally. Error SLA is computed from 4XX and 5XX errors compared to the total request count. Both SLAs are combined with equal weight to form a Service Level Objective (SLO), indicating the overall performance and error rates. Charts visualize these metrics and thresholds, enabling swift assessment and decision-making on API performance and reliability.
+")
+.chart($desired_slo;$current_slo;@barcombo)
+.chart($perf_slo;$err_slo;@barcombo)
+.note("If the Service Level Objective (SLO) is lower, check the factors contributing to this decline. Here are steps to consider:
+- Investigate the metrics that contribute to the SLO decrease. 
+- Focus on specific areas such as increased latency, higher error rates (4XX and 5XX), or other performance-related issues. 
+- Identify whether these issues are due to system changes, increased traffic, or infrastructure problems.
+- Once you've identified the areas causing the decrease in SLO, isolate these issues to specific components or processes within the system. This could involve examining code changes, server configurations, or external dependencies that might be impacting performance.")
+
+//Chart individual time series
+.chart($errors_4xx;$errors_5xx;$request_count;@bar)
+.chart($request_latency;$integration_latency;@barcombo)
+.chart($latency;$latency_backend;@piestack)
+.note("There are different path to address the problem including optimizing code, scaling resources, fixing bugs, or improving infrastructure. Prioritize actions based on their potential impact on improving the SLO. After implementing changes, continue monitoring the system closely to gauge the effects of your changes. Make iterative adjustments as necessary and ensure that any changes made do not inadvertently affect other parts of the system negatively.
+Periodically reassess the SLO and communicate progress to stakeholders.
+Transparency about the steps taken, their impact, and the ongoing efforts to improve performance is crucial for maintaining trust and support.")

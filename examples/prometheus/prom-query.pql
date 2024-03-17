@@ -4,5 +4,4 @@ where(@prometheus)
 .window(15m)
 .request($where[0];$what[0];$when[0];$window[0]).as($p_cpu)
 
-.print($p_cpu)
-.out("prometheus queries")
+.chart($p_cpu;@line)

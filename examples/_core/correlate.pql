@@ -15,6 +15,4 @@ where(@cw_aws)
 .correlate($net;$disk).as($network_to_disk)
 
 .assert($network_to_disk > 0.75).as($highly_persistent_workload)
-
-.print($highly_persistent_workload;$network_to_disk)
-.out("correlate")
+.chart($highly_persistent_workload;$network_to_disk;@tftable)

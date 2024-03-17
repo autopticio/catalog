@@ -5,10 +5,8 @@ where(@cw_aws)
 
 .average($data).as($avg)
 .min($data).as($min)
-.max($data).as($max)
+.max ($data).as($max)
 .count($data).as($count)
 .percentile($data; 0.25; 0.5; 0.75; 0.99).as($perc)
 
-.chart($avg;$min;$max;$count;$perc;@bar)
-
-.out("stats")
+.chart($avg;$min;$max;$count;$perc;@barcombo)

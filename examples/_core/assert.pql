@@ -9,5 +9,4 @@ where(@cw_aws)
 .assert($perc_cpu > $avg_cpu).as($health_check)
 .assert($avg_cpu > 0 ).as($cpu_check)
 
-.print($health_check; $cpu_check)
-.out("assert")
+.chart($health_check;$cpu_check;@tftable)

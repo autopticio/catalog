@@ -38,22 +38,10 @@
       "vars": {
           "backgroundColor": "rgb(99, 99, 132)",
           "borderColor": "rgb(99, 99, 132)",
-          "stacked": false
+          "stacked": false,
+          "style": "max-width: 600px",
+          "aspectRatio": "3.5"
       }
-    },
-    {
-      "name": "lineNotStacked",
-      "type": "line",
-      "vars": {
-          "backgroundColor": "#99d376",
-          "borderColor": "#3158f9",
-          "stacked": false
-      }
-    },
-    {
-      "name": "line123",
-      "type": "line"
-
     },
     {
       "name": "linestack",
@@ -61,7 +49,20 @@
       "vars": {
           "backgroundColor": "rgb(99, 99, 132)",
           "borderColor": "rgb(99, 99, 132)",
-          "stacked": "1"
+          "stacked": true,
+          "style": "max-width: 600px",
+          "aspectRatio": "3"
+      }
+    },
+    {
+      "name": "barstack",
+      "type": "bar",
+      "vars": {
+          "backgroundColor": "rgb(255, 99, 132)",
+          "borderColor": "rgb(255, 99, 132)",
+          "stacked": true,
+          "style": "max-width: 600px",
+          "aspectRatio": "1.5"
       }
     },
     {
@@ -70,7 +71,43 @@
       "vars": {
           "backgroundColor": "rgb(255, 99, 132)",
           "borderColor": "rgb(255, 99, 132)",
-          "stacked": "1"
+          "stacked": false,
+          "style": "max-width: 600px",
+          "aspectRatio": "3"
+      }
+    },
+    {
+      "name": "barsum",
+      "type": "bar",
+      "vars": {
+          "backgroundColor": "rgb(255, 99, 132)",
+          "borderColor": "rgb(255, 99, 132)",
+          "stacked": true,
+          "style": "max-width: 600px",
+          "aspectRatio": "2.5"
+      }
+    },
+    {
+      "name": "barcombo",
+      "type": "bar",
+      "vars": {
+          "backgroundColor": "rgb(255, 99, 132)",
+          "borderColor": "rgb(255, 99, 132)",
+          "stacked": true,
+          "combo":true,
+          "style": "max-width: 600px",
+          "aspectRatio": "2.5"
+      }
+    },
+    {
+      "name": "piestack",
+      "type": "pie",
+      "vars": {
+          "backgroundColor": "rgb(99, 99, 132)",
+          "borderColor": "rgb(99, 99, 132)",
+          "stacked": true,
+          "style": "max-width: 400px",
+          "aspectRatio": "1"
       }
     },
     {
@@ -79,16 +116,35 @@
       "vars": {
           "backgroundColor": "rgb(99, 99, 132)",
           "borderColor": "rgb(99, 99, 132)",
-          "stacked": true
+          "stacked": false,
+          "style": "max-width: 200px",
+          "aspectRatio": "1"
       }
     },
     {
-      "name": "pie-not-stacked",
-      "type": "pie",
+      "name": "tftable",
+      "type": "asserttable",
       "vars": {
-          "backgroundColor": "rgb(99, 99, 132)",
-          "borderColor": "rgb(99, 99, 132)",
-          "stacked": false
+          "row_dimension": "MetricName",
+          "true_label": "pass",
+          "false_label" : "fail",
+          "mark": "&#9679;"
+      }
+    }
+  ],
+  "style":[
+    {
+      "name": "darkmode",
+      "type": "CSS",
+      "vars": {
+        "url": "https://www.autoptic.io/assets/css/darkmode.css"
+      }
+    },
+    {
+      "name": "bootstrap",
+      "type": "CSS",
+      "vars": {
+        "url": "https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
       }
     }
   ]

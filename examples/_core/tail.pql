@@ -4,7 +4,6 @@ where(@cw_aws)
 .request($where[0];$what[0];$when[0]).as($data)
 
 .tail($data; 2).as($abs)
-.tail($data; 25%).as($perc)
+.tail($data; 5%).as($perc)
 
-.print($abs ; $perc)
-.out("tail")
+.chart($abs ; $perc;@bar)

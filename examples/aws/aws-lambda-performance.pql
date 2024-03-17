@@ -1,0 +1,41 @@
+where(@cw_aws)
+
+.what(
+    "MetricName='ClaimedAccountConcurrency';Stat='Maximum';Namespace='AWS/Lambda';Region='eu-west-1'";
+    "MetricName='UnreservedConcurrentExecutions';Stat='Maximum';Namespace='AWS/Lambda';Region='eu-west-1'";
+    "MetricName='Duration';FunctionName='*';Resource='*';Stat='Average';Namespace='AWS/Lambda';Region='eu-west-1'";
+    "MetricName='Errors';FunctionName='*';Resource='*';Stat='Sum';Namespace='AWS/Lambda';Region='eu-west-1'";
+    "MetricName='Throttles';FunctionName='*';Resource='*';Stat='Maximum';Namespace='AWS/Lambda';Region='eu-west-1'";
+    "MetricName='Invocations';FunctionName='*';Resource='*';Stat='Sum';Namespace='AWS/Lambda';Region='eu-west-1'";
+    "MetricName='ConcurrentExecutions';FunctionName='*';Resource='*';Stat='Maximum';Namespace='AWS/Lambda';Region='eu-west-1'"
+    )
+.when(30d)
+.window(1d)
+.request($where[0] ; $what[0] ; $when[0] ; $window[0]).as($ClaimedAccountConcurrency)
+.request($where[0] ; $what[1] ; $when[0] ; $window[0]).as($UnreservedConcurrentExecutions)
+.request($where[0] ; $what[2] ; $when[0] ; $window[0]).as($duration;Unit='milliseconds')
+.request($where[0] ; $what[3] ; $when[0] ; $window[0]).as($errors;Unit='count')
+.request($where[0] ; $what[4] ; $when[0] ; $window[0]).as($throttles;Unit='count')
+.request($where[0] ; $what[5] ; $when[0] ; $window[0]).as($invocations;Unit='count')
+.request($where[0] ; $what[6] ; $when[0] ; $window[0]).as($concurrent_executions;Unit='count')
+
+.average($errors).as($errors_avg).sort($errors_avg;0).as($sorted_errors).head($sorted_errors;10)
+            .as($top10_errors;Decription='Average over entire period';Stat='!')
+.average($invocations).as($invocations_avg).sort($invocations_avg;0).as($sorted_invocations).head($sorted_invocations;10)
+            .as($top10_invocations;Decription='Average over entire period';Stat='!')
+.average($duration).as($duration_avg).sort($duration_avg;0).as($sorted_duration).head($sorted_duration;10)
+            .as($top10_duration;Decription='Average over entire period';Stat='!')
+.average($throttles).as($throttles_avg).sort($throttles_avg;0).as($sorted_throttles).head($sorted_throttles;10)
+            .as($top10_throttles;Decription='Average over entire period';Stat='!')
+
+.chart($top10_invocations;@piestack)
+.chart($top10_errors;@piestack)
+.chart($top10_duration;@piestack)
+.chart($top10_throttles;@piestack)
+.chart($ClaimedAccountConcurrency;$UnreservedConcurrentExecutions;@barstack)
+
+.chart($invocations;@barstack)
+.chart($duration;@barstack)
+.chart($errors;@barstack)
+.chart($throttles;@line)
+.chart($concurrent_executions;@line)
