@@ -1,11 +1,14 @@
+AUTOPTIC_EP=7d31cc55-bd65-4a48-ac92-063e7809038b
 PQL_PROGRAM=$1
 AUTOPTIC_ENV=~/autoptic/env.json
 AUTOPTIC_DATA=~/autoptic/data
 AUTOPTIC_EP_URL="https://autoptic.io/pql/ep/$AUTOPTIC_EP/run"
-clientos="$(uname -s)"
+clientos="$(uname)"
+show_results=0
 
 if [[ $clientos == *"Darwin"* ]]; then
 	base_params=""
+	show_results=1
 elif [[ $clientos == *"Linux"* ]]; then
 	base_params="-w 0"
 else
@@ -32,5 +35,9 @@ curl -H "content-type:application/json" -X POST  \
 	--data '{"vars": "'$(cat $AUTOPTIC_ENV | base64 $base_params)'", "pql": "'$(cat $PQL_PROGRAM | base64 $base_params)'"}' $AUTOPTIC_EP_URL \
 	> "$AUTOPTIC_DATA/$pql_result_file"
 
-# Open the results in a new chrome tab
-open -a "Google Chrome" $AUTOPTIC_DATA/$pql_result_file
+echo "Results saved:$pql_result_file"
+
+if [[ $show_results == "1" ]]; then
+	# Open the results in a new chrome tab
+	open -a "Google Chrome" $AUTOPTIC_DATA/$pql_result_file
+fi
