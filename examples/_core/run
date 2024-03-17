@@ -26,11 +26,11 @@ then
 fi
 
 # Submit the program to the PQL API and save the results
-pql_file=$(basename ${PQL_PROGRAM}).$(date +"%Y%m%d%H%M%S")
+pql_result_file=$(basename ${PQL_PROGRAM}).$(date +"%Y%m%d%H%M%S").html
 mkdir -p "$AUTOPTIC_DATA"
 curl -H "content-type:application/json" -X POST  \
 	--data '{"vars": "'$(cat $AUTOPTIC_ENV | base64 $base_params)'", "pql": "'$(cat $PQL_PROGRAM | base64 $base_params)'"}' $AUTOPTIC_EP_URL \
-	> "$AUTOPTIC_DATA/$pql_file"
+	> "$AUTOPTIC_DATA/$pql_result_file"
 
 # Open the results in a new chrome tab
-open -a "Google Chrome" $AUTOPTIC_DATA/$pql_file
+open -a "Google Chrome" $AUTOPTIC_DATA/$pql_result_file
