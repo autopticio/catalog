@@ -46,12 +46,12 @@ Modification functions handle time series data reduction, filtering and summatio
 
 [filter](#filter) | [merge](#merge) | [group](#group)
 
-### Compute
+### Compute & Analytics
 Compute functions allow computing aggregates for simple or more complex statistics: 
 
 [average](#average) | [min](#min) | [max](#max) | [count](#count) | [percentile](#percentile) | [assert](#assert) | [math](#math) | [correlate](#correlate) | [diff](#diff)
 
-### Output
+### Presentation
 Output functions direct how the resulting output will be handled:
 
 [note](#note) | [chart](#chart) | [sort](#sort) | [head](#head) | [tail](#tail) | [print](#print) | [out](#out) | [style](#style)
