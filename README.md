@@ -457,10 +457,14 @@ Specifies the query time ranges for the program
 		- recent 5 minutes `when(5m)` 
 		- recent 1 hour `when(1h)`
 		- recent 7 days `when(7d)`
+		- Dynamic period selection simplifies time navigation. Previous historical periods can be specified with an index number next to the time value:
+			- the second to last 7-day period `when(7d[1])
+			- the third to last 7-day perdiod `when(7d[2])
+			- the 10th to last 30-day perdiod `when(30d[10])
 	- absolute time selection
 		- start and end date time `when("start = '22-02-2022 00:00:00 +00'; end = '22-02-2022 23:59:59 +00'")`
 	- multi selection
-		- recent 24 hours and 2-22-22 `when(24h,"start = '22-02-2022 00:00:00 +00'; end = '22-02-2022 23:59:59 +00'")`
+		- recent 24 hours and 2-22-22 `when(24h,"start = '22-02-2022 00:00:00 +00'; end = '22-02-2022 23:59:59 +00'";24h[5])`
 ---
 #### where 
 Specifies the data sources that will be used in the program from the [data source configuration](#data-sources).
