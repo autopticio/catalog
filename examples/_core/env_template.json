@@ -6,7 +6,7 @@
       "type": "CloudWatch",
       "vars": {
         "AwsRegion": "eu-west-1",
-        "window": "300s",
+        "window": "15m",
         "aws_access_key_id": "",
         "aws_secret_access_key": ""
       }
@@ -16,9 +16,20 @@
       "type": "CloudWatch",
       "vars": {
         "AwsRegion": "us-east-1",
-        "window": "300s",
+        "window": "15m",
         "aws_access_key_id": "",
         "aws_secret_access_key": ""
+      }
+    },
+    {
+      "name": "cw_aws_mfa",
+      "type": "CloudWatch",
+      "vars": {
+        "AwsRegion": "us-east-1",
+        "window": "15m",
+        "aws_access_key_id": "",
+        "aws_secret_access_key": "",
+        "aws_session_token": ""
       }
     },
     {
