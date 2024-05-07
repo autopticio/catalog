@@ -209,7 +209,7 @@ Graph templates are configured in the env.json and can be referenced in function
 ---
 #### correlate
 Computes the degree of correlation between two time series variables.
-- parameters: 2 time series variables
+- parameters: 2 time series variables. The number of data points in each of the time series being compared have to match.
 - returns: aggregate for degree of correlation. 1 is highest correlation to -1 for inverse correlation. Numbers closer to 0 indicate low or no correlation.
 - use:
 	- compute the number of data points `correlate($cpu_utilization; $memory_utilization).as($resource_correlation)`
