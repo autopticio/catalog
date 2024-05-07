@@ -100,6 +100,8 @@ Creates a named time series or a results variable from the results of the preced
 	.print($avg_cpu")
 	.out("cpu results")
 	```
+	- Remove a deminsion from a variable: 
+		- Removing the Stat dimension: `.average($cpu_timeseries).as($avg_cpu ;Stat='!')`
 ---
 #### assert
 Evaluates if a logical expression is true or false. 
