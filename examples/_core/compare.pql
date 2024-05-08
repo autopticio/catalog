@@ -1,0 +1,27 @@
+//query cloudwatch and get instance CPU utilization for several weeks back and compare how different the periods are
+where(@cw_aws)
+.what("MetricName='CPUUtilization';InstanceId='*';Region='us-east-1';Namespace='AWS/EC2'")
+.when(7d;7d[1];7d[2];7d[3];7d[4])
+.window(1h)
+        .request($where[0];$what[0];$when[0];$window[0]).as($ts_cpu_r1;period='the last period')
+        .request($where[0];$what[0];$when[1];$window[0]).as($ts_cpu_r2;period='the second period back')
+        .request($where[0];$what[0];$when[2];$window[0]).as($ts_cpu_r3;period='the third period back')
+        .request($where[0];$what[0];$when[3];$window[0]).as($ts_cpu_r4;period='the fourth period back')
+        .request($where[0];$what[0];$when[4];$window[0]).as($ts_cpu_r5;period='the fifth period back')
+
+.merge($ts_cpu_r1;average).as($ts_cpu_p1)
+.merge($ts_cpu_r2;average).as($ts_cpu_p2)
+.merge($ts_cpu_r3;average).as($ts_cpu_p3)
+.merge($ts_cpu_r4;average).as($ts_cpu_p4)
+.merge($ts_cpu_r5;average).as($ts_cpu_p5)
+
+.compare($ts_cpu_p1;$ts_cpu_p1;@alike).as($similarity_0th;description='compare to self to baseline';period='!')
+.compare($ts_cpu_p2;$ts_cpu_p1;@alike).as($similarity_2nd;description='compare first to second period';period='!')
+.compare($ts_cpu_p3;$ts_cpu_p1;@alike).as($similarity_3rd;description='compare first to third period';period='!')
+.compare($ts_cpu_p4;$ts_cpu_p1;@alike).as($similarity_4th;description='compare first to fourth period';period='!')
+.compare($ts_cpu_p5;$ts_cpu_p1;@alike).as($similarity_5th;description='compare first to fifth period';period='!')
+
+.style(@darkmode)
+.chart($similarity_0th;$similarity_2nd;$similarity_3rd;$similarity_4th;$similarity_5th;@barcombo)
+.chart($ts_cpu_p1;$ts_cpu_p2;$ts_cpu_p3;$ts_cpu_p4;$ts_cpu_p5;@bar)
+.chart($ts_cpu_r1;$ts_cpu_r2;$ts_cpu_r3;$ts_cpu_r4;$ts_cpu_r5;@bar)
