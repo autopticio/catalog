@@ -6,15 +6,16 @@ where(@cw_aws)
         .request($where[0] ; $what[0] ; $when[0];$window[0]).as($ts_cpu)
 
 .average($ts_cpu).as($avg)
-.assert($avg > 10).as($avg_over_10)
+.assert($avg < 0.2 ).as($avg_over_10)
 
+.chart($avg_over_10;@tftable["InstanceId"])
 .chart($avg ; @piestack)
 .chart($ts_cpu; @line)
 .chart($ts_cpu; @linestack)
 .chart($ts_cpu ; @bar)
 .chart($ts_cpu ; @barstack)
 .chart($ts_cpu ; @barcombo)
-.chart($avg_over_10;@tftable)
+
 
 
 
