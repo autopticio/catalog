@@ -1,0 +1,42 @@
+where(@ct_aws)
+.what(
+    "EventName='ConsoleLogin';Region='us-*|eu-*'";
+    "EventSource='lambda.amazonaws.com';EventName='Update*';Region='eu-*|us-*'";
+    "EventSource='dynamodb.amazonaws.com';EventName='Update*';Region='eu-*|us-*'";
+    "EventSource='iam.amazonaws.com';EventName='Policy*';Region='us-*|eu-*'";
+    "EventSource='ec2.amazonaws.com';EventName='Instances*';Region='us-*|eu-*'";
+    "EventSource='s3.amazonaws.com';EventName='CreateBucket*';Region='us-*|eu-*'"
+) 
+.when(24h) 
+.window(1h)
+
+// Console login events
+.request($where[0];$what[0];$when[0];$window[0]).as($events_login)
+.split($events_login; dimension='EventName';dimension='Username';dimension='Region';annotation='CloudTrailEvent').as($logins)
+.chart($logins; @barstack)
+
+// Lambda function update events
+.request($where[0];$what[1];$when[0];$window[0]).as($lambda_changes_raw)
+.split($lambda_changes_raw; dimension='EventName';dimension='Resources';dimension='Username';dimension='Region';annotation='CloudTrailEvent').as($lambda_changes)
+.chart($lambda_changes; @barstack)
+
+// DynamoDB update events
+.request($where[0];$what[2];$when[0];$window[0]).as($dynamo_changes_raw)
+.split($dynamo_changes_raw; dimension='EventName';dimension='Resources';dimension='Username';dimension='Region';annotation='CloudTrailEvent').as($dynamodb_changes)
+.chart($dynamodb_changes; @barstack)
+
+// IAM policy changes
+.request($where[0];$what[3];$when[0];$window[0]).as($iam_changes_raw)
+.split($iam_changes_raw; dimension='EventName';dimension='Username';dimension='Region';annotation='CloudTrailEvent').as($iam_changes)
+.chart($iam_changes; @barstack)
+
+// EC2 instance lifecycle events
+.request($where[0];$what[4];$when[0];$window[0]).as($ec2_events_raw)
+.split($ec2_events_raw; dimension='EventName';dimension='Resources';dimension='Username';dimension='Region';annotation='CloudTrailEvent').as($ec2_events)
+.chart($ec2_events; @barstack)
+
+// S3 bucket permission changes
+.request($where[0];$what[5];$when[0];$window[0]).as($s3_changes_raw)
+.split($s3_changes_raw; dimension='EventName';dimension='Resources';dimension='Username';dimension='Region';annotation='CloudTrailEvent').as($s3_changes)
+.chart($s3_changes; @barstack)
+

@@ -1,0 +1,42 @@
+ where(@cw_aws)
+.what(
+    "MetricName='Latency*';TableName='*';Operation='*';Region='us-*|eu-*';Namespace='AWS/DynamoDB'";
+    "MetricName='ReadCapacity*';TableName='*';Region='us-*|eu-*';Namespace='AWS/DynamoDB'";
+    "MetricName='WriteCapacity*';TableName='*';Region='us-*|eu-*';Namespace='AWS/DynamoDB'";
+    "MetricName='Count*';TableName='*';Region='us-*|eu-*';Namespace='AWS/DynamoDB'";
+    "MetricName='Account*';Region='us-*|eu-*';Namespace='AWS/DynamoDB'"
+    )
+.when(60d).window(1d)
+.request($where[0];$what[0];$when[0];$window[0]).as($latency_table_ops)
+.request($where[0];$what[1];$when[0];$window[0]).as($reads)
+.request($where[0];$what[2];$when[0];$window[0]).as($writes)
+.request($where[0];$what[3];$when[0];$window[0]).as($items)
+.request($where[0];$what[4];$when[0];$window[0]).as($account_levels)
+
+// Top 10 calculation for each metric
+.average($latency_table_ops).as($latency_avg).sort($latency_avg;0).as($sorted_latency).head($sorted_latency;10)
+    .as($top10_latency;Description='Top 10 Latency Operations over entire period')
+.average($reads).as($reads_avg).sort($reads_avg;0).as($sorted_reads).head($sorted_reads;10)
+    .as($top10_reads;Description='Top 10 Read Capacity Usage over entire period')
+.average($writes).as($writes_avg).sort($writes_avg;0).as($sorted_writes).head($sorted_writes;10)
+    .as($top10_writes;Description='Top 10 Write Capacity Usage over entire period')
+.average($items).as($items_avg).sort($items_avg;0).as($sorted_items).head($sorted_items;10)
+    .as($top10_items;Description='Top 10 Item Counts over entire period')
+.average($account_levels).as($account_avg).sort($account_avg;0).as($sorted_account).head($sorted_account;10)
+    .as($top10_account;Description='Top 10 Account Levels over entire period')
+
+// Pie charts for Top 10 averages
+.chart($top10_latency;@piestack)
+.chart($top10_reads;@piestack)
+.chart($top10_writes;@piestack)
+.chart($top10_items;@piestack)
+.chart($top10_account;@piestack)
+
+.chart($latency_table_ops;@line)
+.chart($reads;@line)
+.chart($writes;@line)
+.chart($items;@line)
+.chart($account_levels;@barstack) 
+
+
+

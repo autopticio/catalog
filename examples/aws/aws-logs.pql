@@ -1,0 +1,29 @@
+where(@cw_aws;@cw_aws_logs)
+.what(
+"MetricName='CPUUtilization';InstanceId='*';Namespace='AWS/EC2';Stat='Maximum';Region='eu-west-1'";
+"LogGroup='/aws/lambda/pql-*'; message='ERROR*'; Region='eu-west-1'";
+"LogGroup='/aws/lambda/pql-*'; message='REPORT*'; Region='eu-west-1'";
+"LogGroup='API-Gateway-Execution*'; message='Path: /pql*'; Region='eu-west-1'"
+) 
+.when(3d) 
+.window(1h)
+.request($where[0];$what[0];$when[0];$window[0]).as($cpu_u)
+.request($where[1];$what[1];$when[0];$window[0]).as($log_errors)
+.request($where[1];$what[2];$when[0];$window[0]).as($log_lambda_resources)
+.request($where[1];$what[3];$when[0];$window[0]).as($log_apigateway_requests)
+.average($cpu_u).as($avg_cpu_u)
+
+.split($log_errors;annotation='message';dimension='log';dimension='logStream').as($by_log)
+.merge($log_apigateway_requests;$log_lambda_resources;sum).as($log_aggregate)
+
+//.print($cpu_u;$avg_cpu_u;$log_errors;$log_lambda_resources;$log_apigateway_requests)
+.note("### CPUUtilization for EC2 service ") 
+.chart($avg_cpu_u; @barcombo) 
+.chart($cpu_u;@line) 
+
+.note("### Log messages")
+.chart($log_errors;@line) 
+.chart($log_lambda_resources;@line) 
+.chart($log_apigateway_requests;@line) 
+.chart($log_aggregate;@line)
+.chart($by_log;@barstack)

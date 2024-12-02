@@ -12,6 +12,26 @@
       }
     },
     {
+      "name": "cw_aws_logs",
+      "type": "cloudwatchLogs",
+      "vars": {
+        "AwsRegion": "eu-west-1",
+        "window": "15m",
+        "aws_access_key_id": "",
+        "aws_secret_access_key": ""
+      }
+    },
+    {
+      "name": "ct_aws",
+      "type": "cloudtrail",
+      "vars": {
+        "AwsRegion": "eu-west-1",
+        "window": "15m",
+        "aws_access_key_id": "",
+        "aws_secret_access_key": ""
+      }
+    },
+    {
       "name": "cw_aws_x",
       "type": "CloudWatch",
       "vars": {
@@ -39,6 +59,14 @@
         "prom_address": "",
         "window": "300s"
       }
+    },
+    {
+      "name": "sentry_demo",
+      "type": "sentry",
+      "vars": {
+        "organization": "orgname",
+        "access_token": "sentry_api_access_token"
+        }
     }
   ],
   "chart":

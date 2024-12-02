@@ -1,0 +1,15 @@
+where(@sentry_demo)
+.what(
+     "field=events;field=user.id;field=level";
+     "field=events;field=user.id;field=level;field=transaction"
+)
+.when(30d).window(1h)
+.request($where[0];$what[0];$when[0];$window[0]).as($events)
+.request($where[0];$what[1];$when[0];$window[0]).as($events_tx)
+
+.split($events;dimension='level';dimension='user.id').as($by_level)
+.split($events_tx;dimension='level';dimension='transaction').as($by_tx)
+
+.chart($events; @barstack)
+.chart($by_level; @barstack)
+.chart($by_tx; @barstack)
