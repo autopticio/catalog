@@ -32,7 +32,7 @@ fi
 pql_result_file=$(basename ${PQL_PROGRAM}).$(date +"%Y%m%d%H%M%S").html
 mkdir -p "$AUTOPTIC_DATA"
 curl -H "content-type:application/json" -X POST  \
-	--data '{"vars": "'$(cat $AUTOPTIC_ENV | base64 $base_params)'", "pql": "'$(cat $PQL_PROGRAM | base64 $base_params)'"}' $AUTOPTIC_EP_URL \
+	--data '{"env": "'$(cat $AUTOPTIC_ENV | base64 $base_params)'", "pql": "'$(cat $PQL_PROGRAM | base64 $base_params)'"}' $AUTOPTIC_EP_URL \
 	> "$AUTOPTIC_DATA/$pql_result_file"
 
 echo "Results saved:$AUTOPTIC_DATA/$pql_result_file"
