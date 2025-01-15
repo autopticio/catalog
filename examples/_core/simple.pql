@@ -1,7 +1,7 @@
 //query cloudwatch and get instance CPU utilization for the last hour
 where(@cw_aws)
-.what("MetricName='CPUUtilization';InstanceId='*'; Namespace='AWS/EC2'")
-.when(1h)
+.what("MetricName='CPUUtilization';InstanceId='*'; Region='us-*';Namespace='AWS/EC2'")
+.when(3h)
         .request($where[0];$what[0];$when[0]).as($ts_cpu)
 
 //compute the 15th and 99th percentile summary statistics

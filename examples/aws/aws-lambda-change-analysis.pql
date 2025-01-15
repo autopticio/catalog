@@ -1,0 +1,43 @@
+where(@cw_aws;@cw_aws_logs;@ct_aws)
+
+.what(
+    "MetricName='ClaimedAccountConcurrency';Stat='Maximum';Namespace='AWS/Lambda';Region='eu-west-1'";
+    "MetricName='UnreservedConcurrentExecutions';Stat='Maximum';Namespace='AWS/Lambda';Region='eu-west-1'";
+    "MetricName='Duration';FunctionName='production*';Resource='*';Stat='Average';Namespace='AWS/Lambda';Region='eu-west-1'";
+    "MetricName='Errors';FunctionName='production*';Resource='*';Stat='Sum';Namespace='AWS/Lambda';Region='eu-west-1'";
+    "MetricName='Throttles';FunctionName='production*';Resource='*';Stat='Maximum';Namespace='AWS/Lambda';Region='eu-west-1'";
+    "MetricName='Invocations';FunctionName='production*';Resource='*';Stat='Sum';Namespace='AWS/Lambda';Region='eu-west-1'";
+    "MetricName='ConcurrentExecutions';FunctionName='production*';Resource='*';Stat='Maximum';Namespace='AWS/Lambda';Region='eu-west-1'";
+    "LogGroup='/aws/lambda/pql-production'; message='ERROR*'; Region='eu-west-1'";
+    "LogGroup='API-Gateway-Execution*';log='production*';message='Path: /pql*'; Region='eu-west-1'";
+    "EventSource='lambda.amazonaws.com';EventName='Update*';Region='eu-west-1'"
+    )
+.when(5d)
+.window(15m)
+
+.request($where[0] ; $what[2] ; $when[0] ; $window[0]).as($duration;Unit='milliseconds')
+.request($where[0] ; $what[3] ; $when[0] ; $window[0]).as($errors;Unit='count')
+.request($where[0] ; $what[4] ; $when[0] ; $window[0]).as($throttles;Unit='count')
+.request($where[0] ; $what[5] ; $when[0] ; $window[0]).as($invocations;Unit='count')
+.request($where[0] ; $what[6] ; $when[0] ; $window[0]).as($concurrent_executions;Unit='count')
+.request($where[1] ; $what[7] ; $when[0] ; $window[0]).as($log_lambda_errors;Unit='count')
+.request($where[1] ; $what[8] ; $when[0] ; $window[0]).as($log_api_calls;Unit='count')
+.request($where[2] ; $what[9] ; $when[0] ; $window[0]).as($trail_lambda_updates;Unit='count')
+
+
+.split($log_lambda_errors;annotation='message';dimension='log').as($logged_lambda_errors)
+.split($log_api_calls;annotation='message';dimension='log').as($logged_api_calls)
+.split($trail_lambda_updates;dimension='EventName';dimension='EventSource';annotation='CloudTrailEvent').as($trailed_lambda_updates)
+
+
+.compare($logged_lambda_errors;$logged_api_calls;@alike).as($similarity_logged_errors_and_api_calls)
+.compare($logged_lambda_errors;$duration;@alike).as($similarity_logged_errors_and_duration)
+.compare($logged_lambda_errors;$invocations;@alike).as($similarity_logged_errors_and_invocations)
+.compare($logged_lambda_errors;$logged_lambda_errors;@alike).as($similarity_logged_errors_and_self)
+
+
+.chart($invocations;$duration;$errors;@bar)
+.chart($throttles;$concurrent_executions;@bar)
+.chart($logged_lambda_errors;$logged_api_calls;$trailed_lambda_updates;@barstack)
+.chart($similarity_logged_errors_and_api_calls;$similarity_logged_errors_and_duration;$similarity_logged_errors_and_invocations;$similarity_logged_errors_and_self;@barcombo)
+

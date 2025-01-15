@@ -4,7 +4,7 @@ where(@cw_aws)
     "MetricName='NumberOfObjects';BucketName='*';Namespace='AWS/S3';Region='eu-*|us-*'"
 )
 .when(180d)
-.window(30d)
+.window(1d)
 .request($where[0] ; $what[0] ; $when[0] ; $window[0]).as($size)
 .request($where[0] ; $what[1] ; $when[0] ; $window[0]).as($count)
 

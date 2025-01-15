@@ -10,6 +10,6 @@ where(@cw_aws)
 - It guides resource allocation decisions by indicating necessary CPU adjustments for efficiency and preventing bottlenecks.
 - Understanding CPU utilization aids in cost management by optimizing resource utilization and minimizing unnecessary expenses.")
 
-.note($cpu_avg;$cpu_avg.Region;$cpu_avg.MetricName;"
-- Average {{3}} is {{1}} in {{2}}
+.note("
+- {{$cpu_avg.MetricName}} average is {{$cpu_avg}} in {{$cpu_avg.Region}} region.
 ")

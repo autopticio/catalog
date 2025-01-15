@@ -1,5 +1,5 @@
 ## Getting started with PQL
-Autoptic PQL is a functional language for time series data analysis. Here is an example program for Amazon CloudWatch.
+Autoptic PQL is a functional language for telemetry analysis. Here is an example program for Amazon CloudWatch.
 ```
 //query cloudwatch and get instance CPU utilization for the last hour
 where(@cw_aws)
@@ -310,13 +310,14 @@ Inserts html formatted text in the output.
 - parameters: markdown or plain text. Note supports templating with providing optional aggregate variables and dimension references that get substituted in the markdown.
 - returns: appends the contents to the output. Notes are displayed in the order they appear in PQL. 
 - use:
-	- renders markdown `note("### Hello! This is my first note. We love <b>PQL</b>!")`
-	- the markdown template below renders the sentence "Average CPUUtilization is 0.19249771467106416 in eu-west-1"
+	- static text render as markdown: `note("### Hello! This is my first note. We love **PQL**!")`
+	- templates and vairables render as markdown:
 	```
-	.note($cpu_avg;$cpu_avg.Region;$cpu_avg.MetricName;"
-	Average {{3}} is {{1}} in {{2}}
+	.note("
+	Average {{$cpu_avg.MetricName}} is {{$cpu_avg}} in {{$cpu_avg.Region}}
 	")
 	```
+	- renders the sentence "Average CPUUtilization is 0.19249771467106416 in eu-west-1"
 ---
 #### open
 Opens a saved PQL results resource from a URI.
@@ -543,7 +544,7 @@ Multiple cloudwatch log data sources can be configured in the environment defini
 	- type: cloudwatchLogs
 	- vars:
 		- AwsRegion: default AWS region that the PQL program will be querying, if "Region" is not specified in 'what'
-		- window: default window size if not specified by the "window" function in a PQL program.
+		- window: default window size if not specified by the "window" function in a PQL program. If the default "window" is set to "auto", the pql program will automatically select a window based on the period selected by the "when" function. For example `.when(30d)` will result in a window set to 1d.
 		- The source supports both static keys and dynamically generated keys through MFA.
 			- aws_access_key_id: AWS key that you have to generate through IAM in AWS.
 			- aws_secret_access_key: The token that is paired with the key id above.

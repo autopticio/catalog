@@ -1,125 +1,64 @@
-where(@cw_aws_east;@cw_aws_west)
-.what("MetricName='CPU*'; Namespace='AWS/RDS'";
-      "MetricName='FreeableMemory'; Namespace='AWS/RDS'";
-      "MetricName='*IOPS'; Namespace='AWS/RDS'";
-      "MetricName='BurstBalance'; Namespace='AWS/RDS'";
-      "MetricName='FreeStorageSpace'; Namespace='AWS/RDS; Stat=Average";
-      "MetricName='ResourceCount'; Namespace='AWS/Usage; Type='Resource'; Resource='AllocatedStorage'; Stat=Average";
-      "MetricName='*Latency'; Namespace='AWS/RDS'"
+where(@cw_aws)
+.what("MetricName='CPU*';Namespace='AWS/RDS';Region='eu-*|us-*'";
+      "MetricName='FreeableMemory';Namespace='AWS/RDS';Region='us-*'";
+      "MetricName='IOPS*';Namespace='AWS/RDS';Region='us-*'";
+      "MetricName='DiskQueueDepth';Namespace='AWS/RDS';Stat='Maximum';Region='us-*'";
+      "MetricName='DatabaseConnections';Namespace='AWS/RDS;Stat=Average;Stat='Maximum';Region='us-*'";
+      "MetricName='Latency*';DBInstanceIdentifier='*prod';Stat='Maximum';Namespace='AWS/RDS';Region='us-*'"
     )
-.when(7d)
-.window(3h;5m)
+.when(14d)
+.window(1d)
 
-//////////////////////////////////////////////////////////////////////////////////
-// CPU Metrics
+.note("### DB connection count
+Watch for monotonic increase as it may indicate leaks")
+.request($where[0];$what[4];$when[0];$window[0]).as($ts_connections)
+.chart($ts_connections;@bar)
 
+.note("### DB operation latency
+Watch for monotonic increase or spikes as it may indicate perf degradations")
+.request($where[0];$what[5];$when[0];$window[0]).as($ts_latency)
+.chart($ts_latency;@barstack)
 
-.request($where[0];$what[0];$when[0];$window[0]).as($ts_cpu_metrics_east)
-.filter($ts_cpu_metrics_east; "MetricName='CPUUtilization'").as($ts_cpu_util_east)
-.filter($ts_cpu_metrics_east; "MetricName='CPUCreditUsage'").as($ts_cpu_credit_east)
-.filter($ts_cpu_metrics_east; "MetricName='CPUCreditBalance'").as($ts_cpu_balance_east)
-//
-.request($where[1];$what[0];$when[0];$window[0]).as($ts_cpu_metrics_west)
-.filter($ts_cpu_metrics_west; "MetricName='CPUUtilization'").as($ts_cpu_util_west)
-.filter($ts_cpu_metrics_west; "MetricName='CPUCreditUsage'").as($ts_cpu_credit_west)
-.filter($ts_cpu_metrics_west; "MetricName='CPUCreditBalance'").as($ts_cpu_balance_west)
-//
-.merge($ts_cpu_util_east;$ts_cpu_util_west;average).as($ts_cpu_util_us)
-.merge($ts_cpu_credit_east;$ts_cpu_credit_west;sum).as($ts_cpu_credit_us)
-.merge($ts_cpu_balance_east;$ts_cpu_balance_west;sum).as($ts_cpu_balance_us)
-
-//.tail($ts_cpu_util_us; 5%).as($cpu_util_recent)
-//.average($cpu_util_recent).as($avg_cpu_util)
-//.assert($avg_cpu_util > 0.85).as($cpu_check)
-
-.note("<b>Average CPU Utilization (percentage) </b>")
-.chart($ts_cpu_util_us;@line)
-
-.note("<b>CPU Performance burst balance and usage </b>")
-.chart($ts_cpu_credit_us;$ts_cpu_balance_us;@linestack)
-
-//////////////////////////////////////////////////////////////////////////////////
-// Memory Metrics
-
-.request($where[0];$what[1];$when[0];$window[1]).as($ts_mem_east)
-.request($where[1];$what[1];$when[0];$window[1]).as($ts_mem_west)
-
-.merge($ts_mem_east;$ts_mem_west;average).as($ts_mem_us)
-
-//.max($ts_mem_us).as($max_mem)
-//.min($ts_mem_us).as($min_mem)
-//.math(1-($min_mem/$max_mem)).as($peak_mem)
-//.assert($peak_mem > 0.90).as($mem_check)
-.note("<b>Available memory (Bytes) </b>")
-.note("Peak memory consumption is: $peak_mem ")
-
-.chart($ts_mem_us;@bar)
-
-//////////////////////////////////////////////////////////////////////////////////
 // Performance Metrics
+.request($where[0];$what[2];$when[0];$window[0]).as($ts_iops)
+.filter($ts_iops; "MetricName='ReadIOPS'").as($ts_read)
+.filter($ts_iops; "MetricName='WriteIOPS'").as($ts_write)
 
-.request($where[0];$what[2];$when[0];$window[1]).as($ts_iops_east)
-.request($where[0];$what[3];$when[0];$window[1]).as($ts_burst_east)
-.request($where[1];$what[2];$when[0];$window[1]).as($ts_iops_west)
-.request($where[1];$what[3];$when[0];$window[1]).as($ts_burst_west)
+.merge($ts_read;average).as($ts_read_us)
+.merge($ts_write;average).as($ts_write_us)
 
-.filter($ts_iops_east; "MetricName='ReadIOPS'").as($ts_read_east)
-.filter($ts_iops_east; "MetricName='WriteIOPS'").as($ts_write_east)
-.filter($ts_iops_west; "MetricName='ReadIOPS'").as($ts_read_west)
-.filter($ts_iops_west; "MetricName='WriteIOPS'").as($ts_write_west)
-
-.merge($ts_read_east;$ts_read_west;average).as($ts_read_us)
-.merge($ts_write_east;$ts_write_west;average).as($ts_write_us)
-.merge($ts_burst_east;$ts_burst_west;average).as($ts_burst_us)
-//.merge($ts_iops_east;$ts_iops_west;sum).as($ts_iops_total)
-
-.note("<b>Read and Write IOPS (count/sec) </b>")
-.note("If max is above 11K/sec application performance may be donwgraded")
-.note("If max is below 5K/sec you may save $ by scaling down DB instance")
+.note("### Read and Write IOPS (count/sec)
+If max is above 11K/sec application performance may be donwgraded.
+If max is below 5K/sec you may save $ by scaling down DB instance
+")
 .chart($ts_read_us;$ts_write_us;@linestack)
 
-.note("<b>Burst bucket IO credits balance</b>")
-.note("Application performance can be degraded if reaches zero. ")
-.chart($ts_burst_us;@linestack)
+.request($where[0];$what[3];$when[0];$window[0]).as($ts_queue)
+.merge($ts_queue;average).as($ts_queue_depth_us)
+.note("### Disk queue depth
+Application performance can be degraded if queue depth increases.
+")
+.chart($ts_queue_depth_us;@linestack)
 
-//.max($ts_iops_total).as($max_IOPS)
-//.assert($max_IOPS > 11000).as($upgrade_iops)
-//.assert($max_IOPS < 5000).as($downgrade_iops)
+// CPU Metrics
+.request($where[0];$what[0];$when[0];$window[0]).as($ts_cpu_metrics)
+.filter($ts_cpu_metrics; "MetricName='CPUUtilization'").as($ts_cpu_util)
+.filter($ts_cpu_metrics; "MetricName='CPUCreditUsage'").as($ts_cpu_credit)
+.filter($ts_cpu_metrics; "MetricName='CPUCreditBalance'").as($ts_cpu_balance)
 
-.request($where[0];$what[6];$when[0];$window[1]).as($ts_latency_east)
-.request($where[1];$what[6];$when[0];$window[1]).as($ts_latency_west)
+.merge($ts_cpu_util;average).as($ts_cpu_util_us)
+.merge($ts_cpu_credit;sum).as($ts_cpu_credit_us)
+.merge($ts_cpu_balance;sum).as($ts_cpu_balance_us)
 
-.filter($ts_latency_east; "MetricName='ReadLatency'").as($ts_readLatency_east)
-.filter($ts_latency_east; "MetricName='WriteLatency'").as($ts_writeLatency_east)
-.filter($ts_latency_west; "MetricName='ReadLatency'").as($ts_readLatency_west)
-.filter($ts_latency_west; "MetricName='WriteLatency'").as($ts_writeLatency_west)
+.note("### Average CPU Utilization (percentage)")
+.chart($ts_cpu_util_us;@line)
 
-.merge($ts_readLatency_east;$ts_readLatency_west;average).as($ts_readLatency_us)
-.merge($ts_writeLatency_east;$ts_writeLatency_west;average).as($ts_writeLatency_us)
+.note("### CPU Performance burst balance and usage")
+.chart($ts_cpu_credit_us;$ts_cpu_balance_us;@linestack)
 
-
-.note("<b>Read and Write Latency (sec) </b>")
-.chart($ts_readLatency_us;$ts_writeLatency_us;@linestack)
-
-.note("<b>P50 and P99 Read Latency (sec)</b>")
-.percentile($ts_readLatency_us;0.50).as($p50_latency)
-.percentile($ts_readLatency_us;0.99).as($p99_latency)
-.chart($p50_latency;$p99_latency;@bar)
-
-//////////////////////////////////////////////////////////////////////////////////
-// Storage Metrics
-.note("<b>Used storage capacity </b>")
-
-.request($where[0];$what[4];$when[0];$window[1]).as($ts_freestorage_east)
-.request($where[0];$what[5];$when[0];$window[1]).as($ts_allocstorage_east)
-
-.tail($ts_freestorage_east;1).as($free_storage_data)
-.tail($ts_allocstorage_east;1).as($alloc_storage_data)
-.max($free_storage_data).as($free_storage)
-.max($alloc_storage_data).as($alloc_storage)
-
-.math(($free_storage/1000000000/$alloc_storage)*100).as($free_storage_percent)
-.math(100-$free_storage_percent).as($used_storage_percent)
-.group($free_storage_percent;$used_storage_percent).as($storage_data)
-
-.chart($storage_data;@pie)
+// Memory Metrics
+.request($where[0];$what[1];$when[0];$window[0]).as($ts_mem)
+.merge($ts_mem;average).as($ts_mem_us)
+.note("### Available memory (Bytes) 
+")
+.chart($ts_mem_us;@bar)

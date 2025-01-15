@@ -7,9 +7,9 @@ where(@cw_aws)
 .percentile($ts_cpu;0.95).as($perc_cpu;Stat='95th percentile')
 
 .note("### CPU utilization stats")
-.note($perc_cpu.Stat;$perc_cpu.MetricName;$perc_cpu.InstanceId;$perc_cpu.Region;$perc_cpu;
+.note(
 "
-{{1}} {{2}} for {{3}} in {{4}} is **{{5}}**
+{{$perc_cpu.MetricName}} is **{{$perc_cpu}}** for instance {{$perc_cpu.InstanceId}} in region {{$perc_cpu.Region}}.
 ")
 
 .chart($ts_cpu;@barstack)
