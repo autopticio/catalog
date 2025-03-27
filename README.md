@@ -51,10 +51,12 @@ Compute functions allow computing aggregates for simple or more complex statisti
 
 [average](#average) | [min](#min) | [max](#max) | [count](#count) | [percentile](#percentile) | [assert](#assert) | [math](#math) | [correlate](#correlate) | [diff](#diff)
 
-### Presentation
+### Output and Presentation
 Output functions direct how the resulting output will be handled:
 
-[note](#note) | [chart](#chart) | [sort](#sort) | [head](#head) | [tail](#tail) | [print](#print) | [out](#out) | [style](#style)
+[note](#note) | [chart](#chart) | [sort](#sort) | [head](#head) | [tail](#tail) | [print](#print) | [prompt](#prompt) | [put](#put) | [out](#out) | [style](#style)
+
+### 
 
 ### Data Source Reference
 Data source references specify which data sources will be used from the environment definition:
