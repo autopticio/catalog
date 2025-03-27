@@ -102,14 +102,18 @@ Creates a named time series or a results variable from the results of the preced
 	```
 	- Remove a deminsion from a variable: 
 		- Removing the Stat dimension: `.average($cpu_timeseries).as($avg_cpu ;Stat='!')`
+	- Create a dimension with a dynamic contextual label
+		- Creating a dynamic label based on InstanceId dimension: `.average($cpu_timeseries).as($avg_cpu ;__name__='server_id_{{InstanceId}}')`
+
 ---
 #### assert
 Evaluates if a logical expression is true or false. 
-- parameters: 1 logical expression.
+- parameters: 1 logical expression with aggregate variables or numerical literals.
 - returns: 0 or 1
 - use:
 	- check if two counters are the same `assert($count_cpu_aws == $count_cpu_prom)`
 	- check if CPU is greater than 50% `assert($cpu_avg_utilization > 0.5)`
+	- using a key dimension 'InstanceId' to evaluate aggregate collections `assert($disk_instances_reads > $disk_instances_writes ; {{InstanceID}} )`
 ---
 #### average
 Computes the average value for a time series.
@@ -261,8 +265,8 @@ Selects the time series matching a logical expression.
 ---
 #### math
 Computes a value from a mathematical expression.
-- parameters: 1 math expression. Only variables that contain single values can be provided in the expression.
-- returns: aggregate
+- parameters: 1 math expression. Aggregates, aggregate collection variables and numeric literals are allowed in the expression. When using collections a key dimension is required as an extra parameter.
+- returns: aggregate collection
 - use:
 	- Sum of the CPU0 user and system utilization. 
 	```
@@ -271,6 +275,10 @@ Computes a value from a mathematical expression.
 	- Network Bytes in-to-out throughput ratio in percent
 	```
 	math((1 - $net_in/$net_out))
+	```
+	- Adding disk reads and writes for every instance in a collection using the InstanceId dimension as the matching key.
+	```
+	math( ($disk_inst_read_ops + $disk_inst_write_ops) ;{{InstanceId}})
 	```
 ---
 #### max
@@ -281,7 +289,7 @@ Computes the maximum value for a timeseries.
 	- compute the maximum `max($cpu_utilization)`
 ---
 #### merge
-Combines multiple time series into a single time series using an aggregation function.
+Combines multiple time series into a single time series using an aggregation statistics function.
 - parameters: N+1 time series and 1 aggregation function (min | max | average | sum).
 - returns: time series[] collection
 - use:
@@ -347,6 +355,64 @@ Outputs the contents of the selected variables in json.
 - returns: N/A
 - use: 
 	- output summary and time-series values `print($cnt_aws ; $cnt_prom ; $assert_cnts)`
+---
+#### prompt 
+Submits a prompt with telemetry to an OpenAI compliant LLM endpoint.
+- parameters: markdown or plain text. Note supports templating with providing optional aggregate variables and dimension references that get substituted in the markdown. The last parameter is the LLM endpoint handle to use for the prompt.
+- returns: appends the contents to the output. Prompt results are displayed in the order they appear in PQL. 
+- use:
+	- static text render as markdown: `prompt("### Hello! Whats the capital of Bulgaria? We love **PQL**!, do you?")`
+	- templates and vairables substitutions:
+	```
+	.prompt("
+	Which is the busiest server?: {{$cpu_avg}}
+	Whats the most notable error message?: {{$lambda_errors}}
+	Report time in US Central time.
+	";@ai_handle)
+	```
+	- renders LLM response as Markdown
+	- The LLM handle is configured in the environment definition. example:
+	```
+	{
+      "name": "ai_handle",
+      "type": "OpenAILLM",
+      "vars": {
+          "temperature": 0.10,
+          "max_tokens": 1000,
+          "endpoint": "http://localhost:8000/v1",
+          "model": "pql",
+          "token": "EMPTY"
+      }
+    }
+	```
+
+---
+#### put
+Publishes telemetry data to a write-enabled sink (eg Prometheus).
+
+- parameters: 1 aggregate collection variable and a target sink handle
+- returns: 0 or 1 as an aggregate  
+- use:  
+	- write 95th percentile CPU utilization to Prometheus with a unique metric name per instance  
+	```autoptic
+	.percentile($ts_cpu ; 0.95).as($perc_cpu ; Stat='95th percentile' ; __name__='server_cpu_{{InstanceId}}')  
+	.put($perc_cpu ; @prom_write)
+	```
+- the sink handle is configured in the environment definition. example:
+```
+"put": [
+    {
+      "name": "prom_write",
+      "type": "Prometheus",
+      "vars": {
+        "url": "http://host:port/api/v1/write"
+      }
+    }
+  ]
+```
+--- 
+
+This demonstrates how to dynamically assign unique metric names using label templating (e.g., `__name__='server_cpu_{{InstanceId}}'`), which is required by Prometheus to avoid name collisions during ingestion.
 ---
 #### request
 Creates a variable name for a selection in the response matrix.

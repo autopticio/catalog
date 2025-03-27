@@ -1,0 +1,12 @@
+//query cloudwatch and get instance CPU utilization for the last hour
+where(@cw_aws)
+.what("MetricName='CPUUtilization';InstanceId='*'; Region='us-*';Namespace='AWS/EC2'")
+.when(3h)
+        .request($where[0];$what[0];$when[0]).as($ts_cpu)
+
+.percentile($ts_cpu;0.90).as($p90_cpu)
+
+//chart the percentile values, and all cpu time series data points.
+.prompt("Which is the busiest server: {{$p90_cpu}} ";@pqlmodel)
+
+.chart($ts_cpu ; @line)

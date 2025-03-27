@@ -1,0 +1,14 @@
+ //query cloudwatch and chart CPU utilization
+where(@cw_aws)
+.what("MetricName='CPUUtilization'; Namespace='AWS/EC2'; Region='us-*';InstanceId='*'")
+.when(1h)
+        .request($where[0];$what[0];$when[0]).as($ts_cpu)
+
+//Prometheus expects a unique name for each published metric so we need to append the InstanceId to the __name__ label
+.percentile($ts_cpu;0.95).as($perc_cpu;Stat='95th percentile';__name__='server_name_{{InstanceId}}')
+
+//write the 95th percentile to prometheus
+.put($perc_cpu;@prom_write).as($put_results)
+
+//Display a note if telemetry was sent to Prometheus successfully
+.note("Publishing data to prometheus succeeded: {{$put_results}}")

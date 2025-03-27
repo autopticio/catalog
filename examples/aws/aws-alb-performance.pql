@@ -1,0 +1,52 @@
+where(@cw_aws)
+.what(
+    "MetricName='RequestCount'; LoadBalancer='app/*';TargetGroup='*'; AvailabilityZone='*'; Region='us-*'; Stat='Sum'; Namespace='AWS/ApplicationELB'";
+    "MetricName='TargetResponseTime'; LoadBalancer='app/*';TargetGroup='*'; AvailabilityZone='*'; Region='us-*'; Stat='Average'; Namespace='AWS/ApplicationELB'";
+    "MetricName='UnHealthyHostCount'; LoadBalancer='app/*';TargetGroup='*'; AvailabilityZone='*'; Region='us-*'; Stat='Sum'; Namespace='AWS/ApplicationELB'";
+    "MetricName='HealthyHostCount'; LoadBalancer='app/*';TargetGroup='*'; AvailabilityZone='*'; Region='us-*'; Stat='Average'; Namespace='AWS/ApplicationELB'";
+    "MetricName='HTTPCode_Target_5XX_Count'; LoadBalancer='app/*';TargetGroup='*'; AvailabilityZone='*'; Region='us-*'; Stat='Sum'; Namespace='AWS/ApplicationELB'";
+    "MetricName='HTTPCode_Target_4XX_Count'; LoadBalancer='app/*';TargetGroup='*'; AvailabilityZone='*'; Region='us-*'; Stat='Sum'; Namespace='AWS/ApplicationELB'"
+)
+.when(24h)
+.request($where[0]; $what[0]; $when[0]).as($elb_request_count)
+.request($where[0]; $what[1]; $when[0]).as($elb_latency)
+.request($where[0]; $what[2]; $when[0]).as($elb_unhealthy_hosts)
+.request($where[0]; $what[3]; $when[0]).as($elb_healthy_hosts)
+.request($where[0]; $what[4]; $when[0]).as($elb_5xx_errors)
+.request($where[0]; $what[5]; $when[0]).as($elb_4xx_errors)
+
+// Compute averages
+.average($elb_request_count).as($request_avg)
+.average($elb_latency).as($latency_avg)
+.average($elb_unhealthy_hosts).as($unhealthy_avg)
+.average($elb_healthy_hosts).as($healthy_avg)
+.average($elb_5xx_errors).as($5xx_avg)
+.average($elb_4xx_errors).as($4xx_avg)
+
+.prompt("Which are the top ALB instance based on Request Count, Latency, Unhealthy Hosts, Healthy Hosts, 5XX Errors, and 4XX Errors?: 
+{{$request_avg}} {{$latency_avg}} {{$unhealthy_avg}} {{$healthy_avg}} {{$5xx_avg}} {{$4xx_avg}}.
+Report in US Central time.
+Use `` markdown to format key entities in the response like specific servers or objjects.
+Show the data in markdown table format.
+Put the overall summary on top of any significant trends or anomalies.
+";@openai)
+
+// Visualizing key metrics
+.chart($request_avg; @piestack)
+.chart($latency_avg; @piestack)
+.chart($unhealthy_avg; @piestack)
+.chart($healthy_avg; @piestack)
+.chart($5xx_avg; @piestack)
+.chart($4xx_avg; @piestack)
+
+// Additional trends
+.chart($elb_request_count; @barstack)
+.chart($elb_latency; @barstack)
+.chart($elb_unhealthy_hosts; @barstack)
+.chart($elb_healthy_hosts; @line)
+.chart($elb_5xx_errors; @line)
+.chart($elb_4xx_errors; @line)
+
+// Debugging output (optional)
+//.print($elb_request_count; $elb_latency; $elb_unhealthy_hosts; $elb_healthy_hosts; $elb_5xx_errors; $elb_4xx_errors)
+//.print($request_avg; $latency_avg; $unhealthy_avg; $healthy_avg; $5xx_avg; $4xx_avg)

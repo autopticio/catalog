@@ -1,0 +1,56 @@
+where(@cw_aws)
+.what(  
+    "MetricName='RequestCount';LoadBalancer='app/*'; TargetGroup='*';AvailabilityZone='*';Region='us-*'; Stat='Sum'; Namespace='AWS/ApplicationELB'";
+    "MetricName='HTTPCode_Target_4XX_Count';LoadBalancer='app/*';TargetGroup='*'; AvailabilityZone='*';Region='us-*'; Stat='Sum'; Namespace='AWS/ApplicationELB'";
+    "MetricName='HTTPCode_Target_5XX_Count';LoadBalancer='app/*'; TargetGroup='*';AvailabilityZone='*';Region='us-*'; Stat='Sum'; Namespace='AWS/ApplicationELB'";
+    "MetricName='TargetResponseTime';LoadBalancer='app/*'; TargetGroup='*';AvailabilityZone='*';Region='us-*'; Namespace='AWS/ApplicationELB'"
+)
+
+.when(30d)
+.request($where[0];$what[0];$when[0]).as($request_count)
+.request($where[0];$what[1];$when[0]).as($errors_4xx)
+.request($where[0];$what[2];$when[0]).as($errors_5xx)
+.request($where[0];$what[3];$when[0]).as($rt;unit='s')
+
+// Compute percentile-based latency
+.percentile($rt;0.9).as($response_time;Stat='p90')
+.average($request_count).as($count)
+.average($errors_4xx).as($err4xx)
+.average($errors_5xx).as($err5xx)
+
+
+.math(100).as($desired_slo;description='desired percent')
+.math(2).as($ok)
+.math($ok*3).as($abandon)
+.assert($response_time > $ok).as($suffering)
+.assert($response_time < $abandon ).as($tolerating)
+
+//If response time is above the abandon threshold the performance SLA is set to 0
+//If response time is greater than the "ok" threshold the performance SLA is decreasing proportionally to the latency above the ok threshold, otherwise the SLA is 100%
+//.math( (100-(($response_time - $ok)/(($abandon - $ok)*0.01))*$suffering)*$tolerating;{{TargetGroup}}).as($perf_slo)
+.math( (100-(($response_time - 2)/((6 - 2)*0.01))*$suffering)*$tolerating;{{TargetGroup}}).as($perf_slo)
+
+//Calculate the error SLO based on 4xx and 5xx errors for the service.
+.math((1-($err4xx+$err5xx)/$count)*100;{{TargetGroup}}).as($err_slo)
+
+//Calculate the combined performance and error rates and roll up into SLO. Performance and errors have equal weights
+.math(($err_slo+$perf_slo)/2;{{TargetGroup}}).as($current_slo;__name__='slo_elb_tenants_lb_{{LoadBalancer}}_{{TargetGroup}}')
+
+// Store SLO in Prometheus
+.put($current_slo;@prom_write).as($put_result)
+.note("The SLO has been written to Prometheus with the label {{$current_slo.__name__}}:{{$put_result}}
+[View in Prometheus](http://52.17.34.227:9090/query?g0.expr={{$current_slo.__name__}}&g0.show_tree=0&g0.tab=graph&g0.range_input=1w&g0.res_type=auto&g0.res_density=high&g0.display_mode=lines&g0.show_exemplars=0)")
+
+.chart($desired_slo;$current_slo;@barcombo)
+.chart($perf_slo;@barcombo)
+.chart($err_slo;@barcombo)
+
+.note("If the Service Level Objective (SLO) is lower, check the factors contributing to this decline. Here are steps to consider:
+- Investigate the metrics that contribute to the SLO decrease. 
+- Focus on specific areas such as increased latency, higher error rates (4XX and 5XX), or other performance-related issues. 
+- Identify whether these issues are due to system changes, increased traffic, or infrastructure problems.
+- Once you've identified the areas causing the decrease in SLO, isolate these issues to specific components or processes within the system. This could involve examining code changes, server configurations, or external dependencies that might be impacting performance.")
+
+//Chart individual time series
+.chart($errors_4xx;$errors_5xx;$request_count;@bar)
+.chart($rt;@line)
