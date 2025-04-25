@@ -1,0 +1,18 @@
+// Monitor Node CPU usage (rate)
+
+where(@prometheus)
+.what(
+    "rate(node_cpu_seconds_total[10m])"
+)
+.when(24h)
+
+// Get the data
+.request($where[0];$what[0];$when[0]).as($cpu_usage)
+
+.filter($cpu_usage; "{mode='user'}").as($user)
+.filter($cpu_usage; "{mode='system'}").as($system)
+
+// Visualize
+.note("### Node CPU Usage by Mode (excluding idle)")
+.chart($user; @linestack)
+.chart($system; @linestack)

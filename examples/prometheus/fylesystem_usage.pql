@@ -1,0 +1,28 @@
+// Monitor Filesystem Usage
+// This piece of code can be adjusted to another metrics like node_memory_MemTotal_bytes, node_memory_MemAvailable_bytes
+where(@prometheus)
+.what(
+    "node_filesystem_size_bytes";
+    "node_filesystem_free_bytes"
+)
+.when(7h)
+.window(25m)
+
+// Get the data
+.request($where[0];$what[0];$when[0];$window[0]).as($size)
+.request($where[0];$what[1];$when[0];$window[0]).as($free)
+
+// Filter out temporary filesystems
+.filter($size; "{fstype!='tmpfs' AND fstype!='overlay'}").as($filtered_size)
+.filter($free; "{fstype!='tmpfs' AND fstype!='overlay'}").as($filtered_free)
+
+// Merge data over time
+.merge($filtered_size;average).as($merged_size)
+.merge($filtered_free;average).as($merged_free)
+
+// Calculate used space
+.diff($merged_size;$merged_free;numeric).as($used)
+
+// Visualize
+.note("### Filesystem Usage Over Time")
+.chart($filtered_size; $used; $filtered_free; @barcombo)
