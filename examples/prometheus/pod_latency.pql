@@ -1,0 +1,17 @@
+// Get a duration time series
+where(@prometheus)
+.what("prometheus_http_request_duration_seconds_bucket")
+.when(90d)
+.window(15m)
+.request($where[0];$what[0];$when[0];$window[0]).as($duration)
+
+// Filter by desired endpoint
+.filter($duration; "{handler='/-/ready'}").as($duration_filtered)
+
+// Calculate 0.1% and 0.01% latency
+.percentile($duration_filtered; 0.999).as($percentage_01)
+.percentile($duration_filtered; 0.9999).as($percentage_001)
+
+// Chart results
+.chart($percentage_01;$percentage_001;@bar)
+
