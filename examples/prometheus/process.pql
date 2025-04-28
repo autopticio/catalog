@@ -1,0 +1,14 @@
+
+
+where(@prometheus)
+.what(
+    "rate(process_resident_memory_bytes[5m])"
+)
+.when(24h)
+
+// Get the data
+.request($where[0];$what[0];$when[0]).as($process_mem)
+
+// Visualize
+.note("### Resident Memory Usage Rate per Process Over Time")
+.chart($process_mem; @linestack)

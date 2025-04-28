@@ -1,0 +1,16 @@
+where(@prometheus)
+.what("node_softnet_processed_total"; "node_softnet_dropped_total")
+.when(24h)
+.window(15m)
+.request($where[0];$what[0];$when[0];$window[0]).as($recived_packets)
+.request($where[0];$what[1];$when[0];$window[0]).as($dropped_packets)
+
+.merge($recived_packets; sum).as($recived_packets_total)
+.merge($dropped_packets; sum).as($dropped_packets_total)
+.average($recived_packets_total).as($recived)
+.average($dropped_packets_total).as($dropped)
+
+.math((($dropped / $recived) * 100)).as($packet_loss)
+
+.chart($packet_loss;$recived;@line)
+.chart($recived;$dropped;@pie)

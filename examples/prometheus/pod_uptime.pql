@@ -1,0 +1,13 @@
+where(@prometheus)
+.what("kube_pod_container_status_running")
+.when(90d)
+.window(15m)
+.request($where[0];$what[0];$when[0];$window[0]).as($up)
+.filter($up; "{container='open-webui'}").as($open_webui_up)
+
+.count($open_web_ui).as($open_web_ui_count)
+.merge($open_web_ui; sum).as($open_web_ui_sum)
+.diff($open_web_ui_count;$open_web_ui_sum).as($uptime)
+
+.chart($open_webui_up;@line)
+.chart($uptime@bar)
