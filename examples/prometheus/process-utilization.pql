@@ -1,0 +1,35 @@
+where(@prometheus)
+.what(
+	"rate(process_resident_memory_bytes[5m])";
+	"rate(node_cpu_seconds_total[5m])";
+	"rate(process_cpu_seconds_total[5m])"
+)
+.when(3h)
+.request($where[0];$what[0];$when[0]).as($process_memory_bytes)
+.request($where[0];$what[1];$when[0]).as($node_cpu_seconds_total)
+.request($where[0];$what[2];$when[0]).as($process_cpu_seconds)
+.match($node_cpu_seconds_total;"mode='idle'").as($node_cpu_seconds_idle)
+
+//Need to merge based on dimensions if we want to compute discrete nodes
+.merge($node_cpu_seconds_total;sum).as($node_cpu_seconds_total_sum)
+.merge($node_cpu_seconds_idle;sum).as($node_cpu_seconds_idle_sum)
+
+.average($node_cpu_seconds_total_sum).as($node_cpu_seconds_total_avg)
+.average($node_cpu_seconds_idle_sum).as($node_cpu_seconds_idle_avg)
+//compute idle and busy CPU percent
+.math( (($node_cpu_seconds_total_avg-$node_cpu_seconds_idle_avg) / $node_cpu_seconds_total_avg) * 100 ).as($node_cpu_seconds_busy_percent)
+.math( ($node_cpu_seconds_idle_avg / $node_cpu_seconds_total_avg) * 100 ).as($node_cpu_seconds_idle_percent)
+
+//compute per process CPU percent utilization
+.average($process_cpu_seconds).as($process_cpu_seconds_avg)
+.math( ($process_cpu_seconds_avg / $node_cpu_seconds_total_avg)*100  ;{{node}} ).as($process_cpu_seconds_percent;unit='percent')
+
+.chart($node_cpu_seconds_busy_percent;$node_cpu_seconds_idle_percent; @piestack)
+
+.note("### CPU Utilization Rate per Process Over Time")
+.chart($process_cpu_seconds_percent;@barcombo)
+.note("### Resident Memory Usage Rate per Process Over Time")
+.chart($process_memory_bytes ; @barstack)
+
+.chart($node_cpu_seconds_total_sum;$node_cpu_seconds_idle_sum;@barstack)
+.chart($process_cpu_seconds;@line)

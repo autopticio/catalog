@@ -67,6 +67,16 @@
         "organization": "orgname",
         "access_token": "sentry_api_access_token"
         }
+    },
+    {
+      "name": "aws_cost",
+      "type": "costexplorer",
+      "vars": {
+        "AwsRegion": "us-east-1",
+        "window": "auto",
+        "aws_access_key_id": "",
+        "aws_secret_access_key": ""
+      }
     }
   ],
   "chart":
@@ -185,6 +195,28 @@
       "vars": {
         "url": "https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
       }
+    }
+  ],
+  "put": [
+    {
+      "name": "prom_write",
+      "type": "Prometheus",
+      "vars": {
+        "url": "http://localhost:9090/api/v1/write"
+      }
+    }
+  ],
+  "prompt": [
+    {
+      "name": "openai",
+      "type": "OpenAILLM",
+      "vars": {
+          "temperature": 0.10,
+          "max_tokens": 1000,
+          "endpoint": "https://api.openai.com/v1",
+          "model": "gpt-4o",
+          "token": ""
+        }
     }
   ]
 }

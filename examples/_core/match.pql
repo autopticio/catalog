@@ -1,0 +1,9 @@
+open("https://autoptic-demo.s3.us-west-2.amazonaws.com/snaps/prometheus.json"; $p_cpu)
+
+.match($p_cpu; "cpu='0' AND mode='user'").as($user_cpu)
+.match($p_cpu; "cpu='0' AND mode='steal'").as($steal_cpu)
+.match($p_cpu; "{cpu='0' OR cpu='1'} AND mode='iowait'").as($wait_cpu)
+.match($p_cpu; "{cpu='0' OR cpu='1'} AND mode!='idle'").as($active_cpu)
+
+.chart($user_cpu;$steal_cpu;$wait_cpu;@line)
+.chart($active_cpu;@barstack)

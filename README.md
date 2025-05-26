@@ -44,7 +44,7 @@ Query functions describe data inputs from the data sources:
 ### Modification
 Modification functions handle time series data reduction, filtering and summation:
 
-[filter](#filter) | [merge](#merge) | [group](#group) | [split](#split)
+[filter](#filter) | [group](#group) | [match](#match) | [merge](#merge) | [split](#split)
 
 ### Compute & Analytics
 Compute functions allow computing aggregates for simple or more complex statistics: 
@@ -61,7 +61,7 @@ Output functions direct how the resulting output will be handled:
 ### Data Source Reference
 Data source references specify which data sources will be used from the environment definition:
 
-[cloudwatch](#cloudwatch) | [prometheus](#prometheus) | [cloudwatch logs](#cloudwatchlogs) | [sentry](#sentry) | [cloudtrail events](#cloudtrail)
+[cloudwatch](#cloudwatch) | [prometheus](#prometheus) | [cloudwatch logs](#cloudwatchlogs) | [cloudtrail events](#cloudtrail) | [costexplorer](#costexplorer) | [sentry](#sentry) 
 		
 ## Functions
 #### 3w's
@@ -252,17 +252,31 @@ Selects the first set of data points from a time series variable.
 	- get the first 2% of data points `head($cpu0_user; 2%)`
 ---
 #### filter
+Selects the time series or aggegates based on result of a numerical comparison.
+- parameters: time series or aggregate collection following by a logical operator and variable or numeric literal operand.
+- returns: time series or aggregate collection
+- use:
+	- Select the time-series with average value exceeding 5 
+	```
+	filter($cpu_usage > 5 ").as($filtered_cpu)
+	``` 
+	- Select the time-series with average value less than the $avg_utilization. Note that only one operand variable can be a collection in the evaluation, the second operand variable has to be single value aggregate.
+	```
+	filter($disk_io < $avg_utilization ").as($filtered_disk)
+	``` 
+---
+#### match
 Selects the time series matching a logical expression.
 - parameters: 1 time series variable and 1 expression.
 - returns: time series[] collection
 - use:
 	- Select the time-series that match the 'user' mode for CPU 0 
 	```
-	filter($cpu_usage ; "{cpu='0' AND mode='user'}")
+	match($cpu_usage ; "{cpu='0' AND mode='user'}")
 	``` 
 	- Select the time-series that match the 'user' and/or 'system' mode for CPU 0 and/or 1 
 	```
-	filter($cpu_usage ; "{cpu='0' OR cpu='1'} AND {mode='user' OR mode='system'}")
+	match($cpu_usage ; "{cpu='0' OR cpu='1'} AND {mode='user' OR mode='system'}")
 	``` 
 ---
 #### math
@@ -395,14 +409,14 @@ Publishes telemetry data to a write-enabled sink (eg Prometheus).
 - parameters: 1 aggregate collection variable and a target sink handle
 - returns: 0 or 1 as an aggregate  
 - use:  
-	- write 95th percentile CPU utilization to Prometheus with a unique metric name per instance  
-	```autoptic
-	.percentile($ts_cpu ; 0.95).as($perc_cpu ; Stat='95th percentile' ; __name__='server_cpu_{{InstanceId}}')  
+	- write 95th percentile CPU utilization to Prometheus with a unique metric name per instance. The example demonstrates how to dynamically assign unique metric names using label templating which is required by Prometheus to avoid name collisions during ingestion.
+	```
+	.percentile($ts_cpu ; 0.95).as($perc_cpu ;Stat='95th percentile'; __name__='server_cpu_{{InstanceId}}')  
 	.put($perc_cpu ; @prom_write)
 	```
-- the sink handle is configured in the environment definition. example:
-```
-"put": [
+- The sink handle is configured in the environment definition. example:
+	```
+	"put": [
     {
       "name": "prom_write",
       "type": "Prometheus",
@@ -411,10 +425,7 @@ Publishes telemetry data to a write-enabled sink (eg Prometheus).
       }
     }
   ]
-```
---- 
-
-This demonstrates how to dynamically assign unique metric names using label templating (e.g., `__name__='server_cpu_{{InstanceId}}'`), which is required by Prometheus to avoid name collisions during ingestion.
+	```
 ---
 #### request
 Creates a variable name for a selection in the response matrix.
@@ -436,8 +447,7 @@ Split enables detailed segmentation of data along specific dimensions. By splitt
 - parameters: 1 time series[], a set of dimension and annotation preoperty/value parameters.
 - returns: times series[] collection
 - use:
-	- 
-	```
+```
 // Retrieve raw event/log data from a Sentry, AWS CloudWatch Logs, or AWS CloudTrail Event data sources
 .request($where[0]; $what[0]; $when[0]; $window[0]).as($raw_events)
 
@@ -446,8 +456,7 @@ Split enables detailed segmentation of data along specific dimensions. By splitt
 
 // Visualize the segmented data
 .chart($segmented_events; @barstack)
-
-	```
+```
 ---
 #### sort
 Sorts all data points in a timeseries.
@@ -588,7 +597,7 @@ Multiple cloudwatch metric data sources can be configured in the environment def
 }
 ```
 #### prometheus
-Multiple Promethues data sources can be configured in the environment definition. 
+Multiple Promethues API compliant data sources can be configured in the environment definition. 
 - attributes:
 	- name: The name that will be referenced by the "where" function in a PQL program.
 	- type: Prometheus
@@ -668,6 +677,30 @@ Multiple cloudtrail data sources can be configured in the environment definition
         "window": "300s",
         "aws_access_key_id": "keystring",
         "aws_secret_access_key": "secretstring"
+      }
+    }
+```
+#### costexplorer
+Configures access to AWS Billing data with CostExplorer. 
+- attributes:
+	- name: The name that will be referenced by the "where" function in a PQL program.
+	- type: costexplorer
+	- vars:
+		- AwsRegion: default AWS region that the PQL program will be querying, if "Region" is not specified in 'what'
+		- window: default window size if not specified by the "window" function in a PQL program. If the default "window" is set to "auto", the pql program will automatically select a window based on the period selected by the "when" function. For example `.when(30d)` will result in a window set to 1d.
+		- The source supports both static keys and dynamically generated keys through MFA.
+			- aws_access_key_id: AWS key that you have to generate through IAM in AWS.
+			- aws_secret_access_key: The token that is paired with the key id above.
+			- aws_session_token: The session token generated by a MFA login through STS.This token is not needed when static keys are used for auth. 
+```
+{
+      "name": "aws_cost",
+      "type": "costexplorer",
+      "vars": {
+        "AwsRegion": "eu-west-1",
+        "window": "auto",
+        "aws_access_key_id": "your_key_id",
+        "aws_secret_access_key": "your_secret_key"
       }
     }
 ```

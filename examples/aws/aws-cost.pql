@@ -1,0 +1,17 @@
+where(@aws_cost)
+.what(
+    "Service='EC2' ; Region='us-east-1'; MetricName='UnblendedCost';Environment='production';Tenant='demo'";
+    "Service='EC2-Other';Region='us-east-1'; MetricName='UnblendedCost';Environment='production';Tenant='demo'";
+    "Service='VPC';Region='us-east-1'; MetricName='UnblendedCost';Environment='production';Tenant='demo'";
+    "Service='ELB';Region='us-east-1'; MetricName='UnblendedCost';Environment='production';Tenant='demo'";
+    "Service='EC2-Other' ; Region='us-east-1'; MetricName='UnblendedCost';Tenant='demo';UsageType='*'"	
+)
+.when(7d)
+.request($where[0];$when[0];$what[0]).as($ec2)
+.request($where[0];$when[0];$what[1]).as($ec2_other)
+.request($where[0];$when[0];$what[2]).as($vpc)
+.request($where[0];$when[0];$what[3]).as($elb)
+.request($where[0];$when[0];$what[4]).as($ec2_other_types)
+
+.note("### EC2 cost stats per environment and tenant")
+.chart($ec2;$ec2_other;$vpc;$elb;$ec2_other_types;@barstack)

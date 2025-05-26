@@ -1,0 +1,107 @@
+// 1. Where to run queries
+where(@prometheus)
+
+// 2. What metrics to fetch:
+// -- Softnet stats (kernel network processing)
+.what(
+  "rate(node_softnet_processed_total[5m])"; // Packets processed by the network stack
+  "rate(node_softnet_dropped_total[5m])";   // Packets dropped by softnet (kernel drops)
+  
+  // -- Basic network traffic
+  "rate(node_network_receive_bytes_total[5m])"; // Incoming network traffic (bytes/sec)
+  "rate(node_network_transmit_bytes_total[5m])"; // Outgoing network traffic (bytes/sec)
+  
+  // -- Packet rates
+  "rate(node_network_receive_packets_total[5m])"; // Packets received/sec
+  "rate(node_network_transmit_packets_total[5m])"; // Packets sent/sec
+  
+  // -- Packet errors
+  "rate(node_network_receive_errs_total[5m])"; // Receive packet errors/sec
+  "rate(node_network_transmit_errs_total[5m])"; // Transmit packet errors/sec
+  
+  // -- Softnet backlog
+  "node_softnet_backlog_packets" // Packets stuck waiting in kernel backlog
+)
+
+// 3. When and over what window
+.when(24h)
+
+// 4. Fetch the metrics individually and alias them
+.request($where[0]; $what[0]; $when[0]).as($processed_packets)
+.request($where[0]; $what[1]; $when[0]).as($dropped_packets)
+.request($where[0]; $what[2]; $when[0]).as($rx_bytes)
+.request($where[0]; $what[3]; $when[0]).as($tx_bytes)
+.request($where[0]; $what[4]; $when[0]).as($rx_packets)
+.request($where[0]; $what[5]; $when[0]).as($tx_packets)
+.request($where[0]; $what[6]; $when[0]).as($rx_errors)
+.request($where[0]; $what[7]; $when[0]).as($tx_errors)
+.request($where[0]; $what[8]; $when[0]).as($softnet_backlog)
+
+// 5. Aggregate totals over time
+.merge($processed_packets; sum).as($processed_packets_total)
+.merge($dropped_packets; sum).as($dropped_packets_total)
+.merge($rx_bytes; sum).as($rx_bytes_total)
+.merge($tx_bytes; sum).as($tx_bytes_total)
+.merge($rx_packets; sum).as($rx_packets_total)
+.merge($tx_packets; sum).as($tx_packets_total)
+.merge($rx_errors; sum).as($rx_errors_total)
+.merge($tx_errors; sum).as($tx_errors_total)
+
+// 6. Averages (or summaries) for key metrics
+.average($processed_packets_total).as($processed)
+.average($dropped_packets_total).as($dropped)
+.average($rx_bytes_total).as($rx_bytes_avg)
+.average($tx_bytes_total).as($tx_bytes_avg)
+.average($rx_packets_total).as($rx_packets_avg)
+.average($tx_packets_total).as($tx_packets_avg)
+.average($rx_errors_total).as($rx_errors_avg)
+.average($tx_errors_total).as($tx_errors_avg)
+.average($softnet_backlog).as($softnet_backlog_avg)
+
+// 7. Key derived metrics
+// Packet Loss Rate (softnet drops / processed packets)
+.math(($dropped / $processed) * 100).as($packet_loss_percent)
+
+// Receive Error Rate (receive errors / received packets)
+.math(($rx_errors_avg / $rx_packets_avg) * 100).as($rx_error_rate_percent)
+
+// Transmit Error Rate (transmit errors / transmitted packets)
+.math(($tx_errors_avg / $tx_packets_avg) * 100).as($tx_error_rate_percent)
+
+// Total network throughput (RX + TX bytes/sec)
+.math($rx_bytes_avg + $tx_bytes_avg).as($total_bandwidth_bytes_per_sec)
+
+// 8. Notes (report summary)
+.note("
+### Network Packet and Traffic Summary (Last 24h)
+
+- Packet Loss Rate: **{{$packet_loss_percent}}%**
+- Receive Error Rate: **{{$rx_error_rate_percent}}%**
+- Transmit Error Rate: **{{$tx_error_rate_percent}}%**
+- Avg Received Bytes/sec: **{{$rx_bytes_avg}} Bps**
+- Avg Transmitted Bytes/sec: **{{$tx_bytes_avg}} Bps**
+- Avg Total Bandwidth: **{{$total_bandwidth_bytes_per_sec}} Bps**
+- Avg Softnet Backlog: **{{$softnet_backlog_avg}} packets**
+
+")
+
+// 9. Charts (visualizations)
+
+// Stack chart for receive/transmit throughput
+.chart($rx_bytes_avg; $tx_bytes_avg; @barstack)
+
+// Stack chart for receive/transmit packet rates
+.chart($rx_packets_avg; $tx_packets_avg; @barstack)
+
+// Pie chart for packet loss (received vs dropped)
+.chart($processed; $dropped; @piestack)
+
+// Line chart for softnet backlog trend
+.chart($softnet_backlog_avg; @line)
+
+.chart($processed_packets_total; $dropped_packets_total; @barstack)
+.chart($rx_bytes_total; $tx_bytes_total; @barstack)
+.chart($rx_packets_total; $tx_packets_total; @barstack)
+.chart($rx_errors_total; $tx_errors_total; @barstack)
+
+

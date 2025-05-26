@@ -46,8 +46,8 @@ where(@prometheus)
 .request($where[0];$what[0];$when[0]).as($cpu_usage)
 
 // Filter by CPU mode
-.filter($cpu_usage; "{mode='user'}").as($user)
-.filter($cpu_usage; "{mode='system'}").as($system)
+.match($cpu_usage; "{mode='user'}").as($user)
+.match($cpu_usage; "{mode='system'}").as($system)
 
 // Visualize
 .note("### Node CPU Usage by Mode (excluding idle)")

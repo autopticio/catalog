@@ -6,15 +6,15 @@ where(@prometheus)
     "node_filesystem_free_bytes"
 )
 .when(7h)
-.window(25m)
+.window(1h)
 
 // Get the data
 .request($where[0];$what[0];$when[0];$window[0]).as($size)
 .request($where[0];$what[1];$when[0];$window[0]).as($free)
 
 // Filter out temporary filesystems
-.filter($size; "{fstype!='tmpfs' AND fstype!='overlay'}").as($filtered_size)
-.filter($free; "{fstype!='tmpfs' AND fstype!='overlay'}").as($filtered_free)
+.match($size; "{fstype!='tmpfs' AND fstype!='overlay'}").as($filtered_size)
+.match($free; "{fstype!='tmpfs' AND fstype!='overlay'}").as($filtered_free)
 
 // Merge data over time
 .merge($filtered_size;average).as($merged_size)

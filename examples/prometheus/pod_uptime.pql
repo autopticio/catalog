@@ -1,13 +1,16 @@
 where(@prometheus)
 .what("kube_pod_container_status_running")
 .when(90d)
-.window(15m)
+.window(1d)
 .request($where[0];$what[0];$when[0];$window[0]).as($up)
-.filter($up; "{container='open-webui'}").as($open_webui_up)
 
-.count($open_web_ui).as($open_web_ui_count)
-.merge($open_web_ui; sum).as($open_web_ui_sum)
-.diff($open_web_ui_count;$open_web_ui_sum).as($uptime)
+.average($up).as($uptime_avg)
+.sort($uptime_avg;1).as($uptime_avg_sorted)
+.math(100).as($to_percent)
+.math($uptime_avg_sorted*$to_percent).as($uptime_percent)
 
-.chart($open_webui_up;@line)
-.chart($uptime@bar)
+.assert($uptime_percent > 95).as($uptime_percent_assert;Condition='exceeds 95% uptime')
+
+.chart($uptime_percent_assert;@tfpass["container"])
+.chart($uptime_percent;@barcombo)
+.chart($up;@bar)

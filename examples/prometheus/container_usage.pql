@@ -14,14 +14,13 @@ where(@prometheus)
 .request($where[0];$what[2];$when[0]).as($net_receive)
 .request($where[0];$what[3];$when[0]).as($net_transmit)
 
-
 // Filter out temporary filesystems
-.filter($mem;"{container='node-exporter'}").as($filtered_mem)
-.filter($cpu;"{container='node-exporter'}").as($filtered_cpu)
+.match($mem;"{container='node-exporter'}").as($filtered_mem)
+.match($cpu;"{container='node-exporter'}").as($filtered_cpu)
 
 // Filter out the network interface and pod name
-.filter($net_receive;"{interface='ens5' AND pod='prometheus-prometheus-node-exporter-snmx9'}").as($filtered_net_receive)
-.filter($net_transmit;"{interface='ens5' AND pod='prometheus-prometheus-node-exporter-snmx9'}").as($filtered_net_transmit)
+.match($net_receive;"{interface='ens5' AND pod='prometheus-prometheus-node-exporter-snmx9'}").as($filtered_net_receive)
+.match($net_transmit;"{interface='ens5' AND pod='prometheus-prometheus-node-exporter-snmx9'}").as($filtered_net_transmit)
 
 
 .note("### Memory & CPU Usage Over Time")

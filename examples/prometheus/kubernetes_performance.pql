@@ -1,0 +1,104 @@
+// Set Prometheus source
+where(@prometheus)
+
+// Define key Kubernetes metrics to pull
+.what(
+  // CPU and memory usage per container
+  "rate(container_cpu_usage_seconds_total{image!='', container!='POD'}[5m])";
+  "container_memory_usage_bytes{image!='', container!='POD'}";
+
+  // Node allocatable CPU & memory
+  "kube_node_status_allocatable{unit='core'}";
+  "kube_node_status_allocatable{unit='byte'}";
+
+  // Container resource requests
+  "kube_pod_container_resource_requests{unit='core'}";
+  "kube_pod_container_resource_requests{unit='byte'}";
+
+  // Pod restarts and status
+  "kube_pod_container_status_restarts_total";
+  "kube_pod_status_phase";
+
+  // Pending pods and node info
+  "kube_pod_status_phase{phase='Pending'}";
+  "kube_node_info";
+
+  // Filesystem usage
+  "node_filesystem_size_bytes{fstype!~'tmpfs|overlay'}";
+  "node_filesystem_avail_bytes{fstype!~'tmpfs|overlay'}"
+)
+
+// Set the timeframe
+.when(24h)
+
+// --- Fetch the metrics
+.request($where[0];$what[0];$when[0]).as($cpu_usage)
+.request($where[0];$what[1];$when[0]).as($memory_usage)
+.request($where[0];$what[2];$when[0]).as($cpu_alloc)
+.request($where[0];$what[3];$when[0]).as($memory_alloc)
+.request($where[0];$what[4];$when[0]).as($cpu_requested)
+.request($where[0];$what[5];$when[0]).as($memory_requested)
+.request($where[0];$what[6];$when[0]).as($pod_restarts)
+.request($where[0];$what[7];$when[0]).as($pod_status)
+.request($where[0];$what[8];$when[0]).as($pending_pods)
+.request($where[0];$what[9];$when[0]).as($node_info)
+.request($where[0];$what[10];$when[0]).as($fs_total_raw)
+.request($where[0];$what[11];$when[0]).as($fs_free_raw)
+
+// --- Merge across cluster
+.merge($cpu_usage; sum).as($cpu_used)
+.merge($memory_usage; sum).as($mem_used)
+.merge($cpu_alloc; sum).as($cpu_capacity)
+.merge($memory_alloc; sum).as($mem_capacity)
+.merge($cpu_requested; sum).as($cpu_req)
+.merge($memory_requested; sum).as($mem_req)
+.merge($pod_restarts; sum).as($total_restarts)
+.merge($pending_pods; sum).as($pending_total)
+.merge($node_info; sum).as($node_total)
+.merge($fs_total_raw; sum).as($disk_total)
+.merge($fs_free_raw; sum).as($disk_free)
+
+// --- Average over time window
+.average($cpu_used).as($cpu_used_avg)
+.average($mem_used).as($mem_used_avg)
+.average($cpu_capacity).as($cpu_capacity_avg)
+.average($mem_capacity).as($mem_capacity_avg)
+.average($cpu_req).as($cpu_req_avg)
+.average($mem_req).as($mem_req_avg)
+.average($total_restarts).as($total_restarts_avg)
+.average($pending_total).as($pending_total_avg)
+.average($node_total).as($node_total_avg)
+.average($disk_total).as($disk_total_avg)
+.average($disk_free).as($disk_free_avg)
+
+// --- Compute usage values and percentages
+.math(($cpu_used_avg / $cpu_capacity_avg) * 100).as($cpu_util)
+.math(($mem_used_avg / $mem_capacity_avg) * 100).as($mem_util)
+.math(($cpu_req_avg / $cpu_capacity_avg) * 100).as($cpu_req_pct)
+.math(($mem_req_avg / $mem_capacity_avg) * 100).as($mem_req_pct)
+.math($disk_total_avg - $disk_free_avg).as($disk_used_avg)
+.math(($disk_used_avg / $disk_total_avg) * 100).as($disk_util)
+
+// --- Summary Note
+.note("
+### Kubernetes Cluster Health Summary
+
+- **CPU Utilization**: {{$cpu_util}}%
+- **Memory Utilization**: {{$mem_util}}%
+- **CPU Requested vs Capacity**: {{$cpu_req_pct}}%
+- **Memory Requested vs Capacity**: {{$mem_req_pct}}%
+
+- **Pending Pods**: {{$pending_total_avg}}
+- **Container Restarts (avg/24h)**: {{$total_restarts_avg}}
+- **Node Count**: {{$node_total_avg}}
+
+- **Disk Usage**: {{$disk_util}}%
+")
+
+// --- Visual Charts
+.chart($cpu_util; $cpu_req_pct; @line)
+.chart($mem_util; $mem_req_pct; @line)
+.chart($pending_total_avg; @line)
+.chart($total_restarts_avg; @bar)
+.chart($disk_util; @line)
+.chart($pod_status; @bar)

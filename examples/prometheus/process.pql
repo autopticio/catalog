@@ -11,4 +11,4 @@ where(@prometheus)
 
 // Visualize
 .note("### Resident Memory Usage Rate per Process Over Time")
-.chart($process_mem; @linestack)
+.chart($process_mem; @barstack)

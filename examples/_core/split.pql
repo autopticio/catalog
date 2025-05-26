@@ -1,0 +1,11 @@
+where(@cw_aws_logs)
+.what(
+    "LogGroup='/aws/lambda/*'; message='ERROR*'; Region='eu-west-1'"
+) 
+.when(3d)
+
+.request($where[0];$what[0];$when[0]).as($err_logs)
+.split($err_logs;annotation='message';dimension='log';dimension='logStream').as($by_stream)
+
+.chart($by_stream;@barstack)
+
